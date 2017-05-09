@@ -16,6 +16,10 @@ link: http://dl.acm.org/citation.cfm?id=585747
 
 link: http://www.citygen.net/files/images/Procedural_City_Generation_Survey.pdf
 
+#### Generating Random Fractal Terrain
+
+http://www.gameprogrammer.com/fractal.html
+
 ### To look at:
 
 Procedural modeling of cities: 
@@ -44,6 +48,6 @@ https://en.wikipedia.org/wiki/Perlin_noise
 
 ---
 
-## Helpful links
+## Misc and Helpful links
 
 original find: https://nccastaff.bournemouth.ac.uk/jmacey/MastersProjects/MSc09/Ilangovan/Thesis_i7834000.pdf

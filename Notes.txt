@@ -1,0 +1,65 @@
+Road Networks:
+
+	L-systems:
+
+		Input is taken in the form of 2D image maps
+		
+			-Geographical information:
+				-Elevation, vegetation and water boundaries
+					-These are required.
+					
+			-Socio statictal image maps can be included:
+				-Population density, land usage, street pattern and maximum building heights
+					-These are optional
+					
+			-Extra user parameters:
+				-Smoothing angle of road network edges, road width, edges
+					-Also optional
+					
+					
+		Road generation is accomplished through 2 rule sets:
+		
+			Road segments are initially plotted according to the global goals which are 
+			similar to the goals that a city designer may have. These tentative plans are 
+			then refined by the local constraints which reflect the practical constaints
+			of the real world and the state of the existing road network
+		
+			Global goals:
+				
+				-There are two types of roads:
+					
+					-Highways or major roads:
+						-Connect poplation density centres which can be identified from the population
+						density map supplied at input
+						
+					-Small roads:
+						-Connect at the nearest highways
+						
+				-Streets follow some super imposed geometic pattern
+				
+				-Streets follow the path of least elevation
+			
+			Local constraints:
+			
+				-Road segments are pruned to fit inside the legal area/land
+				
+				-Roads are rotated to fit inside the legal area/land
+				Coastline roads bend around the coastlines like a coastal road
+				
+				-Highways are allowed to cross illegal area (water etc.) if it is a certain distance
+				this makes it a bridge
+				
+				-Road segments are checked to see if they intersect with existing roads or if they come within 
+				a certain distance of an existing road junction before finishing the roads.
+					-See figure 22. in Procedural City Generation Survey
+	.			
+	
+
+Builings:
+
+	L-systems:
+	
+		-L-systems can use a rule set to create and refine buildings
+			-See Figure .25 in Procedural City Generation Survey
+	.
+	
