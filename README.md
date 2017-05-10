@@ -18,12 +18,15 @@ link: http://www.citygen.net/files/images/Procedural_City_Generation_Survey.pdf
 
 #### Generating Random Fractal Terrain
 
-http://www.gameprogrammer.com/fractal.html
+Martz, P. (1997). *Generating Random Fractal Terrain*. [Online] 1997. Available Online: http://www.gameprogrammer.com/fractal.html [Date of access: 09 May 2016]
+
+#### Procedural modeling of cities:
+
+Parish, Y, I, H. Muller, Pascal. (2001). "Procedural modeling of cities". In *Proceedings of the 28th annual conference on Computer graphics and interactive techniques* (SIGGRAPH '01). Acm, New York, NY, USA, 301 - 308.
+
+link: http://dl.acm.org/citation.cfm?id=383292
 
 ### To look at:
-
-Procedural modeling of cities: 
-http://dl.acm.org/citation.cfm?id=383292
 
 Procedural Techniques for City Generation - Reading Report: 
 http://msdl.cs.mcgill.ca/people/hv/teaching/MSBDesign/COMP763B2008/projects/repository/Riry%20Pheng/readingReport.pdf
