@@ -1,0 +1,177 @@
+Building Worlds in No Mans Sky Using Math(s): https://www.youtube.com/watch?v=C9RyEiEzMiU
+------------------------------------------------------------------------------------------
+
+A unified method of Noise Generation
+-------------------------------------
+
+History:
+
+-He always wrote his own engines, specific to what he wanted to do
+-He keeps talking about how old he is
+
+The Pipeline:
+
+Noise Generation (GPU) ->
+Polygonisation (CPU) ->
+Render+Physics+Population (GPU+CPU)
+
+Attempt 1 - Copy Minecraft!
+
+Trilinear filtered low density layered perlin noise field
+
+Attempt 2 - Noise fields
+
+Layers of 3D Noise with lots of image processing
+straight perlin noise
+
+Unaltered perlin noise - sort of looks like mountains but also sort of doesnt
+The features are extremely repetitive and theyre also unrealistic
+	The slope is constant
+	In the real world, you see sharp cliffs and way more difference in noise
+	
+Attempt 3 - DEM Data Trainer
+
+Alter noise fields using real world DEM data as a trainer
+
+Contour data from the real world captured at real points
+Look at the real world, figure out real life data, how does the distribution of shape change
+look in real life - feed it back into my code
+
+Noise in the real world is exponentionally distributed
+
+Attempt 4 - Uber Noise
+
+A unifying method of noise generation
+
+
+Current Noise Methods
+-Perlin
+-Simplex
+-Billow
+-Ridged
+-Worley
+-Analytical Derivative Based Alterations
+-Domain Warping
+
+Perlin:
+	Simplest of the composite Perlin Noise algorithms
+	Weighted sum a number of scaled Perlin noise 'octaves'
+	Each octave is responsible for a different size of features
+	
+	Fractional Brosnian Motion:
+	
+		float sum = 0;
+		float freq = 1.0, amp = 1.0f;
+		for (int i = 0; i < octaves; i++)
+		{
+			float n = noise (p*freq, seed);
+			sum += n*amp;
+			freq *= lacunarity;
+			amp *= gain;'
+		}
+		return sum;
+		
+		Cohesive
+		Fractional
+		Put layers ontop of itself at different altitudes - multiple octaves
+		
+	Billow:
+	
+		'billowy' and eroded terrain with sharp creases can be created
+		creates rolling hills
+		
+		abs(noise(p, seed))
+		
+	Ridged:
+		
+		Using the complement of Billows creates sharp ridges instead of creases
+		makes sharp alpine like ridges
+		
+		1.0f-abs(noise(p, seed))
+		
+		
+	Analytical Derivative
+		
+		Modify the amplitude of finer detail octaves based on (intermediate) output from coarser 
+		octaves while summing over them as before
+		
+		Creates realistic erosion (originally described by I. Quillez)
+		
+		float sum 0.0f, freq = 1.0f, amp = 1.0;
+		vec2 dsum = vec2(0, 0);
+		
+		for (int i = 0; i < octaves; i++)
+		{
+			vec3 n = noiseDeriv(p*freq, seed);
+			dsum += n.yz;
+			sum += amp * n.x / (1 + dot(dsum, dsum));
+			freq *= lacunarity;
+			amp *= gain;
+		}
+		
+		return sum;
+		
+		We have this massive array of voaxles and we are going to generate 1 voaxle
+		Pick x, y, z position anywhere in the universe and say fill in this voxale
+		When you do this you can never query the voaxles round about you
+		So its hard to have erosion
+		But if you can get the analytical derivative then you can query the rate of change 
+		and this allows you to build erosion
+		
+		References:
+		
+		Inio Quilez
+		https://www.patreon.com/inigoquilez
+		http://iquilezles.org/www/index.htm
+		
+		Giliam de Carpentier
+		http://www.decarpentier.nl/
+			
+	Domain Warping:
+	
+		distorting the domain of the noise we're generating with another function
+		
+		float pattern (in vec2 p)
+		{
+			vec2 q = vec2	(fbm (p + vec2(0.0, 0.0)),
+							fbm (p + vec(5.2, 1.0f)));
+							
+			vec2 r = vec2	(fbm (p + 4.0*q +  vec2(1.7, 9.2)),
+							fbm (p + 4.0*q +  vec(8.3, 2.8f)));
+							
+			return fbm (p + 4.0 * r);
+		}
+		
+	Uber Noise
+	
+		Domain warping
+		Slope erosion
+		Altitude erosion
+		Ridges
+		Plateaus
+		Terraces
+		Rolling hills
+		Non-repeating features
+		Analytical Derivative
+		
+		float UserNoise(
+			vec2 lPosition,
+			int liOctaves,
+			float lfPerturbFeatures,
+			float lfSharpness,
+			float lfAmplifyFeatures,
+			float lfAltitudeErosion,
+			float lfRidgeErosion,
+			float lfSlopeErosion,
+			float lfLAcunarity,
+			float lfGain)
+			
+			
+		/* Lots more pseudo code for the terrain generation on the video */
+		
+	Testing the untestable:
+	
+		Near infinite planets/permutations
+		Can't possibly test them all
+		Limited memory and performance
+		Every player boots up into a different configuration
