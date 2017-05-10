@@ -12,7 +12,7 @@ link: http://dl.acm.org/citation.cfm?id=585747
 
 #### A Survey of Procedural Techniques for City Generation
 
-[Find out how to cite this]
+G Kelly, H Mccabe. (2006). "A Survey of Procedural Techniques for City Generation". In *ITB Journal, No. 14*.
 
 link: http://www.citygen.net/files/images/Procedural_City_Generation_Survey.pdf
 
