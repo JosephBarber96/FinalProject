@@ -1,5 +1,10 @@
 # dissertation
 
+### Useful links
+
+PCG Wiki
+http://pcg.wikidot.com/
+
 ---
 
 ## Bibliography
