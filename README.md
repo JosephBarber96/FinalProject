@@ -9,11 +9,8 @@ http://pcg.wikidot.com/
 
 ## Bibliography
 
-#### Template-Based Generation of Road Networks for Vritual City Modeling
 
-Sun, J. Yu, X. Baciu, G. Green, M. (2002). "Template-based generation of road networks for virtual city modeling". In *Proceedings of the ACM symposium on Virtual reality software and technology* (VRST '02). Acm, New Work, NY, USA, 33 - 40.
-
-link: http://dl.acm.org/citation.cfm?id=585747
+Cities:
 
 #### A Survey of Procedural Techniques for City Generation
 
@@ -21,7 +18,13 @@ G Kelly, H Mccabe. (2006). "A Survey of Procedural Techniques for City Generatio
 
 link: http://www.citygen.net/files/images/Procedural_City_Generation_Survey.pdf
 
-#### Procedural modeling of cities:
+#### Template-Based Generation of Road Networks for Vritual City Modeling
+
+Sun, J. Yu, X. Baciu, G. Green, M. (2002). "Template-based generation of road networks for virtual city modeling". In *Proceedings of the ACM symposium on Virtual reality software and technology* (VRST '02). Acm, New Work, NY, USA, 33 - 40.
+
+link: http://dl.acm.org/citation.cfm?id=585747
+
+#### Procedural Modeling of Cities:
 
 Parish, Y, I, H. Muller, Pascal. (2001). "Procedural modeling of cities". In *Proceedings of the 28th annual conference on Computer graphics and interactive techniques* (SIGGRAPH '01). Acm, New York, NY, USA, 301 - 308.
 
@@ -31,18 +34,33 @@ link: http://dl.acm.org/citation.cfm?id=383292
 
 Martz, P. (1997). *Generating Random Fractal Terrain*. [Online] 1997. Available Online: http://www.gameprogrammer.com/fractal.html [Date of access: 09 May 2016]
 
-## New, to read: 
+### Interactive Procedural Street Modeling
+
+link: http://www.sci.utah.edu/~chengu/street_sig08/street_project.htm 
+//Tensor fields
 
 ### Procedural Generation For Dummies: Road Generation
 
-link: http://martindevans.me/game-development/2015/12/11/Procedural-Generation-For-Dummies/
-part 2: http://martindevans.me/game-development/2015/12/11/Procedural-Generation-For-Dummies-Roads/
-
-### Interactive Procedural Street Modeling
-
-link: http://www.sci.utah.edu/~chengu/street_sig08/street_project.htm
+Evans, M. (2015). *Procedual Generation For Summies: Road Generation*. [Online] 11 December 2015. Available online: http://martindevans.me/game-development/2015/12/11/Procedural-Generation-For-Dummies-Roads/ [Date of access: 19 May 2016]
+//Also talks about tensor fields
 
 ---
+
+Buildings:
+
+#### Greuter, S. Parker, J. Stewart, N. Leach, G. (2003). "Real-time procedural generation of 'pseudo infinite' cities". In *Proceedings of the 1st international conference on Computer graphics and interactive techniques in Astralasia and South East Asia* (GRAPHITE '03) Acm, New York, Ny, USA, 87 - ff.
+
+link: http://dl.acm.org/citation.cfm?doid=604471.604490
+
+^ Has the library used for clipping shapes together to create buildings
+
+#### Procedural modeling of buildings:
+
+link: http://dl.acm.org/citation.cfm?id=1141931
+
+---
+
+Techniques:
 
 #### Voronoi Diagram
 
@@ -65,6 +83,9 @@ https://en.wikipedia.org/wiki/Fractal
 #### Perlin Noise
 
 https://en.wikipedia.org/wiki/Perlin_noise
+
+#### Shape grammars
+These may be useful
 
 
 ---
