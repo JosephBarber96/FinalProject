@@ -41,7 +41,7 @@ link: http://www.sci.utah.edu/~chengu/street_sig08/street_project.htm
 
 ### Procedural Generation For Dummies: Road Generation
 
-Evans, M. (2015). *Procedual Generation For Summies: Road Generation*. [Online] 11 December 2015. Available online: http://martindevans.me/game-development/2015/12/11/Procedural-Generation-For-Dummies-Roads/ [Date of access: 19 May 2016]
+Evans, M. (2015). *Procedual Generation For Dummies: Road Generation*. [Online] 11 December 2015. Available online: http://martindevans.me/game-development/2015/12/11/Procedural-Generation-For-Dummies-Roads/ [Date of access: 19 May 2016]
 //Also talks about tensor fields
 
 ---
