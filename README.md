@@ -30,25 +30,23 @@ Parish, Y, I, H. Muller, Pascal. (2001). "Procedural modeling of cities". In *Pr
 
 link: http://dl.acm.org/citation.cfm?id=383292
 
-#### Generating Random Fractal Terrain
-
-Martz, P. (1997). *Generating Random Fractal Terrain*. [Online] 1997. Available Online: http://www.gameprogrammer.com/fractal.html [Date of access: 09 May 2016]
-
-### Interactive Procedural Street Modeling
+#### Interactive Procedural Street Modeling
 
 link: http://www.sci.utah.edu/~chengu/street_sig08/street_project.htm 
 //Tensor fields
 
-### Procedural Generation For Dummies: Road Generation
+#### Procedural Generation For Dummies: Road Generation
 
-Evans, M. (2015). *Procedual Generation For Summies: Road Generation*. [Online] 11 December 2015. Available online: http://martindevans.me/game-development/2015/12/11/Procedural-Generation-For-Dummies-Roads/ [Date of access: 19 May 2016]
+Evans, M. (2015). *Procedual Generation For Dummies: Road Generation*. [Online] 11 December 2015. Available online: http://martindevans.me/game-development/2015/12/11/Procedural-Generation-For-Dummies-Roads/ [Date of access: 19 May 2016]
 //Also talks about tensor fields
 
 ---
 
 Buildings:
 
-#### Greuter, S. Parker, J. Stewart, N. Leach, G. (2003). "Real-time procedural generation of 'pseudo infinite' cities". In *Proceedings of the 1st international conference on Computer graphics and interactive techniques in Astralasia and South East Asia* (GRAPHITE '03) Acm, New York, Ny, USA, 87 - ff.
+#### Real-time procedural generation of 'pseudo infinite' cities"
+
+Greuter, S. Parker, J. Stewart, N. Leach, G. (2003). "Real-time procedural generation of 'pseudo infinite' cities". In *Proceedings of the 1st international conference on Computer graphics and interactive techniques in Astralasia and South East Asia* (GRAPHITE '03) Acm, New York, Ny, USA, 87 - ff.
 
 link: http://dl.acm.org/citation.cfm?doid=604471.604490
 
@@ -60,13 +58,21 @@ link: http://dl.acm.org/citation.cfm?id=1141931
 
 ---
 
+Misc:
+
+#### Generating Random Fractal Terrain
+
+Martz, P. (1997). *Generating Random Fractal Terrain*. [Online] 1997. Available Online: http://www.gameprogrammer.com/fractal.html [Date of access: 09 May 2016]
+
+---
+
 Techniques:
 
 #### Voronoi Diagram
 
 Weisstein, W. (Date unknown) *Voroni Diagram* [Online] Date unknown. Available online: http://mathworld.wolfram.com/VoronoiDiagram.html [Date of access: 08 May 2017]
 
-### Delaunay triangulation
+#### Delaunay triangulation
 
 (Essentially the inverse of voronoi diagrams - only really worth implementing one of the two)
 
