@@ -30,12 +30,12 @@ Parish, Y, I, H. Muller, Pascal. (2001). "Procedural modeling of cities". In *Pr
 
 link: http://dl.acm.org/citation.cfm?id=383292
 
-### Interactive Procedural Street Modeling
+#### Interactive Procedural Street Modeling
 
 link: http://www.sci.utah.edu/~chengu/street_sig08/street_project.htm 
 //Tensor fields
 
-### Procedural Generation For Dummies: Road Generation
+#### Procedural Generation For Dummies: Road Generation
 
 Evans, M. (2015). *Procedual Generation For Dummies: Road Generation*. [Online] 11 December 2015. Available online: http://martindevans.me/game-development/2015/12/11/Procedural-Generation-For-Dummies-Roads/ [Date of access: 19 May 2016]
 //Also talks about tensor fields
@@ -72,7 +72,7 @@ Techniques:
 
 Weisstein, W. (Date unknown) *Voroni Diagram* [Online] Date unknown. Available online: http://mathworld.wolfram.com/VoronoiDiagram.html [Date of access: 08 May 2017]
 
-### Delaunay triangulation
+#### Delaunay triangulation
 
 (Essentially the inverse of voronoi diagrams - only really worth implementing one of the two)
 
