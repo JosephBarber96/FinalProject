@@ -121,4 +121,7 @@ Slime mold implementation: http://www.popsci.com/science/article/2010-05/slimeog
 
 original find: https://nccastaff.bournemouth.ac.uk/jmacey/MastersProjects/MSc09/Ilangovan/Thesis_i7834000.pdf
 
+Ilangovan, K, P. (2009) Procedural City Generaror, MSc thesus, Bournemouth University. Available at: https://nccastaff.bournemouth.ac.uk/jmacey/MastersProjects/MSc09/Ilangovan/Thesis_i7834000.pdf (Accessed: 30 May 2017).
+
+
 Procedural Techniques for City Generation - Reading Report:  http://msdl.cs.mcgill.ca/people/hv/teaching/MSBDesign/COMP763B2008/projects/repository/Riry%20Pheng/readingReport.pdf
