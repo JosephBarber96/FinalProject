@@ -32,8 +32,9 @@ link: http://dl.acm.org/citation.cfm?id=383292
 
 #### Interactive Procedural Street Modeling
 
-link: http://www.sci.utah.edu/~chengu/street_sig08/street_project.htm 
-//Tensor fields
+Chen G. Esch G. Wonka P. Mueller P. Zhang E. (2008). "Interactive Procedural Street Modeling" In Proceedings of SIGGRAPH 2008. ACM Trans. Graph. Article 103: 1-10.
+
+link: http://www.sci.utah.edu/~chengu/street_sig08/street_project.htm //Tensor fields
 
 #### Procedural Generation For Dummies: Road Generation
 
@@ -70,7 +71,14 @@ Techniques:
 
 #### Voronoi Diagram
 
+1:
+
 Weisstein, W. (Date unknown) *Voroni Diagram* [Online] Date unknown. Available online: http://mathworld.wolfram.com/VoronoiDiagram.html [Date of access: 08 May 2017]
+
+2:
+
+Havey, D. (2008). *Tutorial #7: Voronoi diagrams* [Online] May 4, 2008. Available online: http://donhavey.com/blog/tutorials/tutorial-7-voronoi-diagrams/ [Date of access: 30 May 2017]
+
 
 #### Delaunay triangulation
 
