@@ -1,0 +1,9 @@
+There is no need to implement your own renderer for these projects, though you could attempt it if you 
+wished - the focus should be on the generation of the assets, so you could implement these technques 
+within an existing engine such as unity or Unreal and allow them to handle the rendering work for you.
+
+* Procedural Cities & Buildings
+
+Research approaches to procedurally generating city layouts that are filled with generated buildings,
+undetake research into how cities evolve and the impact that has on the style and placement of 
+buildings in your application.
