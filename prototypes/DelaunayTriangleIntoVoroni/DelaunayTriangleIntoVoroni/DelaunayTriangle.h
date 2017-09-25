@@ -7,10 +7,7 @@ public:
 	DelaunayTriangle();
 	~DelaunayTriangle();
 
-	void GenerateDelaunay(const int screenSize, const int columns, const int rows, bool withDiagonalSplit);
-	int columns;
-	int rows;
-
+	void GenerateDelaunay(const int screenMin, const int screenMax, const int columns, const int rows, bool withDiagonalSplit);
 	std::vector<std::vector<ScreenSegment*>> screenSegments;
 };
 

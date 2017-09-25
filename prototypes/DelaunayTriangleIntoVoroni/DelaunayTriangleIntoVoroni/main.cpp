@@ -18,31 +18,33 @@ void Display()
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// Segments
-	glColor3f(.0f, .0f, 1.0f);
+	//glColor3f(.0f, .0f, 1.f);
 
-	for (int y = 0; y < tri->columns; y++)
-	{
-		for (int x = 0; x < tri->rows; x++)
-		{
-			glBegin(GL_LINE_STRIP);
-			glVertex2f(tri->screenSegments[y][x]->minX, tri->screenSegments[y][x]->minY);
-			glVertex2f(tri->screenSegments[y][x]->minX, tri->screenSegments[y][x]->maxY);
-			glVertex2f(tri->screenSegments[y][x]->maxX, tri->screenSegments[y][x]->maxY);
-			glVertex2f(tri->screenSegments[y][x]->maxX, tri->screenSegments[y][x]->minY);
-			glEnd();
-		}
-	}
+	//for (std::vector<ScreenSegment*> vec : tri->screenSegments)
+	//{
+	//	for (ScreenSegment* ss : vec)
+	//	{
+	//		glBegin(GL_LINE_STRIP);
+	//		glVertex2f(ss->minX, ss->minY);
+	//		glVertex2f(ss->minX, ss->maxY);
+	//		glVertex2f(ss->maxX, ss->maxY);
+	//		glVertex2f(ss->maxX, ss->minY);
+	//		glVertex2f(ss->minX, ss->minY);
+	//		glEnd();
+	//	}
+	//}
 
 	// Lines
-	glColor3f(1.0, .0f, .0f);
-	for (int y = 0; y < tri->columns; y++)
+	glColor3f(1.f, .0f, .0f);
+
+	for (std::vector<ScreenSegment*> vec : tri->screenSegments)
 	{
-		for (int x = 0; x < tri->rows; x++)
+		for (ScreenSegment* ss : vec)
 		{
-			for each (Point* neighbour in tri->screenSegments[y][x]->point->neighbours)
+			for (Point* neighbour : ss->point->neighbours)
 			{
 				glBegin(GL_LINES);
-				glVertex2f(tri->screenSegments[y][x]->point->position->x, tri->screenSegments[y][x]->point->position->y);
+				glVertex2f(ss->point->position->x, ss->point->position->y);
 				glVertex2f(neighbour->position->x, neighbour->position->y);
 				glEnd();
 			}
@@ -73,7 +75,7 @@ int main(int argc, char* argv[])
 
 	// Create and generate a delaunay triangle
 	tri = new DelaunayTriangle();
-	tri->GenerateDelaunay(WIN_SIZE, 9, 9, false);
+	tri->GenerateDelaunay(25, WIN_SIZE - 100, 8, 8, false);
 
 	// Init OpenGL
 	glutInit(&argc, argv);

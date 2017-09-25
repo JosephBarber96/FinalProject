@@ -8,27 +8,32 @@
 DelaunayTriangle::DelaunayTriangle() {}
 DelaunayTriangle::~DelaunayTriangle() {}
 
-void DelaunayTriangle::GenerateDelaunay(const int screenSize, const int columns_, const int rows_, bool withDiagonalSplit)
+void DelaunayTriangle::GenerateDelaunay(const int screenMin, const int screenMax, const int columns, const int rows, bool withDiagonalSplit)
 {
-	columns = columns_;
-	rows = rows_;
+	screenSegments.resize(rows);
 
-	screenSegments.resize(columns_);
+	int screenSize = screenMax - screenMin;
+
+	int segWidth = screenSize / columns;
+	int segHeight = screenSize / rows;
+
 
 	// Split the screen into segments
-	for (int y = 0; y < columns; y++)
+	for (int y = 0; y < rows; y++)
 	{
-		for (int x = 0; x < rows; x++)
+		int columnCounter = (y % 2 == 0) ? columns : (columns + 1);
+
+		for (int x = 0; x < columnCounter; x++)
 		{
-			int minx = 0 + ((screenSize / columns) * x);
-			int maxx = minx + screenSize / columns;
+			int minY = screenMin + ((screenSize / rows) * y);
+			int maxY = minY + (screenSize / rows);
 
-			int miny = 0 + ((screenSize / rows) * y);
-			int maxy = miny + screenSize / rows;
+			int minX = screenMin + ((screenSize / columns) * x);
+			if (y % 2 == 0) { minX += segWidth / 2; }
+			int maxX = minX + (screenSize / columns);
 
-			std::cout << "Segment: (" << minx << ", " << maxx << ", " << miny << ", " << maxy << ")" << std::endl;
-
-			screenSegments[y].push_back(new ScreenSegment(minx, maxx, miny, maxy));
+			std::cout << "Segment: (" << minX << ", " << maxX << ", " << minY << ", " << maxY << ")" << std::endl;
+			screenSegments[y].push_back(new ScreenSegment(minX, maxX, minY, maxY));
 		}
 	}
 
@@ -36,9 +41,6 @@ void DelaunayTriangle::GenerateDelaunay(const int screenSize, const int columns_
 	int pointsPerSegment = 1; //int(numberOfPoints / screenSegments.size());
 
 	// Calculating the minimum and maximum boundaries a point can be placed within a screen segment
-	int segWidth = screenSize / columns;
-	int segHeight = screenSize / rows;
-
 	int floorX = segWidth / 5;
 	int ceilingX = segWidth - floorX;
 	int rangeX = (ceilingX - floorX) + 1;
@@ -48,9 +50,11 @@ void DelaunayTriangle::GenerateDelaunay(const int screenSize, const int columns_
 	int rangeY = (ceilingY - floorY) + 1;
 
 	// Loops through screen segments
-	for (int y = 0; y < columns; y++)
+	for (int y = 0; y < rows; y++)
 	{
-		for (int x = 0; x < rows; x++)
+		int columnCounter = (y % 2 == 0) ? columns : (columns + 1);
+
+		for (int x = 0; x < columnCounter; x++)
 		{
 			int posX = floorX + rand() % rangeX;
 			posX += screenSegments[y][x]->minX;
@@ -65,38 +69,60 @@ void DelaunayTriangle::GenerateDelaunay(const int screenSize, const int columns_
 
 	// Assign neighbours
 	// Loops through screen segments
-	for (int y = 0; y < columns; y++)
+	for (int y = 0; y < rows; y++)
 	{
-		for (int x = 0; x < rows; x++)
+		// Longer rows - Only check left and right
+		if (y % 2 == 1)
 		{
-			// Up
-			if (y > 0)
+			for (int x = 0; x < columns + 1; x++)
 			{
-				screenSegments[y][x]->point->AddNeighbour(screenSegments[y - 1][x]->point);
-			}
-			// Right
-			if (x < rows -1)
-			{
-				screenSegments[y][x]->point->AddNeighbour(screenSegments[y][x + 1]->point);
-			}
-			// Down
-			if (y < columns -1)
-			{
-				screenSegments[y][x]->point->AddNeighbour(screenSegments[y + 1][x]->point);
-			}
-			// Left
-			if (x > 0)
-			{
-				screenSegments[y][x]->point->AddNeighbour(screenSegments[y][x - 1]->point);
-			}
+				// Right
+				if (x < columns - 1)
+				{
+					screenSegments[y][x]->point->AddNeighbour(screenSegments[y][x + 1]->point);
+				}
 
-			// Diagonal split
-			if (withDiagonalSplit)
+				// Left
+				if (x > 0)
+				{
+					screenSegments[y][x]->point->AddNeighbour(screenSegments[y][x - 1]->point);
+				}
+			}
+		}
+		// Shorter rows - check all directions
+		else
+		{
+			for (int x = 0; x < columns; x++)
 			{
-				// Up-right
+				// Up left
+				if (y > 0)
+				{
+					screenSegments[y][x]->point->AddNeighbour(screenSegments[y - 1][x]->point);
+				}
+				// Up right
 				if (y > 0 && x < rows - 1)
 				{
 					screenSegments[y][x]->point->AddNeighbour(screenSegments[y - 1][x + 1]->point);
+				}
+				// Right
+				if (x < columns - 1)
+				{
+					screenSegments[y][x]->point->AddNeighbour(screenSegments[y][x + 1]->point);
+				}
+				// Down left
+				if (y < rows - 1)
+				{
+					screenSegments[y][x]->point->AddNeighbour(screenSegments[y + 1][x]->point);
+				}
+				// Down right
+				if (y < rows - 1 && x < columns - 1)
+				{
+					screenSegments[y][x]->point->AddNeighbour(screenSegments[y + 1][x + 1]->point);
+				}
+				// Left
+				if (x > 0)
+				{
+					screenSegments[y][x]->point->AddNeighbour(screenSegments[y][x - 1]->point);
 				}
 			}
 		}
