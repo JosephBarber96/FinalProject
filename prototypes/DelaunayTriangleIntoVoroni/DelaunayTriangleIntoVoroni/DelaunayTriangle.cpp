@@ -2,99 +2,103 @@
 #include "Point.h"
 #include "V2.h"
 #include "Utility.h"
-#include "Box.h"
+#include "ScreenSegment.h"
 #include <iostream>
+#include <random>
 DelaunayTriangle::DelaunayTriangle() {}
 DelaunayTriangle::~DelaunayTriangle() {}
 
-void DelaunayTriangle::Generate(int size)
+void DelaunayTriangle::GenerateDelaunay(const int screenSize, const int columns_, const int rows_, bool withDiagonalSplit)
 {
-	int columns = 3;
-	int rows = 3;
+	columns = columns_;
+	rows = rows_;
+
+	screenSegments.resize(columns_);
 
 	// Split the screen into segments
-	for (int x = 0; x < columns; x++)
+	for (int y = 0; y < columns; y++)
 	{
-		for (int y = 0; y < rows; y++)
+		for (int x = 0; x < rows; x++)
 		{
-			int minx = 0 + ((size / columns) * x);
-			int maxx = minx + size / columns;
+			int minx = 0 + ((screenSize / columns) * x);
+			int maxx = minx + screenSize / columns;
 
-			int miny = 0 + ((size / rows) * y);
-			int maxy = miny + size / rows;
+			int miny = 0 + ((screenSize / rows) * y);
+			int maxy = miny + screenSize / rows;
 
 			std::cout << "Segment: (" << minx << ", " << maxx << ", " << miny << ", " << maxy << ")" << std::endl;
 
-			screenSegments.push_back(new Box(minx, maxx, miny, maxy));
+			screenSegments[y].push_back(new ScreenSegment(minx, maxx, miny, maxy));
 		}
 	}
 
 	// Generate points
-	int numberOfPoints = (size / 10);
 	int pointsPerSegment = 1; //int(numberOfPoints / screenSegments.size());
 
-	for each (Box segment in screenSegments)
+	// Calculating the minimum and maximum boundaries a point can be placed within a screen segment
+	int segWidth = screenSize / columns;
+	int segHeight = screenSize / rows;
+
+	int floorX = segWidth / 5;
+	int ceilingX = segWidth - floorX;
+	int rangeX = (ceilingX - floorX) + 1;
+
+	int floorY = segHeight / 5;
+	int ceilingY = segHeight - floorY;
+	int rangeY = (ceilingY - floorY) + 1;
+
+	// Loops through screen segments
+	for (int y = 0; y < columns; y++)
 	{
-		for (auto i = 0; i < pointsPerSegment; i++)
+		for (int x = 0; x < rows; x++)
 		{
-			int x = rand() % (size / columns);
-			x += segment.minX;
-			int y = rand() % (size / rows);
-			y += segment.minY;
+			int posX = floorX + rand() % rangeX;
+			posX += screenSegments[y][x]->minX;
+
+			int posY = floorY + rand() % rangeY;
+			posY += screenSegments[y][x]->minY;
 
 			std::cout << "Creating point at: " << x << ", " << y << std::endl;
-
-			points.push_back(new Point(x, y));
+			screenSegments[y][x]->point = new Point(posX, posY);
 		}
 	}
 
-	//for (auto i = 0; i < numberOfPoints; i++)
-	//{
-	//	int x = rand() % size;
-	//	int y = rand() % size;
-
-	//	points.push_back(new Point(x, y));
-	//}
-
-	// Minimum distance to be considered neighbouring points
-	int minNeighbourDist = float((screenSegments[0].maxX) * 1.5); //size / 4;
-
 	// Assign neighbours
-	// For each point
-	for each (Point* point in points)
+	// Loops through screen segments
+	for (int y = 0; y < columns; y++)
 	{
-		int neighboursAdded = 0;
-		float lowestDist = FLT_MAX;
-		Point* closingNeighbour = nullptr;
-
-		// Check if every other point is close enough
-		for each (Point* possibleNeighbour in points)
+		for (int x = 0; x < rows; x++)
 		{
-			// Skip itself
-			if (point->position->x == possibleNeighbour->position->x &&
-				point->position->y == possibleNeighbour->position->y)
+			// Up
+			if (y > 0)
 			{
-				continue;
+				screenSegments[y][x]->point->AddNeighbour(screenSegments[y - 1][x]->point);
+			}
+			// Right
+			if (x < rows -1)
+			{
+				screenSegments[y][x]->point->AddNeighbour(screenSegments[y][x + 1]->point);
+			}
+			// Down
+			if (y < columns -1)
+			{
+				screenSegments[y][x]->point->AddNeighbour(screenSegments[y + 1][x]->point);
+			}
+			// Left
+			if (x > 0)
+			{
+				screenSegments[y][x]->point->AddNeighbour(screenSegments[y][x - 1]->point);
 			}
 
-			float dist = Utility::DistanceBetween(*point->position, *possibleNeighbour->position);
-
-			if (dist < minNeighbourDist)
+			// Diagonal split
+			if (withDiagonalSplit)
 			{
-				neighboursAdded == 1;
-				std::cout << " Distance between neighbours = " << Utility::DistanceBetween(*point->position, *possibleNeighbour->position) << std::endl;
-				point->AddNeighbour(possibleNeighbour);
+				// Up-right
+				if (y > 0 && x < rows - 1)
+				{
+					screenSegments[y][x]->point->AddNeighbour(screenSegments[y - 1][x + 1]->point);
+				}
 			}
-			else if (dist<lowestDist)
-			{
-				lowestDist = dist;
-				closingNeighbour = possibleNeighbour;
-			}
-		}
-
-		if (neighboursAdded < 2)
-		{
-			point->AddNeighbour(closingNeighbour);
 		}
 	}
 }

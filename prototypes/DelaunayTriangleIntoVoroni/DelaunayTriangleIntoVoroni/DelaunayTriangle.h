@@ -1,16 +1,16 @@
 #pragma once
 #include <vector>
-class Point;
-class Box;
+class ScreenSegment;
 class DelaunayTriangle
 {
 public:
 	DelaunayTriangle();
 	~DelaunayTriangle();
 
-	void Generate(int size);
+	void GenerateDelaunay(const int screenSize, const int columns, const int rows, bool withDiagonalSplit);
+	int columns;
+	int rows;
 
-	std::vector<Point*> points;
-	std::vector<Box> screenSegments;
+	std::vector<std::vector<ScreenSegment*>> screenSegments;
 };
 

@@ -19,17 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Box.cpp" />
     <ClCompile Include="DelaunayTriangle.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Point.cpp" />
+    <ClCompile Include="ScreenSegment.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="V2.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Box.h" />
     <ClInclude Include="DelaunayTriangle.h" />
     <ClInclude Include="Point.h" />
+    <ClInclude Include="ScreenSegment.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="V2.h" />
   </ItemGroup>
