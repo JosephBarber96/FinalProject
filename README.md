@@ -34,8 +34,6 @@ link: http://dl.acm.org/citation.cfm?doid=604471.604490
 
 Ilangovan, K, P. (2009) Procedural City Generaror, MSc thesus, Bournemouth University. Available at: https://nccastaff.bournemouth.ac.uk/jmacey/MastersProjects/MSc09/Ilangovan/Thesis_i7834000.pdf (Accessed: 30 May 2017).
 
-Weisstein, W. (Date unknown) *Voroni Diagram* [Online] Date unknown. Available online: http://mathworld.wolfram.com/VoronoiDiagram.html [Date of access: 08 May 2017]
-
 Parish, Y, I, H. Muller, Pascal. (2001). "Procedural modeling of cities". In *Proceedings of the 28th annual conference on Computer graphics and interactive techniques* (SIGGRAPH '01). Acm, New York, NY, USA, 301 - 308.
 link: http://dl.acm.org/citation.cfm?id=383292
 
@@ -81,7 +79,5 @@ I like this above post because it uses many of the ideas that I already had, suc
 Slime mold implementation: http://www.popsci.com/science/article/2010-05/slimeography
 
 original find: https://nccastaff.bournemouth.ac.uk/jmacey/MastersProjects/MSc09/Ilangovan/Thesis_i7834000.pdf
-
-
 
 Procedural Techniques for City Generation - Reading Report:  http://msdl.cs.mcgill.ca/people/hv/teaching/MSBDesign/COMP763B2008/projects/repository/Riry%20Pheng/readingReport.pdf
