@@ -18,21 +18,21 @@ void Display()
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// Segments
-	//glColor3f(.0f, .0f, 1.f);
+	glColor3f(.0f, .0f, 1.f);
 
-	//for (std::vector<ScreenSegment*> vec : tri->screenSegments)
-	//{
-	//	for (ScreenSegment* ss : vec)
-	//	{
-	//		glBegin(GL_LINE_STRIP);
-	//		glVertex2f(ss->minX, ss->minY);
-	//		glVertex2f(ss->minX, ss->maxY);
-	//		glVertex2f(ss->maxX, ss->maxY);
-	//		glVertex2f(ss->maxX, ss->minY);
-	//		glVertex2f(ss->minX, ss->minY);
-	//		glEnd();
-	//	}
-	//}
+	for (std::vector<ScreenSegment*> vec : tri->screenSegments)
+	{
+		for (ScreenSegment* ss : vec)
+		{
+			glBegin(GL_LINE_STRIP);
+			glVertex2f(ss->minX, ss->minY);
+			glVertex2f(ss->minX, ss->maxY);
+			glVertex2f(ss->maxX, ss->maxY);
+			glVertex2f(ss->maxX, ss->minY);
+			glVertex2f(ss->minX, ss->minY);
+			glEnd();
+		}
+	}
 
 	// Lines
 	glColor3f(1.f, .0f, .0f);
@@ -73,9 +73,11 @@ int main(int argc, char* argv[])
 	// Give a seed to rand()
 	srand(time(NULL));
 
+	int size = 4;
+
 	// Create and generate a delaunay triangle
 	tri = new DelaunayTriangle();
-	tri->GenerateDelaunay(25, WIN_SIZE - 100, 8, 8, false);
+	tri->GenerateDelaunay(25, WIN_SIZE - 50, size, size, false);
 
 	// Init OpenGL
 	glutInit(&argc, argv);

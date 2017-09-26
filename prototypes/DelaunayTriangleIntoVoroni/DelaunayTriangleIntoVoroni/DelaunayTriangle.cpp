@@ -32,7 +32,7 @@ void DelaunayTriangle::GenerateDelaunay(const int screenMin, const int screenMax
 			if (y % 2 == 0) { minX += segWidth / 2; }
 			int maxX = minX + (screenSize / columns);
 
-			std::cout << "Segment: (" << minX << ", " << maxX << ", " << minY << ", " << maxY << ")" << std::endl;
+			//std::cout << "Segment: (" << minX << ", " << maxX << ", " << minY << ", " << maxY << ")" << std::endl;
 			screenSegments[y].push_back(new ScreenSegment(minX, maxX, minY, maxY));
 		}
 	}
@@ -62,7 +62,7 @@ void DelaunayTriangle::GenerateDelaunay(const int screenMin, const int screenMax
 			int posY = floorY + rand() % rangeY;
 			posY += screenSegments[y][x]->minY;
 
-			std::cout << "Creating point at: " << x << ", " << y << std::endl;
+			//std::cout << "Creating point at: " << x << ", " << y << std::endl;
 			screenSegments[y][x]->point = new Point(posX, posY);
 		}
 	}
