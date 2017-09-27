@@ -1,3 +1,5 @@
 http://www.lighthouse3d.com/tutorials/glut-tutorial/keyboard-example-moving-around-the-world/
 
 https://r3dux.org/2012/12/a-c-camera-class-for-simple-opengl-fps-controls/
+
+http://www.swiftless.com/tutorials/opengl/camera3.html
