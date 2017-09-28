@@ -48,8 +48,6 @@ void Display()
 				glVertex2f(neighbour->position->x, neighbour->position->y);
 				glEnd();
 			}
-
-
 		}
 	}
 
@@ -73,7 +71,7 @@ int main(int argc, char* argv[])
 	// Give a seed to rand()
 	srand(time(NULL));
 
-	int size = 7;
+	int size = 11;
 
 	// Create and generate a delaunay triangle
 	tri = new DelaunayTriangle();

@@ -1,11 +1,11 @@
 ﻿  main.cpp
-d:\documents\uni\year3\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(28): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-d:\documents\uni\year3\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(29): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-d:\documents\uni\year3\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(30): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-d:\documents\uni\year3\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(31): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-d:\documents\uni\year3\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(32): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-d:\documents\uni\year3\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(47): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-d:\documents\uni\year3\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(48): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-d:\documents\uni\year3\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(74): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-  DelaunayTriangleIntoVoroni.vcxproj -> D:\Documents\Uni\Year3\dissertation\Prototypes\DelaunayTriangleIntoVoroni\Debug\DelaunayTriangleIntoVoroni.exe
-  DelaunayTriangleIntoVoroni.vcxproj -> D:\Documents\Uni\Year3\dissertation\Prototypes\DelaunayTriangleIntoVoroni\Debug\DelaunayTriangleIntoVoroni.pdb (Full PDB)
+c:\_jb\year 3\finalproject\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(28): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+c:\_jb\year 3\finalproject\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(29): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+c:\_jb\year 3\finalproject\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(30): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+c:\_jb\year 3\finalproject\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(31): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+c:\_jb\year 3\finalproject\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(32): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+c:\_jb\year 3\finalproject\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(47): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+c:\_jb\year 3\finalproject\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(48): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+c:\_jb\year 3\finalproject\dissertation\prototypes\delaunaytriangleintovoroni\delaunaytriangleintovoroni\main.cpp(74): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  DelaunayTriangleIntoVoroni.vcxproj -> C:\_jb\Year 3\FinalProject\dissertation\Prototypes\DelaunayTriangleIntoVoroni\Debug\DelaunayTriangleIntoVoroni.exe
+  DelaunayTriangleIntoVoroni.vcxproj -> C:\_jb\Year 3\FinalProject\dissertation\Prototypes\DelaunayTriangleIntoVoroni\Debug\DelaunayTriangleIntoVoroni.pdb (Full PDB)
