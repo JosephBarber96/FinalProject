@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 	// Give a seed to rand()
 	srand(time(NULL));
 
-	int size = 4;
+	int size = 7;
 
 	// Create and generate a delaunay triangle
 	tri = new DelaunayTriangle();
