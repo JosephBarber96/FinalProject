@@ -6,6 +6,13 @@ void Display()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	glPointSize(5.0f);
+	glColor3f(1.0, 0.0, 0.0);
+
+	glBegin(GL_POINTS);
+	glVertex2f(50.0f, 50.0f);
+	glEnd();
+
 	glutSwapBuffers();
 	glutPostRedisplay();
 }
