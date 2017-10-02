@@ -1,15 +1,31 @@
 #pragma once
-class V2;
+class Node;
 class Edge
 {
 public:
 	Edge();
-	Edge(V2* newStart, V2* newEnd);
+	Edge(Node* newStart, Node* newEnd);
 	~Edge();
 
-	V2* start;
-	V2* end;
+	Node* start;
+	Node* end;
+	
+	float length;
+	float EdgeLength();
+	bool EdgeContainsNode(Node* node);
 
-	bool operator== (Edge edge);
+	bool operator== (const Edge& edge);
+	bool operator< (const Edge edge) const;
+	bool operator> (const Edge edge) const;
+
+	//friend bool operator< (const Edge& lhs, const Edge& rhs)
+	//{
+	//	return (lhs.length < rhs.length);
+	//}
+
+	//friend bool operator> (const Edge& lhs, const Edge& rhs)
+	//{
+	//	return (lhs.length > rhs.length);
+	//}
 };
 

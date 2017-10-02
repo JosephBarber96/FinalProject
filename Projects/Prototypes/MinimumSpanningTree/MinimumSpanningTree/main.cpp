@@ -18,14 +18,25 @@ void Display()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-
-	// Draw edges
+	// Draw all edges
 	glColor3f(0.0, 1.0, 0.0);
+	glLineWidth(1.0);
 	for (Edge* edge : mst->GetAllEdges())
 	{
 		glBegin(GL_LINE_STRIP);
-		glVertex2f(edge->start->x, edge->start->y);
-		glVertex2f(edge->end->x, edge->end->y);
+		glVertex2f(edge->start->position->x, edge->start->position->y);
+		glVertex2f(edge->end->position->x, edge->end->position->y);
+		glEnd();
+	}
+
+	// Draw only minimum spanning graph
+	glColor3f(0.0, 0.0, 1.0);
+	glLineWidth(2.0);
+	for (Edge* edge : mst->GetTreeEdges())
+	{
+		glBegin(GL_LINE_STRIP);
+		glVertex2f(edge->start->position->x, edge->start->position->y);
+		glVertex2f(edge->end->position->x, edge->end->position->y);
 		glEnd();
 	}
 
@@ -126,7 +137,7 @@ int main(int argc, char* argv[])
 		for (Node* neighbour : node->getPossibleNeighbours())
 		{
 			// Create an edge between the node and a neighbour
-			Edge* edge = new Edge(node->position, neighbour->position);
+			Edge* edge = new Edge(node, neighbour);
 
 			// If allEdges does not contain this edge, add it
 			if (mst->GetAllEdges().empty())
@@ -157,10 +168,10 @@ int main(int argc, char* argv[])
 	int edgeCounter = 0;
 	for (Edge* edge : mst->GetAllEdges())
 	{
-		std::cout << "Edge " << ++edgeCounter << " - Start: (" << edge->start->x << ", " << edge->start->y << "), End(" << edge->end->x << ", " << edge->end->y << ")" << std::endl;
+		std::cout << "Edge " << ++edgeCounter << " - Start: (" << edge->start->position->x << ", " << edge->start->position->y << "), End(" << edge->end->position->x << ", " << edge->end->position->y << ")" << std::endl;
 	}
 
-
+	mst->Attempt();
 
 
 

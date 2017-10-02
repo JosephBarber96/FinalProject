@@ -19,3 +19,8 @@ void Node::AddPossibleNeighbour(Node* neighbour)
 {
 	possibleNeighbours.push_back(neighbour);
 }
+
+bool Node::operator== (Node node)
+{
+	return (position == node.position);
+}

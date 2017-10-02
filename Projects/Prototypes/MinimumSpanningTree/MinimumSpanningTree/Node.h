@@ -10,13 +10,15 @@ public:
 	~Node();
 
 	V2* position;
+	bool partOfTree;
+
 	std::vector<Node*> getPossibleNeighbours() { return possibleNeighbours; }
 
 	void AddPossibleNeighbour(Node* neighbour);
 
+	bool operator== (Node node);
+
 private:
 	std::vector<Node*> possibleNeighbours;
-
-
 };
 
