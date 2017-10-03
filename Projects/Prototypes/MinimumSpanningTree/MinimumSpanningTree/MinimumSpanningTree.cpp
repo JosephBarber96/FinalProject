@@ -1,13 +1,124 @@
+#include "Defines.h"
+
+#if DEBUG_MODE == 1
 #include <iostream>
+#endif
+
 #include <algorithm>
+#include <queue>
+#include <map>
+#include <stdlib.h>
 
 #include "MinimumSpanningTree.h"
 #include "Node.h"
 #include "Edge.h"
+#include "V2.h"
 
 MinimumSpanningTree::MinimumSpanningTree() {}
 
 MinimumSpanningTree::~MinimumSpanningTree() {}
+
+void MinimumSpanningTree::SpawnPoints(int numberOfPoints, int minX, int minY, int maxX, int maxY)
+{
+
+	for (int i = 0; i < numberOfPoints; i++)
+	{
+		int nodeX = rand() % maxX - minX;
+		int nodeY = rand() % maxY - minY;
+		Node* node = new Node(nodeX, nodeY);
+		node->id = i;
+		AddNode(node);
+
+#if DEBUG_MODE == true
+		std::cout << "Node created at: " << node->position->x << ", " << node->position->y << std::endl;
+#endif
+	}
+}
+
+void MinimumSpanningTree::AssignNighbours(float maxDist)
+{
+	// For each node
+	for (Node* node : nodes)
+	{
+
+		bool neighbourFound = false;
+		Node* closestNeighbour = nullptr;
+
+		// For every other ndoe
+		for (Node* possibleNeighbour : nodes)
+		{
+			// Skip itself
+			if (*node == *possibleNeighbour) { continue; }
+
+			// The first neighbour is the closest if closestNeighbour is nullptr
+			if (closestNeighbour == nullptr)
+			{
+				closestNeighbour = possibleNeighbour;
+				continue;
+			}
+
+			// If possible neighbour is closer than closest neighbour, replace it
+			if (V2::DistanceBetween(*node->position, *possibleNeighbour->position) < V2::DistanceBetween(*node->position, *closestNeighbour->position))
+			{
+				closestNeighbour = possibleNeighbour;
+			}
+
+			// If possibleNeighbour is close enough, add it as a possible neighbour
+			if (V2::DistanceBetween(*node->position, *possibleNeighbour->position) < maxDist)
+			{
+				neighbourFound = true;
+				node->AddPossibleNeighbour(possibleNeighbour);
+			}
+		}
+
+		// After checking each neighbour, if a close enough neighbour wasnt found, add the closest neighbour
+		if (!neighbourFound)
+		{
+			node->AddPossibleNeighbour(closestNeighbour);
+		}
+	}
+}
+
+void MinimumSpanningTree::CreateAllEdges()
+{
+	// For every node
+	for (Node* node : nodes)
+	{
+		// For each neighbour
+		for (Node* neighbour : node->getPossibleNeighbours())
+		{
+			// Create an edge between the node and neighbour
+			Edge* edge = new Edge(node, neighbour);
+
+			if (GetAllEdges().empty())
+			{
+				AddPossibleEdge(edge);
+				continue;
+			}
+			else
+			{
+
+				if (std::find(allEdges.begin(), allEdges.end(), edge) != allEdges.end())
+				{
+					continue;
+				}
+				else
+				{
+					AddPossibleEdge(edge);
+				}
+			}
+		}
+	}
+
+#if DEBUG_MODE == true
+	std::cout << "Total number of edges: " << allEdges.size() << std::endl;
+	for (Edge* edge : allEdges)
+	{
+		std::cout << "Edge - Start: (" << edge->start->position->x << ", " << edge->start->position->y << "), End(" << edge->end->position->x << ", " << edge->end->position->y << ")" << std::endl;
+	}
+#endif
+
+}
 
 void MinimumSpanningTree::Sort()
 {
@@ -17,243 +128,164 @@ void MinimumSpanningTree::Sort()
 	{
 		node->partOfTree = false;
 	}
+	for (Edge* edge : allEdges)
+	{
+		edge->partOfTree = false;
+	}
 
-	// Grab the set of all edges
-	std::vector<Edge*> edges = allEdges;
+	// Start
 
-	// Pick a random starting point.
-	int nodeIndex = rand() % nodes.size();
+	// Find the edge of lowest cost
+	Edge shortest = *allEdges[0];
+	for (int i = 1; i < allEdges.size(); i++)
+	{
+		if (allEdges[i]->length < shortest.length)
+		{
+			shortest = *allEdges[i];
+		}
+	}
 
-	std::vector<Node*> treeNodes;
-	treeNodes.push_back(nodes[nodeIndex]);
+	treeEdges.push_back(shortest);
+	shortest.partOfTree = true;
+	shortest.start->partOfTree = true;
+	shortest.end->partOfTree = true;
 
+	// Dictionary for debugging to keep count of how many times each node was added.
+	std::map<int, int> myMap;
+	for (Node* node : nodes)
+	{
+		myMap.insert(std::pair<int, int>(node->id, 0));
+	}
+
+	// Loop...
 	bool completed = false;
+	int loopCount = 0;
 	while (!completed)
 	{
-		if (treeNodes.size() > nodes.size()) return;
+		loopCount++;
 
-		// Get the list of all edges connected to any nodes within treeNodes;
-		std::vector<Edge*> possibleEdges;
-		for (Node* node : treeNodes)
+		// Get every node connected to the MST
+		std::vector<Node> mstNodes;
+		for (Edge edge : treeEdges)
 		{
-			std::vector<Edge*> edgesForThisNode = GetEdgesForNode(node);
-
-			for (Edge* edge : edgesForThisNode)
+			// If edge.start isnt in mstNodes... add it
+			if (std::find(mstNodes.begin(), mstNodes.end(), *edge.start) != mstNodes.end())
 			{
-				possibleEdges.push_back(edge);
+
+			}
+			else
+			{
+				// std::cout << "Adding node " << edge.start->id << " to grid on loop " << loopCount << std::endl;
+				myMap[edge.start->id] += 1;
+				mstNodes.push_back(*edge.start);
+			}
+
+			// If edge.end isnt in mstNodes... add it
+			if (std::find(mstNodes.begin(), mstNodes.end(), *edge.end) != mstNodes.end())
+			{
+
+			}
+			else
+			{
+				// std::cout << "Adding node " << edge.end->id << " to grid on loop " << loopCount << std::endl;
+				myMap[edge.end->id] += 1;
+				mstNodes.push_back(*edge.end);
 			}
 		}
 
-		// Find the lowest length edge that is valid
-		Edge* shortestValid = possibleEdges[0];
-		int index = 0;
-		for (int i = 1; i < possibleEdges.size(); i++)
+
+		// Get all edges for these nodes that arent already within the MST and are valid
+		std::vector<Edge> possibleEdges;
+		// For each node
+		for (Node node : mstNodes)
 		{
-			// If the end or start of this edge is not contained within the tree
-			if (!possibleEdges[0]->start->partOfTree || !possibleEdges[0]->end->partOfTree)
+			// Get all edges connected to this road
+			std::vector<Edge*> nodeEdges = GetEdgesForNode(node);
+
+			// For each edge connected to this node
+			for (Edge* edge : nodeEdges)
 			{
-				// And the length is valid
-				if (possibleEdges[0]->length < shortestValid->length)
+				// If the edge is already a part of the tree, exit
+				if (edge->partOfTree) continue;
+
+				// If one side of the edge is not in the tree (thus can be connected to from the current tree)
+				// add it to possibleEdges
+
+				// If start and not end
+				if (edge->start->partOfTree && !edge->end->partOfTree)
 				{
-					// Replace...
-					shortestValid = possibleEdges[i];
-					index = i;
+					possibleEdges.push_back(*edge);
+				}
+				// Or end and not start
+				else if (edge->end->partOfTree && !edge->start->partOfTree)
+				{
+					possibleEdges.push_back(*edge);
 				}
 			}
 		}
-		
-		// Add the nodes to the nodes which make up the MST
-		if (std::find(treeNodes.begin(), treeNodes.end(), shortestValid->start) != treeNodes.end())
+
+		// Grab the shortest possibleEdge
+		Edge theShortest = possibleEdges[0];
+		if (possibleEdges.size() > 1)
 		{
-			shortestValid->start->partOfTree = true;
-			treeNodes.push_back(shortestValid->start);
+			for (int i = 0; i < possibleEdges.size(); i++)
+			{
+				if (possibleEdges[i].length < theShortest.length)
+				{
+					theShortest = possibleEdges[i];
+				}
+			}
 		}
 
-		if (std::find(treeNodes.begin(), treeNodes.end(), shortestValid->end) != treeNodes.end())
+		// Add the shortest to the MST...
+		treeEdges.push_back(theShortest);
+
+		// Add the nodes to MST nodes...
+		if (!(std::find(mstNodes.begin(), mstNodes.end(), *theShortest.start) != mstNodes.end()))
 		{
-			shortestValid->end->partOfTree = true;
-			treeNodes.push_back(shortestValid->end);
+			mstNodes.push_back(*theShortest.start);
 		}
 
-		// All the edge to the MST
-		treeEdges.push_back(shortestValid);
+		if (!(std::find(mstNodes.begin(), mstNodes.end(), *theShortest.end) != mstNodes.end()))
+		{
+			mstNodes.push_back(*theShortest.end);
+		}
+
+		//Mark them
+		theShortest.partOfTree = true;
+		theShortest.start->partOfTree = true;
+		theShortest.end->partOfTree = true;
 
 
-		// Check that all nodes are now within TREE
-		bool allNodes = true;
+		// Check to see if all nodes are now a part of the tree..
+		bool allInTree = true;
 		for (Node* node : nodes)
 		{
 			if (!node->partOfTree)
 			{
-				allNodes = false;
+				allInTree = false;
 				break;
 			}
 		}
-		if (allNodes) { completed = true; }
+
+		// If they all are in MST...
+		if (allInTree)
+		{
+			// stop looping
+			completed = true;
+		}
 	}
 
-}
-
-void MinimumSpanningTree::Attempt()
-{
-	// Completely reset the tree
-	treeEdges.clear();
+	// Debugging - output how many times each was added
 	for (Node* node : nodes)
 	{
-		node->partOfTree = false;
+#if DEBUG_MODE == true
+		std::cout << "Node " << node->id << " has " << myMap[node->id] << " entries." << std::endl;
+#endif
 	}
-
-	// Grab the set of all EDGES
-	std::vector<Edge*> edges = allEdges;
-
-	for (Edge* edge : allEdges)
-	{
-		std::cout << "edge length: " << edge->length << std::endl;
-	}
-
-	// We also have a subgraph of TREE
-
-	// FOR each edge SHORTEST in EDGES
-	bool completed = false;
-	while (edges.size() > 2 && !completed)
-	{
-		// OPTIMIZE
-		// SHORTEST = shortest in EDGES
-		Edge* shortest = edges[0];
-		int index = 0;
-		for (int i = 1; i < edges.size(); i++)
-		{
-			if (edges[i]->length < shortest->length)
-			{
-				shortest = edges[i];
-				index = i;
-			}
-		}
-		edges.erase(edges.begin() + index);
-
-		// If each endpoint of E is not within the subgraph of TREE
-		if (!shortest->start->partOfTree || !shortest->end->partOfTree)
-		{
-			// ADD edge E to TREE
-			treeEdges.push_back(shortest);
-
-			shortest->start->partOfTree = true;
-			shortest->end->partOfTree = true;
-		}
-
-		// Check that all nodes are now within TREE
-		bool allNodes = true;
-		for (Node* node : nodes)
-		{
-			if (!node->partOfTree)
-			{
-				allNodes = false;
-				break;
-			}
-		}
-		if (allNodes) { completed = true; }
-	}
-
-
-	std::cout << std::endl;
-
-	//std::cout << "treeEdges size: " << treeEdges.size() << std::endl;
-
-	// Test priority queue
-
-	//bool completed = false;
-	//while (!completed)
-	//{
-
-	//	Edge* newEdge = sortedEdges.top();
-	//	sortedEdges.pop();
-
-
-	//}
-
 }
 
-void MinimumSpanningTree::AttemptAdjusted()
-{
-	// Completely reset the tree
-	treeEdges.clear();
-	for (Node* node : nodes)
-	{
-		node->partOfTree = false;
-	}
-
-	// Grab the set of all EDGES
-	std::vector<Edge*> edges = allEdges;
-
-	for (Edge* edge : allEdges)
-	{
-		std::cout << "edge length: " << edge->length << std::endl;
-	}
-
-	// We also have a subgraph of TREE
-
-	// FOR each edge SHORTEST in EDGES
-	bool completed = false;
-	while (edges.size() > 2 && !completed)
-	{
-		// OPTIMIZE
-		// SHORTEST = shortest in EDGES
-		Edge* shortest = edges[0];
-		int index = 0;
-		for (int i = 1; i < edges.size(); i++)
-		{
-			if (edges[i]->length < shortest->length)
-			{
-				shortest = edges[i];
-				index = i;
-			}
-		}
-		edges.erase(edges.begin() + index);
-
-		// If each endpoint of E is not within the subgraph of TREE
-		if (!shortest->start->partOfTree || !shortest->end->partOfTree)
-		{
-			// ADD edge E to TREE
-			treeEdges.push_back(shortest);
-
-			shortest->start->partOfTree = true;
-			shortest->end->partOfTree = true;
-		}
-
-		// Check that all nodes are now within TREE
-		bool allNodes = true;
-		for (Node* node : nodes)
-		{
-			if (!node->partOfTree)
-			{
-				allNodes = false;
-				break;
-			}
-		}
-		if (allNodes) { completed = true; }
-	}
-
-
-	std::cout << std::endl;
-
-	//std::cout << "treeEdges size: " << treeEdges.size() << std::endl;
-
-	// Test priority queue
-
-	//bool completed = false;
-	//while (!completed)
-	//{
-
-	//	Edge* newEdge = sortedEdges.top();
-	//	sortedEdges.pop();
-
-
-	//}
-
-}
-
-
-std::vector<Edge*> MinimumSpanningTree::GetEdgesForNode(Node* node)
+std::vector<Edge*> MinimumSpanningTree::GetEdgesForNode(Node node)
 {
 	std::vector<Edge*> edges;
 
@@ -268,11 +300,11 @@ std::vector<Edge*> MinimumSpanningTree::GetEdgesForNode(Node* node)
 	return edges;
 }
 
-bool MinimumSpanningTree::TreeEdgesContainsNode(Node* node)
+bool MinimumSpanningTree::TreeEdgesContainsNode(Node node)
 {
-	for (Edge* edge : treeEdges)
+	for (Edge edge : treeEdges)
 	{
-		if (*edge->start == *node || *edge->end == *node)
+		if (*edge.start == node || *edge.end == node)
 		{
 			return true;
 		}
@@ -285,7 +317,7 @@ void MinimumSpanningTree::AddNode(Node* newNode)
 	nodes.push_back(newNode);
 }
 
-void MinimumSpanningTree::AddEdge(Edge* newEdge)
+void MinimumSpanningTree::AddPossibleEdge(Edge* newEdge)
 {
 	allEdges.push_back(newEdge);
 }

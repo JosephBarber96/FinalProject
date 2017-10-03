@@ -11,8 +11,9 @@ public:
 	Node* end;
 	
 	float length;
+	bool partOfTree;
 	float EdgeLength();
-	bool EdgeContainsNode(Node* node);
+	bool EdgeContainsNode(Node node);
 
 	bool operator== (const Edge& edge);
 	bool operator< (const Edge edge) const;

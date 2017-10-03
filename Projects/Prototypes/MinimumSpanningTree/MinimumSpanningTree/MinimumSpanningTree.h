@@ -9,24 +9,25 @@ public:
 	MinimumSpanningTree();
 	~MinimumSpanningTree();
 
-	void AddNode(Node* newNode);
-	void AddEdge(Edge* newEdge);
+	std::vector<Edge*> GetEdgesForNode(Node node);
+
+	void SpawnPoints(int numberOfPoints, int minX, int minY, int maxX, int maxY);
+	void AssignNighbours(float maxDist);
+	void CreateAllEdges();
 
 	void Sort();
-	void Attempt();
-	void AttemptAdjusted();
 
-	std::vector<Edge*> GetEdgesForNode(Node* node);
-
-	bool TreeEdgesContainsNode(Node* node);
+	bool TreeEdgesContainsNode(Node node);
 
 	inline std::vector<Node*> GetNodes() { return nodes; }
 	inline std::vector<Edge*> GetAllEdges() { return allEdges; }
-	inline std::vector<Edge*> GetTreeEdges() { return treeEdges; }
+	inline std::vector<Edge> GetTreeEdges() { return treeEdges; }
 
 private:
+	void AddNode(Node* newNode);
+	void AddPossibleEdge(Edge* newEdge);
 
 	std::vector<Node*> nodes;
 	std::vector<Edge*> allEdges;
-	std::vector<Edge*> treeEdges;
+	std::vector<Edge> treeEdges;
 };

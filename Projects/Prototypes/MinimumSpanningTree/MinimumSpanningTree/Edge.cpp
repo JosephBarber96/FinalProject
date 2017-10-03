@@ -19,9 +19,9 @@ float Edge::EdgeLength()
 	return (V2::DistanceBetween(*start->position, *end->position));
 }
 
-bool Edge::EdgeContainsNode(Node* node)
+bool Edge::EdgeContainsNode(Node node)
 {
-	return (*start == *node || *end == *node);
+	return (*start == node || *end == node);
 }
 
 bool Edge::operator== (const Edge& edge)

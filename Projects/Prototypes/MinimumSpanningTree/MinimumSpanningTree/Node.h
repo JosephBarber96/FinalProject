@@ -9,6 +9,7 @@ public:
 	Node(int x, int y);
 	~Node();
 
+	int id;
 	V2* position;
 	bool partOfTree;
 

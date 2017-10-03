@@ -122,6 +122,7 @@
     <ClCompile Include="V2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Defines.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="MinimumSpanningTree.h" />
     <ClInclude Include="Node.h" />
