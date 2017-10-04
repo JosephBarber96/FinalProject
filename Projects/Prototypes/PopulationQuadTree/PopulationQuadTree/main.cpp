@@ -1,58 +1,46 @@
 #include <array>
 #include <stdlib.h>
 #include <ctime>
+#include <string>
 
 #include <SFML\Graphics.hpp>
 
 #include "QuadTree.h"
 
-//const int winX = 500;
-//const int winY = 500;
+int winX;
+int winY;
 
 int main()
 {
+	std::string filename = "PopulationMap.jpg";
+
 	// Read in population data
 	sf::Image populationMap;
-	if (!populationMap.loadFromFile("PopulationMap.bmp"))
+	if (!populationMap.loadFromFile(filename))
 	{
 		return -1;
 	}
 
-	/////////////////////
-	// TEST 
-	/////////////////////
+	winX = populationMap.getSize().x;
+	winY = populationMap.getSize().y;
 
-	// Randomly make population data for testing now
-	srand(time(NULL));
+	// Create a window
+	sf::RenderWindow window(sf::VideoMode(winX, winY), "Population Data Quad Tree");
 
-	//sf::Image populationMap;
-	//populationMap.create(100, 100, sf::Color::White);
-
-	for (int i = 0; i < 100; i++)
-	{
-		int x = rand() % 100;
-		int y = rand() % 100;
-
-		populationMap.setPixel(x, y, sf::Color::Black);
-	}
-
-	populationMap.saveToFile("SavedImage.bmp");
-
-	/////////////////////
-	// END TEST
-	/////////////////////
 
 	// Create a sprite to display this image;
 	sf::Texture populationTexture;
-	populationTexture.update(populationMap);
+	if (!populationTexture.loadFromFile(filename))
+	{
+		return -1;
+	}
 	populationTexture.setSmooth(true);
 
 	sf::Sprite populationSprite;
 	populationSprite.setTexture(populationTexture);
 	populationSprite.setPosition(0, 0);
 
-	// Create a window
-	sf::RenderWindow window(sf::VideoMode(500, 500), "Population Data Quad Tree");
+
 
 	// Create a quad tree
 	// QuadTree* qt = new QuadTree(200, 200, 200, 200);
