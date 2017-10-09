@@ -98,8 +98,9 @@ int main()
 	// Plot points
 	for (QuadTree* qt : QuadTree::Children)
 	{
+#if DEBUG_MODE == true
 		std::cout << "minX: " << qt->xOrigin << ", minY: " << qt->yOrigin << ", maxX: " << (qt->xOrigin + qt->width) << ", maxY: " << (qt->yOrigin + qt->height) << std::endl;
-
+#endif
 		mst->SpawnPoint(qt->xOrigin, qt->yOrigin, (qt->xOrigin + qt->width), (qt->yOrigin + qt->height));
 	}
 
@@ -113,7 +114,8 @@ int main()
 	// Sort the MST
 	mst->Sort();
 
-	std::cout << "The complete MST has " << mst->GetTreeEdges().size() << " edges.";
+	std::cout << "The quad tree consts of " << QuadTree::Children.size() << " quads." << std::endl;
+	std::cout << "The complete MST has " << mst->GetTreeEdges().size() << " edges." << std::endl;
 
 	// Display
 	while (window.isOpen())
@@ -162,9 +164,9 @@ int main()
 		// Nodes
 		for (Node* node : mst->GetNodes())
 		{
-			sf::CircleShape point(3);
+			sf::CircleShape point(2);
 			point.setFillColor(sf::Color::Green);
-			point.setPosition(node->position->x -1.5f, node->position->y -1.5f);
+			point.setPosition(node->position->x -1, node->position->y -1);
 
 			window.draw(point);
 

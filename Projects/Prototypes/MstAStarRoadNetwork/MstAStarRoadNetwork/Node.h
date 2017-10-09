@@ -11,7 +11,8 @@ public:
 
 	int id;
 	V2* position;
-	bool partOfTree;
+	bool partOfTree = false;
+	bool checkedForNeighbours = false;
 
 	std::vector<Node*> getPossibleNeighbours() { return possibleNeighbours; }
 

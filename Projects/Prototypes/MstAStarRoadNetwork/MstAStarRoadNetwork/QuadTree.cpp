@@ -44,7 +44,7 @@ bool QuadTree::CheckSplit(sf::Image populationMap)
 			if (color == 255)
 			{
 				// Don't split if the quad is already small enough
-				if (width > populationMap.getSize().x / 8)
+				if (width > populationMap.getSize().x / 17)
 				{
 					return true;
 				}
