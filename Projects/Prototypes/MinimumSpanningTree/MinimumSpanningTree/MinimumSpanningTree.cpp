@@ -8,6 +8,7 @@
 #include <queue>
 #include <map>
 #include <stdlib.h>
+#include <list>
 
 #include "MinimumSpanningTree.h"
 #include "Node.h"
@@ -135,15 +136,34 @@ void MinimumSpanningTree::Sort()
 
 	// Start
 
-	// Find the edge of lowest cost
-	Edge shortest = *allEdges[0];
-	for (int i = 1; i < allEdges.size(); i++)
+	// Sortest list of all edges
+	std::list<Edge> sortedEdgeList;
+	for (int i = 0; i < allEdges.size(); i++)
 	{
-		if (allEdges[i]->length < shortest.length)
-		{
-			shortest = *allEdges[i];
-		}
+		sortedEdgeList.push_back(*allEdges[i]);
 	}
+
+#if DEBUG_MODE == true
+	std::cout << "BEFORE SORTING: " << std::endl;
+	for (Edge edge : sortedEdgeList)
+	{
+		std::cout << "edge length: " << edge.length << std::endl;
+	}
+#endif
+
+	sortedEdgeList.sort();
+
+#if DEBUG_MODE == true
+	std::cout << "AFTER SORTING: " << std::endl;
+	for (Edge edge : sortedEdgeList)
+	{
+		std::cout << "edge length: " << edge.length << std::endl;
+	}
+#endif
+
+	// Find the edge of lowest cost
+	Edge shortest = sortedEdgeList.front();
+	sortedEdgeList.pop_front();
 
 	treeEdges.push_back(shortest);
 	shortest.partOfTree = true;
@@ -164,98 +184,35 @@ void MinimumSpanningTree::Sort()
 	{
 		loopCount++;
 
-		// Get every node connected to the MST
-		std::vector<Node> mstNodes;
-		for (Edge edge : treeEdges)
+		// Find the node of lowest cost that is connected to the MST...
+		bool nodeFound = false;
+		Edge shortestEdge;
+		for (auto const& edge : sortedEdgeList)
 		{
-			// If edge.start isnt in mstNodes... add it
-			if (std::find(mstNodes.begin(), mstNodes.end(), *edge.start) != mstNodes.end())
+			// If start and not end
+			if (edge.start->partOfTree && !edge.end->partOfTree)
 			{
-
+				shortestEdge = edge;
+				sortedEdgeList.remove(edge);
+				break;
 			}
-			else
+			// Or end and not start
+			else if (edge.end->partOfTree && !edge.start->partOfTree)
 			{
-				// std::cout << "Adding node " << edge.start->id << " to grid on loop " << loopCount << std::endl;
-				myMap[edge.start->id] += 1;
-				mstNodes.push_back(*edge.start);
-			}
-
-			// If edge.end isnt in mstNodes... add it
-			if (std::find(mstNodes.begin(), mstNodes.end(), *edge.end) != mstNodes.end())
-			{
-
-			}
-			else
-			{
-				// std::cout << "Adding node " << edge.end->id << " to grid on loop " << loopCount << std::endl;
-				myMap[edge.end->id] += 1;
-				mstNodes.push_back(*edge.end);
+				shortestEdge = edge;
+				sortedEdgeList.remove(edge);
+				break;
 			}
 		}
 
-
-		// Get all edges for these nodes that arent already within the MST and are valid
-		std::vector<Edge> possibleEdges;
-		// For each node
-		for (Node node : mstNodes)
-		{
-			// Get all edges connected to this road
-			std::vector<Edge*> nodeEdges = GetEdgesForNode(node);
-
-			// For each edge connected to this node
-			for (Edge* edge : nodeEdges)
-			{
-				// If the edge is already a part of the tree, exit
-				if (edge->partOfTree) continue;
-
-				// If one side of the edge is not in the tree (thus can be connected to from the current tree)
-				// add it to possibleEdges
-
-				// If start and not end
-				if (edge->start->partOfTree && !edge->end->partOfTree)
-				{
-					possibleEdges.push_back(*edge);
-				}
-				// Or end and not start
-				else if (edge->end->partOfTree && !edge->start->partOfTree)
-				{
-					possibleEdges.push_back(*edge);
-				}
-			}
-		}
-
-		// Grab the shortest possibleEdge
-		Edge theShortest = possibleEdges[0];
-		if (possibleEdges.size() > 1)
-		{
-			for (int i = 0; i < possibleEdges.size(); i++)
-			{
-				if (possibleEdges[i].length < theShortest.length)
-				{
-					theShortest = possibleEdges[i];
-				}
-			}
-		}
 
 		// Add the shortest to the MST...
-		treeEdges.push_back(theShortest);
-
-		// Add the nodes to MST nodes...
-		if (!(std::find(mstNodes.begin(), mstNodes.end(), *theShortest.start) != mstNodes.end()))
-		{
-			mstNodes.push_back(*theShortest.start);
-		}
-
-		if (!(std::find(mstNodes.begin(), mstNodes.end(), *theShortest.end) != mstNodes.end()))
-		{
-			mstNodes.push_back(*theShortest.end);
-		}
+		treeEdges.push_back(shortestEdge);
 
 		//Mark them
-		theShortest.partOfTree = true;
-		theShortest.start->partOfTree = true;
-		theShortest.end->partOfTree = true;
-
+		shortestEdge.partOfTree = true;
+		shortestEdge.start->partOfTree = true;
+		shortestEdge.end->partOfTree = true;
 
 		// Check to see if all nodes are now a part of the tree..
 		bool allInTree = true;

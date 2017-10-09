@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 	mst = new MinimumSpanningTree;
 
 	// Plot points
-	int numOfPoints = 12;
+	int numOfPoints = 50;
 	mst->SpawnPoints(numOfPoints, 0, 0, WIN_SIZE, WIN_SIZE);
 
 	// Assign neighbours
