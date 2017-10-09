@@ -52,6 +52,10 @@ void MinimumSpanningTree::SpawnPoint(int minX, int minY, int maxX, int maxY)
 
 void MinimumSpanningTree::AssignNighbours(float maxDist)
 {
+#if DEBUG_MODE == true
+	std::cout << "Assigning neighbours..." << std::endl;
+#endif
+
 	// For each node
 	for (Node* node : nodes)
 	{
@@ -95,26 +99,22 @@ void MinimumSpanningTree::AssignNighbours(float maxDist)
 
 void MinimumSpanningTree::CreateAllEdges()
 {
+#if DEBUG_MODE == true
+	std::cout << "Creating edges..." << std::endl;
+#endif
+
 	// For every node
 	for (Node* node : nodes)
 	{
+#if DEBUG_MODE == true
+		std::cout << "Assigning edges for node " << node->id << std::endl;
+#endif
+
 		// For each neighbour
 		for (Node* neighbour : node->getPossibleNeighbours())
 		{
 			if (neighbour->checkedForNeighbours) { continue; }
-
-			// Create an edge between the node and neighbour
-			Edge* newEdge = new Edge(node, neighbour);
-
-			if (GetAllEdges().empty())
-			{
-				AddPossibleEdge(newEdge);
-				continue;
-			}
-			else
-			{
-				AddPossibleEdge(newEdge);
-			}
+			AddPossibleEdge(new Edge(node, neighbour));
 		}
 		node->checkedForNeighbours = true;
 	}
@@ -131,6 +131,10 @@ void MinimumSpanningTree::CreateAllEdges()
 
 void MinimumSpanningTree::Sort()
 {
+#if DEBUG_MODE == true
+	std::cout << "Sorting the MST..." << std::endl;
+#endif
+
 	// Completely reset the tree
 	treeEdges.clear();
 	for (Node* node : nodes)

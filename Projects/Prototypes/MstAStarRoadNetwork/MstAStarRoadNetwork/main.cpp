@@ -19,6 +19,10 @@ int winY;
 
 MinimumSpanningTree* mst;
 
+bool drawPopulationMap = true;
+bool drawQuadTree = true;
+bool drawMst = true;
+
 void SearchImageForPixelData(sf::Image image)
 {
 	int xSize = image.getSize().x;
@@ -90,9 +94,15 @@ int main()
 #endif
 
 	// Create a quad tree
+#if DEBUG_MODE == true
+	std::cout << "Creating Quad tree" << std::endl;
+#endif
 	QuadTree* qt = new QuadTree(0, 0, winX, winY, populationMap);
 
 	// Minimum Spanning tree
+#if DEBUG_MODE == true
+	std::cout << "Creating MST" << std::endl;
+#endif
 	mst = new MinimumSpanningTree();
 
 	// Plot points
@@ -124,6 +134,21 @@ int main()
 		while (window.pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed) { window.close(); }
+			else if (event.type == sf::Event::KeyPressed)
+			{
+				switch (event.key.code)
+				{
+				case sf::Keyboard::Num1:
+					drawPopulationMap = !drawPopulationMap;
+					break;
+				case sf::Keyboard::Num2:
+					drawQuadTree = !drawQuadTree;
+					break;
+				case sf::Keyboard::Num3:
+					drawMst = !drawMst;
+					break;
+				}
+			}
 		}
 
 		// Clear
@@ -132,51 +157,62 @@ int main()
 		// Draw...
 
 		// Population map
-		window.draw(populationSprite);
+		if (drawPopulationMap)
+		{
+			window.draw(populationSprite);
+		}
 
 		// Quad tree
-		for (QuadTree* qt : QuadTree::Children)
+		if (drawQuadTree)
 		{
-			sf::Vertex qtVertices[5] =
+			for (QuadTree* qt : QuadTree::Children)
 			{
-				sf::Vertex(sf::Vector2f(qt->xOrigin, qt->yOrigin), sf::Color::Red),
-				sf::Vertex(sf::Vector2f(qt->xOrigin, qt->yOrigin + qt->height), sf::Color::Red),
-				sf::Vertex(sf::Vector2f(qt->xOrigin + qt->width, qt->yOrigin + qt->height), sf::Color::Red),
-				sf::Vertex(sf::Vector2f(qt->xOrigin + qt->width, qt->yOrigin), sf::Color::Red),
-				sf::Vertex(sf::Vector2f(qt->xOrigin, qt->yOrigin), sf::Color::Red)
-			};
+				sf::Vertex qtVertices[5] =
+				{
+					sf::Vertex(sf::Vector2f(qt->xOrigin, qt->yOrigin), sf::Color::Red),
+					sf::Vertex(sf::Vector2f(qt->xOrigin, qt->yOrigin + qt->height), sf::Color::Red),
+					sf::Vertex(sf::Vector2f(qt->xOrigin + qt->width, qt->yOrigin + qt->height), sf::Color::Red),
+					sf::Vertex(sf::Vector2f(qt->xOrigin + qt->width, qt->yOrigin), sf::Color::Red),
+					sf::Vertex(sf::Vector2f(qt->xOrigin, qt->yOrigin), sf::Color::Red)
+				};
 
-			window.draw(qtVertices, 5, sf::LineStrip);
+				window.draw(qtVertices, 5, sf::LineStrip);
+			}
 		}
+
 
 		// MST
-		for (Edge edge : mst->GetTreeEdges())
+		if (drawMst)
 		{
-			sf::Vertex edgeVertices[2] =
+			for (Edge edge : mst->GetTreeEdges())
 			{
-				sf::Vertex(sf::Vector2f(edge.start->position->x, edge.start->position->y), sf::Color::Blue),
-				sf::Vertex(sf::Vector2f(edge.end->position->x, edge.end->position->y), sf::Color::Blue)
-			};
+				sf::Vertex edgeVertices[2] =
+				{
+					sf::Vertex(sf::Vector2f(edge.start->position->x, edge.start->position->y), sf::Color::Blue),
+					sf::Vertex(sf::Vector2f(edge.end->position->x, edge.end->position->y), sf::Color::Blue)
+				};
 
-			window.draw(edgeVertices, 2, sf::Lines);
+				window.draw(edgeVertices, 2, sf::Lines);
+			}
+
+			// Nodes
+			for (Node* node : mst->GetNodes())
+			{
+				sf::CircleShape point(2);
+				point.setFillColor(sf::Color::Green);
+				point.setPosition(node->position->x - 1, node->position->y - 1);
+
+				window.draw(point);
+
+				//sf::Vertex nodeVertiex[1] =
+				//{
+				//	sf::Vertex(sf::Vector2f(node->position->x, node->position->y), sf::Color::Green)
+				//};
+
+				//window.draw(nodeVertiex, 1, sf::Points);
+			}
 		}
 
-		// Nodes
-		for (Node* node : mst->GetNodes())
-		{
-			sf::CircleShape point(2);
-			point.setFillColor(sf::Color::Green);
-			point.setPosition(node->position->x -1, node->position->y -1);
-
-			window.draw(point);
-
-			//sf::Vertex nodeVertiex[1] =
-			//{
-			//	sf::Vertex(sf::Vector2f(node->position->x, node->position->y), sf::Color::Green)
-			//};
-
-			//window.draw(nodeVertiex, 1, sf::Points);
-		}
 
 		// Display
 		window.display();

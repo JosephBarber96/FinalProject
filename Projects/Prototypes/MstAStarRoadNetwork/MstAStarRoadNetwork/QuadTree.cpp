@@ -34,9 +34,9 @@ bool QuadTree::CheckSplit(sf::Image populationMap)
 	std::map<int, int> colorMap;
 
 	// Loop through each pixel of the aray, output the pixel data
-	for (int y = yOrigin; y < (yOrigin + height); y++)
+	for (int y = yOrigin; y < (yOrigin + height); y+=2)
 	{
-		for (int x = xOrigin; x < (xOrigin + width); x++)
+		for (int x = xOrigin; x < (xOrigin + width); x+=2)
 		{
 			auto color = populationMap.getPixel(x, y).toInteger();
 
