@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <SFML/Graphics.hpp>
 
 class QuadTree
 {
@@ -8,7 +9,7 @@ public:
 	static std::vector<QuadTree*> Children;
 
 	QuadTree();
-	QuadTree(int newXOrigin, int newYOrigin, int newWidth, int newHeight);
+	QuadTree(int newXOrigin, int newYOrigin, int newWidth, int newHeight, sf::Image populationMap);
 	~QuadTree();
 
 	int xOrigin;
@@ -23,7 +24,7 @@ public:
 
 private:
 
-	virtual bool CheckSplit();
-	virtual void Split();
+	virtual bool CheckSplit(sf::Image populationMap);
+	virtual void Split(sf::Image populationMap);
 };
 

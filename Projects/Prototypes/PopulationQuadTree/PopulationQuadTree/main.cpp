@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <ctime>
 #include <string>
+#include <map>
+#include <iostream>
 
 #include <SFML\Graphics.hpp>
 
@@ -10,9 +12,44 @@
 int winX;
 int winY;
 
+void SearchImageForPixelData(sf::Image image)
+{
+	int xSize = image.getSize().x;
+	int ySize = image.getSize().y;
+
+	int counter = 0;
+	std::map<int, int> colorMap;
+
+	for (int y = 0; y < ySize; y++)
+	{
+		for (int x = 0; x < xSize; x++)
+		{
+			// Grab the int32 representation of the color
+			auto color = image.getPixel(x, y).toInteger();
+
+			if (colorMap.find(color) == colorMap.end())
+			{
+				colorMap.insert(std::pair<int, int>(color, counter));
+				counter++;
+			}
+			else
+			{
+				colorMap[color]++;
+			}
+		}
+	}
+
+	std::cout << "Number of different pixel colours:" << colorMap.size() << std::endl;
+	std::map<int, int>::iterator iter;
+	for (iter = colorMap.begin(); iter != colorMap.end(); iter++)
+	{
+		std::cout << "Colour key: " << iter->first << " entries: " << iter->second << std::endl;
+	}
+}
+
 int main()
 {
-	std::string filename = "PopulationMap.jpg";
+	std::string filename = "PopulationMap.bmp";
 
 	// Read in population data
 	sf::Image populationMap;
@@ -27,7 +64,6 @@ int main()
 	// Create a window
 	sf::RenderWindow window(sf::VideoMode(winX, winY), "Population Data Quad Tree");
 
-
 	// Create a sprite to display this image;
 	sf::Texture populationTexture;
 	if (!populationTexture.loadFromFile(filename))
@@ -40,10 +76,10 @@ int main()
 	populationSprite.setTexture(populationTexture);
 	populationSprite.setPosition(0, 0);
 
-
+	SearchImageForPixelData(populationMap);
 
 	// Create a quad tree
-	// QuadTree* qt = new QuadTree(200, 200, 200, 200);
+	QuadTree* qt = new QuadTree(0, 0, winX, winY, populationMap);
 
 	// Display
 	while (window.isOpen())
@@ -64,11 +100,11 @@ int main()
 		{
 			sf::Vertex vertices[5] =
 			{
-				sf::Vertex(sf::Vector2f(qt->xOrigin, qt->yOrigin)),
-				sf::Vertex(sf::Vector2f(qt->xOrigin, qt->yOrigin + qt->height)),
-				sf::Vertex(sf::Vector2f(qt->xOrigin + qt->width, qt->yOrigin + qt->height)),
-				sf::Vertex(sf::Vector2f(qt->xOrigin + qt->width, qt->yOrigin)),
-				sf::Vertex(sf::Vector2f(qt->xOrigin, qt->yOrigin))
+				sf::Vertex(sf::Vector2f(qt->xOrigin, qt->yOrigin), sf::Color::Red),
+				sf::Vertex(sf::Vector2f(qt->xOrigin, qt->yOrigin + qt->height), sf::Color::Red),
+				sf::Vertex(sf::Vector2f(qt->xOrigin + qt->width, qt->yOrigin + qt->height), sf::Color::Red),
+				sf::Vertex(sf::Vector2f(qt->xOrigin + qt->width, qt->yOrigin), sf::Color::Red),
+				sf::Vertex(sf::Vector2f(qt->xOrigin, qt->yOrigin), sf::Color::Red)
 			};
 
 			window.draw(vertices, 5, sf::LineStrip);
