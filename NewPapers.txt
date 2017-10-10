@@ -1,3 +1,0 @@
-[1]
-Procedural generation of road networks for large virtual environments.
-http://scholarworks.rit.edu/cgi/viewcontent.cgi?article=6536&context=theses
