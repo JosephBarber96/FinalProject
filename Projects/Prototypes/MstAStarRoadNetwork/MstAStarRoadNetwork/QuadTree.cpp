@@ -40,8 +40,21 @@ bool QuadTree::CheckSplit(sf::Image populationMap)
 		{
 			auto color = populationMap.getPixel(x, y).toInteger();
 
-			// 255 is the int32 value for black
-			if (color == 255)
+			// Int32 colours
+			// -1061109505 = light grey
+			// -2139062017 = dark grey
+			// 255 = black
+			if (color == -1061109505
+				&& width > populationMap.getSize().x / 8)
+			{
+				return true;
+			}
+			else if (color == -2139062017
+				&& width > populationMap.getSize().x / 12)
+			{
+				return true;
+			}
+			else if (color == 255)
 			{
 				// Don't split if the quad is already small enough
 				if (width > populationMap.getSize().x / 17)
