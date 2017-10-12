@@ -9,6 +9,7 @@
 
 #include "MinimumSpanningTree.h"
 #include "Edge.h"
+#include "MstNode.h"
 #include "Node.h"
 #include "V2.h"
 #include "QuadTree.h"
@@ -196,7 +197,7 @@ int main()
 			}
 
 			// Nodes
-			for (Node* node : mst->GetNodes())
+			for (MstNode* node : mst->GetNodes())
 			{
 				sf::CircleShape point(2);
 				point.setFillColor(sf::Color::Green);

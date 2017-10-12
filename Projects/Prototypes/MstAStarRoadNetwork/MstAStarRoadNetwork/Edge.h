@@ -1,19 +1,19 @@
 #pragma once
-class Node;
+class MstNode;
 class Edge
 {
 public:
 	Edge();
-	Edge(Node* newStart, Node* newEnd);
+	Edge(MstNode* newStart, MstNode* newEnd);
 	~Edge();
 
-	Node* start;
-	Node* end;
+	MstNode* start;
+	MstNode* end;
 
 	float length;
 	bool partOfTree;
 	float EdgeLength();
-	bool EdgeContainsNode(Node node);
+	bool EdgeContainsNode(MstNode node);
 
 	bool operator== (const Edge& edge);
 	bool operator< (const Edge edge) const;

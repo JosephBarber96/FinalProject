@@ -118,16 +118,20 @@
     <ClCompile Include="Edge.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MinimumSpanningTree.cpp" />
+    <ClCompile Include="MstNode.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="QuadTree.cpp" />
+    <ClCompile Include="RoadNode.cpp" />
     <ClCompile Include="V2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="debug_mode.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="MinimumSpanningTree.h" />
+    <ClInclude Include="MstNode.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="QuadTree.h" />
+    <ClInclude Include="RoadNode.h" />
     <ClInclude Include="V2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

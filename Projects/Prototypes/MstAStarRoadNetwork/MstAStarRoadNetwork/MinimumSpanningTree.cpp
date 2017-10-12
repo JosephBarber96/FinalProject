@@ -11,7 +11,7 @@
 #include <stdlib.h>
 
 #include "MinimumSpanningTree.h"
-#include "Node.h"
+#include "MstNode.h"
 #include "Edge.h"
 #include "V2.h"
 
@@ -25,7 +25,7 @@ void MinimumSpanningTree::SpawnPoints(int numberOfPoints, int minX, int minY, in
 	{
 		int nodeX = rand() % maxX - minX;
 		int nodeY = rand() % maxY - minY;
-		Node* node = new Node(nodeX, nodeY);
+		MstNode* node = new MstNode(nodeX, nodeY);
 		node->id = nodeCount++;
 		AddNode(node);
 
@@ -41,7 +41,7 @@ void MinimumSpanningTree::SpawnPoint(int minX, int minY, int maxX, int maxY)
 
 	int nodeY = rand() % (maxY - minY + 1) + minY;
 
-	Node* node = new Node(nodeX, nodeY);
+	MstNode* node = new MstNode(nodeX, nodeY);
 	node->id = nodeCount++;
 	AddNode(node);
 
@@ -57,13 +57,13 @@ void MinimumSpanningTree::AssignNighbours(float maxDist)
 #endif
 
 	// For each node
-	for (Node* node : nodes)
+	for (MstNode* node : nodes)
 	{
 		bool neighbourFound = false;
-		Node* closestNeighbour = nullptr;
+		MstNode* closestNeighbour = nullptr;
 
 		// For every other ndoe
-		for (Node* possibleNeighbour : nodes)
+		for (MstNode* possibleNeighbour : nodes)
 		{
 			// Skip itself
 			if (*node == *possibleNeighbour) { continue; }
@@ -104,14 +104,14 @@ void MinimumSpanningTree::CreateAllEdges()
 #endif
 
 	// For every node
-	for (Node* node : nodes)
+	for (MstNode* node : nodes)
 	{
 #if DEBUG_MODE == true
 		std::cout << "Assigning edges for node " << node->id << std::endl;
 #endif
 
 		// For each neighbour
-		for (Node* neighbour : node->getPossibleNeighbours())
+		for (MstNode* neighbour : node->getPossibleNeighbours())
 		{
 			if (neighbour->checkedForNeighbours) { continue; }
 			AddPossibleEdge(new Edge(node, neighbour));
@@ -137,7 +137,7 @@ void MinimumSpanningTree::Sort()
 
 	// Completely reset the tree
 	treeEdges.clear();
-	for (Node* node : nodes)
+	for (MstNode* node : nodes)
 	{
 		node->partOfTree = false;
 	}
@@ -185,7 +185,7 @@ void MinimumSpanningTree::Sort()
 
 	// Dictionary for debugging to keep count of how many times each node was added.
 	std::map<int, int> myMap;
-	for (Node* node : nodes)
+	for (MstNode* node : nodes)
 	{
 		myMap.insert(std::pair<int, int>(node->id, 0));
 	}
@@ -229,7 +229,7 @@ void MinimumSpanningTree::Sort()
 
 		// Check to see if all nodes are now a part of the tree..
 		bool allInTree = true;
-		for (Node* node : nodes)
+		for (MstNode* node : nodes)
 		{
 			if (!node->partOfTree)
 			{
@@ -247,7 +247,7 @@ void MinimumSpanningTree::Sort()
 	}
 
 	// Debugging - output how many times each was added
-	for (Node* node : nodes)
+	for (MstNode* node : nodes)
 	{
 #if DEBUG_MODE == true
 		std::cout << "Node " << node->id << " has " << myMap[node->id] << " entries." << std::endl;
@@ -255,7 +255,7 @@ void MinimumSpanningTree::Sort()
 	}
 }
 
-std::vector<Edge*> MinimumSpanningTree::GetEdgesForNode(Node node)
+std::vector<Edge*> MinimumSpanningTree::GetEdgesForNode(MstNode node)
 {
 	std::vector<Edge*> edges;
 
@@ -270,7 +270,7 @@ std::vector<Edge*> MinimumSpanningTree::GetEdgesForNode(Node node)
 	return edges;
 }
 
-bool MinimumSpanningTree::TreeEdgesContainsNode(Node node)
+bool MinimumSpanningTree::TreeEdgesContainsNode(MstNode node)
 {
 	for (Edge edge : treeEdges)
 	{
@@ -282,7 +282,7 @@ bool MinimumSpanningTree::TreeEdgesContainsNode(Node node)
 	return false;
 }
 
-void MinimumSpanningTree::AddNode(Node* newNode)
+void MinimumSpanningTree::AddNode(MstNode* newNode)
 {
 	nodes.push_back(newNode);
 }

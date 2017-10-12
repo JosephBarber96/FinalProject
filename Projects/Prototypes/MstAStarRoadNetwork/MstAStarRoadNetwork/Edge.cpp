@@ -1,10 +1,11 @@
 #include "Edge.h"
+#include "MstNode.h"
 #include "Node.h"
 #include "V2.h"
 
 Edge::Edge() {}
 
-Edge::Edge(Node* newStart, Node* newEnd)
+Edge::Edge(MstNode* newStart, MstNode* newEnd)
 	:
 	start(newStart),
 	end(newEnd)
@@ -19,7 +20,7 @@ float Edge::EdgeLength()
 	return (V2::DistanceBetween(*start->position, *end->position));
 }
 
-bool Edge::EdgeContainsNode(Node node)
+bool Edge::EdgeContainsNode(MstNode node)
 {
 	return (*start == node || *end == node);
 }
