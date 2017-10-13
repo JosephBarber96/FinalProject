@@ -25,6 +25,11 @@ bool V2::operator==(V2 arg)
 	return (x == arg.x && y == arg.y);
 }
 
+V2 V2::operator- (V2 arg)
+{
+	return V2(x - arg.x, y - arg.y);
+}
+
 // Static methods
 
 float V2::DistanceBetween(V2 left, V2 right)

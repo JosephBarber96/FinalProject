@@ -7,10 +7,13 @@
 
 #include <SFML\Graphics.hpp>
 
+#include "AStar.h"
 #include "MinimumSpanningTree.h"
 #include "Edge.h"
+#include "RoadNode.h"
 #include "MstNode.h"
 #include "Node.h"
+#include "Road.h"
 #include "V2.h"
 #include "QuadTree.h"
 #include "debug_mode.h"
@@ -57,6 +60,59 @@ void SearchImageForPixelData(sf::Image image)
 	{
 		std::cout << "Colour key: " << iter->first << " entries: " << iter->second << std::endl;
 	}
+}
+
+void CreateRoadNodes(sf::Image image)
+{
+	int xSize = image.getSize().x;
+	int ySize = image.getSize().y;
+
+	RoadNode::grid.resize(ySize);
+
+	for (int y = 0; y < ySize; y++)
+	{
+		for (int x = 0; x < xSize; x++)
+		{
+
+			// Grab the int32 representation of the color
+			auto color = image.getPixel(x, y).toInteger();
+
+			// Int32 colours
+			// -1061109505 = light grey
+			// -2139062017 = dark grey
+			// 255 = black
+
+			RoadNode* node = new RoadNode(x, y);
+
+			switch (color)
+			{
+			case -1061109505:
+				node->SetCost(2);
+				break;
+			case -2139062017:
+				node->SetCost(5);
+				break;
+			case 255:
+				node->SetCost(10);
+				break;
+			default:
+				node->SetCost(0);
+				break;
+			}
+
+			RoadNode::grid[y].push_back(node);
+		}
+	}
+
+	for (int y = 0; y < ySize-1; y++)
+	{
+		for (int x = 0; x < xSize-1; x++)
+		{
+			RoadNode::grid[y][x]->FillNeighbours(ySize-1, xSize-1);
+		}
+	}
+
+	std::cout << "RoadNodes setup successfully" << std::endl;
 }
 
 int main()
@@ -124,9 +180,33 @@ int main()
 
 	// Sort the MST
 	mst->Sort();
-
 	std::cout << "The quad tree consts of " << QuadTree::Children.size() << " quads." << std::endl;
 	std::cout << "The complete MST has " << mst->GetTreeEdges().size() << " edges." << std::endl;
+
+	// Now that we've sorted the MST, we have to set up road nodes and use A* to pathfind the roads.
+	std::string elevationMapFileName = "elevationMap.bmp";
+	sf::Image evelationMap;
+	if (!evelationMap.loadFromFile(elevationMapFileName))
+	{
+		std::cerr << "Could not find/open elevationMap" << std::endl;
+		return -1;
+	}
+
+	CreateRoadNodes(evelationMap);
+
+	int counter = 0;
+
+	// Construct a road from each edge
+	for (Edge edge : mst->GetTreeEdges())
+	{
+		std::cout << "Creating node for edge: " << ++counter << std::endl;
+		// Make a road for this edge
+		Road* road = new Road();
+
+		// Pathfind it
+		road->nodes = AStar::PathFind(edge.start->position->x, edge.start->position->y, edge.end->position->x, edge.end->position->y);
+	}
+
 
 	// Display
 	while (window.isOpen())
@@ -211,6 +291,19 @@ int main()
 				//};
 
 				//window.draw(nodeVertiex, 1, sf::Points);
+			}
+		}
+
+		// Roads
+		for (Road* road : Road::roads)
+		{
+			for (RoadNode* rn : road->nodes)
+			{
+				sf::CircleShape point(1);
+				point.setFillColor(sf::Color::Cyan);
+				point.setPosition(rn->position->x, rn->position->y);
+
+				window.draw(point);
 			}
 		}
 

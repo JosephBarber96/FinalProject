@@ -11,6 +11,7 @@ public:
 
 	// Operators
 	bool operator== (V2 arg);
+	V2 operator- (V2 arg);
 
 	// Static
 	static float DistanceBetween(V2 left, V2 right);
