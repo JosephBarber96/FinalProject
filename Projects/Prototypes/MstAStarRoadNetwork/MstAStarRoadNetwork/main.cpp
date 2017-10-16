@@ -26,6 +26,9 @@ MinimumSpanningTree* mst;
 bool drawPopulationMap = true;
 bool drawQuadTree = true;
 bool drawMst = true;
+bool drawNodes = true;
+bool drawRoads = true;
+bool drawElevationMap = false;
 
 void SearchImageForPixelData(sf::Image image)
 {
@@ -87,13 +90,13 @@ void CreateRoadNodes(sf::Image image)
 			switch (color)
 			{
 			case -1061109505:
-				node->SetCost(2);
+				node->SetCost(20);
 				break;
 			case -2139062017:
-				node->SetCost(5);
+				node->SetCost(50);
 				break;
 			case 255:
-				node->SetCost(10);
+				node->SetCost(100);
 				break;
 			default:
 				node->SetCost(0);
@@ -184,6 +187,8 @@ int main()
 	std::cout << "The complete MST has " << mst->GetTreeEdges().size() << " edges." << std::endl;
 
 	// Now that we've sorted the MST, we have to set up road nodes and use A* to pathfind the roads.
+
+	// Read in elevation map
 	std::string elevationMapFileName = "elevationMap.bmp";
 	sf::Image evelationMap;
 	if (!evelationMap.loadFromFile(elevationMapFileName))
@@ -194,12 +199,27 @@ int main()
 
 	CreateRoadNodes(evelationMap);
 
-	int counter = 0;
+	// Create a sprite to display this image;
+	sf::Texture elevationTexture;
+	if (!elevationTexture.loadFromFile(elevationMapFileName))
+	{
+		return -1;
+	}
+	elevationTexture.setSmooth(true);
 
+	sf::Sprite elevationSprite;
+	elevationSprite.setTexture(elevationTexture);
+	elevationSprite.setPosition(0, 0);
+
+#if DEBUG_MODE == true
+	int counter = 0;
+#endif
 	// Construct a road from each edge
 	for (Edge edge : mst->GetTreeEdges())
 	{
-		std::cout << "Creating node for edge: " << ++counter << std::endl;
+#if DEBUG_MODE = true
+		std::cout << "Creating road for edge: " << ++counter << std::endl;
+#endif
 		// Make a road for this edge
 		Road* road = new Road();
 
@@ -228,6 +248,16 @@ int main()
 				case sf::Keyboard::Num3:
 					drawMst = !drawMst;
 					break;
+				case sf::Keyboard::Num4:
+					drawNodes = !drawNodes;
+					break;
+				case sf::Keyboard::Num5:
+					drawElevationMap = !drawElevationMap;
+					break;
+				case sf::Keyboard::Num6:
+					drawRoads = !drawRoads;
+					break;
+					break;
 				}
 			}
 		}
@@ -241,6 +271,12 @@ int main()
 		if (drawPopulationMap)
 		{
 			window.draw(populationSprite);
+		}
+
+		// Elevation map
+		if (drawElevationMap)
+		{
+			window.draw(elevationSprite);
 		}
 
 		// Quad tree
@@ -275,7 +311,10 @@ int main()
 
 				window.draw(edgeVertices, 2, sf::Lines);
 			}
+		}
 
+		if (drawNodes)
+		{
 			// Nodes
 			for (MstNode* node : mst->GetNodes())
 			{
@@ -295,17 +334,45 @@ int main()
 		}
 
 		// Roads
-		for (Road* road : Road::roads)
+		if (drawRoads)
 		{
-			for (RoadNode* rn : road->nodes)
+			for (Road* road : Road::roads)
 			{
-				sf::CircleShape point(1);
-				point.setFillColor(sf::Color::Cyan);
-				point.setPosition(rn->position->x, rn->position->y);
+				//int size = road->nodes.size();
+				//sf::Vertex* nodeVertices = (sf::Vertex*)malloc(size);
 
-				window.draw(point);
+				//for (int i = 0; i < size; i++)
+				//{
+				//	nodeVertices[i] = sf::Vertex(sf::Vector2f(road->nodes[i]->position->x, road->nodes[i]->position->y), sf::Color::Green);
+				//}
+
+				//window.draw(nodeVertices, size, sf::LineStrip);
+
+				sf::VertexArray nodeVertices(sf::LineStrip, road->nodes.size());
+
+				int nodeCounter = 0;
+				for (RoadNode* node : road->nodes)
+				{
+					nodeVertices[nodeCounter].position = sf::Vector2f(node->position->x, node->position->y);
+					nodeVertices[nodeCounter].color = sf::Color(255, 0, 255);
+					nodeCounter++;
+				}
+
+				window.draw(nodeVertices);
 			}
 		}
+
+		//for (Road* road : Road::roads)
+		//{
+		//	for (RoadNode* rn : road->nodes)
+		//	{
+		//		sf::CircleShape point(1);
+		//		point.setFillColor(sf::Color::Cyan);
+		//		point.setPosition(rn->position->x, rn->position->y);
+
+		//		window.draw(point);
+		//	}
+		//}
 
 
 		// Display

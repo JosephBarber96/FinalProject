@@ -40,9 +40,9 @@ std::vector<RoadNode*> AStar::PathFind(int startX, int startY, int endX, int end
 		for (RoadNode* rn : Q)
 		{
 			if (
-				(rn->distance + Utility::Length(*rn->position - *end->position))
+				(rn->GetCost() + Utility::Length(*rn->position - *end->position))
 				<
-				(u->distance + Utility::Length(*rn->position - *end->position))
+				(u->GetCost() + Utility::Length(*rn->position - *end->position))
 				)
 			{
 				u = rn;
