@@ -20,8 +20,10 @@ public:
 	void FillNeighbours(int gridHeight, int gridWidth);
 	void SetCost(int newCost);
 
-	inline bool GetCost() { return cost; }
+	float GetCost() { return cost; }
+
+	float cost;
 
 private:
-	float cost;
+	
 };
