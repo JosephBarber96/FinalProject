@@ -6,96 +6,101 @@
 #include "Utility.h"
 #include "V2.h"
 
-AStar::AStar() {}
-
-AStar::~AStar() {}
-
-std::vector<RoadNode*> AStar::PathFind(int startX, int startY, int endX, int endY)
+namespace AStar
 {
-	// Start, End
-	RoadNode* start = RoadNode::GetNodeAtPosition(startX, startY);
-	RoadNode* end = RoadNode::GetNodeAtPosition(endX, endY);
-
-	//RoadNode* start = RoadNode::grid[startY][startX];
-	//RoadNode* end = RoadNode::grid[endY][endX];
-
-	// Q : the set of all nodes
-	std::vector<RoadNode*> Q;
-	for (auto vec : RoadNode::grid)
+	std::vector<RoadNode*> PathFind(int startX, int startY, int endX, int endY)
 	{
-		for (auto node : vec)
+		// Start, End
+		RoadNode* start = RoadNode::GetNodeAtPosition(startX, startY);
+		RoadNode* end = RoadNode::GetNodeAtPosition(endX, endY);
+
+		if (start == nullptr || end == nullptr)
 		{
-			node->distance = FLT_MAX;
-			node->parent = nullptr;
-			Q.push_back(node);
+			return std::vector<RoadNode*>();
 		}
-	}
 
-	//for (int y = 0; y < RoadNode::grid.size()-1; y++)
-	//{
-	//	for (int x = 0; x < RoadNode::grid[0].size()-1; x++)
-	//	{
-	//		RoadNode::grid[y][x]->distance = FLT_MAX;
-	//		RoadNode::grid[y][x]->parent = nullptr;
-	//		Q.push_back(RoadNode::grid[y][x]);
-	//	}
-	//}
+		//RoadNode* start = RoadNode::grid[startY][startX];
+		//RoadNode* end = RoadNode::grid[endY][endX];
 
-	// The start has a distance of 0
-	start->distance = 0;
-
-	while (!Q.empty())
-	{
-		
-		//u is node in Q with the smallest distance
-		RoadNode* u = Q.front();
-		for (RoadNode* rn : Q)
+		// Q : the set of all nodes
+		std::vector<RoadNode*> Q;
+		for (auto vec : RoadNode::grid)
 		{
-			if (
-				(rn->distance + Utility::Length(*rn->position - *end->position))
-				<
-				(u->distance + Utility::Length(*rn->position - *end->position))
-				)
+			for (auto node : vec)
 			{
-				u = rn;
+				node->distance = FLT_MAX;
+				node->parent = nullptr;
+				Q.push_back(node);
 			}
 		}
 
-		// Remove u from Q
-		Q.erase(std::remove(Q.begin(), Q.end(), u), Q.end());
+		//for (int y = 0; y < RoadNode::grid.size()-1; y++)
+		//{
+		//	for (int x = 0; x < RoadNode::grid[0].size()-1; x++)
+		//	{
+		//		RoadNode::grid[y][x]->distance = FLT_MAX;
+		//		RoadNode::grid[y][x]->parent = nullptr;
+		//		Q.push_back(RoadNode::grid[y][x]);
+		//	}
+		//}
 
-		// For each neighbour of u
-		for (RoadNode* neighbour : u->neighbours)
+		// The start has a distance of 0
+		start->distance = 0;
+
+		while (!Q.empty())
 		{
-			// Skip non-walkables
-			// if (!neighbour->isWalkable) continue;
 
-			auto alt = neighbour->GetCost() + Utility::Length(*neighbour->position - *end->position);
-
-			if (alt < neighbour->distance)
+			//u is node in Q with the smallest distance
+			RoadNode* u = Q.front();
+			for (RoadNode* rn : Q)
 			{
-				neighbour->distance = alt;
-				neighbour->parent = u;
-				if (neighbour->position->x == end->position->x
-					&&
-					neighbour->position->y == end->position->y)
+				if (
+					(rn->distance + Utility::Length(*rn->position - *end->position))
+					<
+					(u->distance + Utility::Length(*rn->position - *end->position))
+					)
 				{
-					return ReconstructPath(neighbour);
+					u = rn;
+				}
+			}
+
+			// Remove u from Q
+			Q.erase(std::remove(Q.begin(), Q.end(), u), Q.end());
+
+			// For each neighbour of u
+			for (RoadNode* neighbour : u->neighbours)
+			{
+				// Skip non-walkables
+				// if (!neighbour->isWalkable) continue;
+
+				auto alt = neighbour->GetCost() + Utility::Length(*neighbour->position - *end->position);
+
+				if (alt < neighbour->distance)
+				{
+					neighbour->distance = alt;
+					neighbour->parent = u;
+					if (neighbour->position->x == end->position->x
+						&&
+						neighbour->position->y == end->position->y)
+					{
+						return ReconstructPath(neighbour);
+					}
 				}
 			}
 		}
 	}
-}
 
-std::vector<RoadNode*> AStar::ReconstructPath(RoadNode* goal)
-{
-	std::vector<RoadNode*> road = std::vector<RoadNode*>();
-	do
+	std::vector<RoadNode*> ReconstructPath(RoadNode* goal)
 	{
+		std::vector<RoadNode*> road = std::vector<RoadNode*>();
+		do
+		{
+			road.push_back(goal);
+			goal = goal->parent;
+		} while (goal->parent != nullptr);
 		road.push_back(goal);
-		goal = goal->parent;
-	} while (goal->parent != nullptr);
-	road.push_back(goal);
 
-	return road;
+		return road;
+	}
 }
+

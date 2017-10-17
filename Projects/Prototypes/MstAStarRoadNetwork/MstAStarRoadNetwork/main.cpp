@@ -63,13 +63,13 @@ void CreateRoadNodes(sf::Image image)
 			switch (color)
 			{
 			case -1061109505:
-				node->SetCost(2);
+				node->SetCost(20);
 				break;
 			case -2139062017:
-				node->SetCost(5);
+				node->SetCost(50);
 				break;
 			case 255:
-				node->SetCost(10);
+				node->SetCost(100);
 				break;
 			default:
 				node->SetCost(0);
@@ -155,7 +155,7 @@ int main()
 	// Create a window
 	winX = populationMap.getSize().x;
 	winY = populationMap.getSize().y;
-	sf::RenderWindow window(sf::VideoMode(winX, winY), "Population Data Quad Tree");
+	sf::RenderWindow window(sf::VideoMode(winX, winY), "Road network prototype");
 
 	// Create a sprite to display this image;
 	sf::Texture populationTexture;
@@ -193,6 +193,33 @@ int main()
 #endif
 		mst->SpawnPoint(qt->xOrigin, qt->yOrigin, (qt->xOrigin + qt->width), (qt->yOrigin + qt->height));
 	}
+
+#if DEBUG_MODE == false
+	for (auto node : mst->GetNodes())
+	{
+		if (node->position->x == winX)
+		{
+			node->position->x -= 5;
+		}
+		
+		if (node->position->y == winY)
+		{
+			node->position->y -= 5;
+		}
+
+		//if (node->position->x == winX || node->position->y == winY)
+		//{
+		//	std::cerr << "Node position is at the end of the map" << std::endl;
+		//	return -1;
+		//}
+
+		if (node->position->x % 5 != 0 || node->position->y % 5 != 0)
+		{
+			std::cerr << "Node position not set on a factor of 5" << std::endl;
+			return -1;
+		}
+	}
+#endif
 
 	// Assign neighbour
 	float maxDist = winX / 4;
