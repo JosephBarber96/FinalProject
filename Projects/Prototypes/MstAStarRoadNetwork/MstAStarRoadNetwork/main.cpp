@@ -32,15 +32,21 @@ bool drawRoads = true;
 
 void CreateRoadNodes(sf::Image image)
 {
-	int xSize = image.getSize().x;
-	int ySize = image.getSize().y;
+	int imageWidth = image.getSize().x;
+	int imageHeight = image.getSize().y;
 
-	RoadNode::grid.resize(ySize);
+	int yIndex = 0;
+	int xIndex = 0;
 
-	for (int y = 0; y < ySize; y++)
+	for (int y = 0; y < imageHeight; y++)
 	{
-		for (int x = 0; x < xSize; x++)
+		if (y % 5 != 0) { continue; }
+
+		RoadNode::grid.push_back(std::vector<RoadNode*>());
+		for (int x = 0; x < imageWidth; x++)
 		{
+
+			if (x % 5 != 0) { continue; }
 
 			// Grab the int32 representation of the color
 			auto color = image.getPixel(x, y).toInteger();
@@ -51,6 +57,8 @@ void CreateRoadNodes(sf::Image image)
 			// 255 = black
 
 			RoadNode* node = new RoadNode(x, y);
+			node->yIndex = yIndex;
+			node->xIndex = xIndex;
 
 			switch (color)
 			{
@@ -68,17 +76,29 @@ void CreateRoadNodes(sf::Image image)
 				break;
 			}
 
-			RoadNode::grid[y].push_back(node);
+			RoadNode::grid[yIndex].push_back(node);
+
+			xIndex++;
+		}
+		yIndex++;
+		xIndex = 0;
+	}
+
+	for (auto vec : RoadNode::grid)
+	{
+		for (auto node : vec)
+		{
+			node->FillNeighbours();
 		}
 	}
 
-	for (int y = 0; y < ySize - 1; y++)
-	{
-		for (int x = 0; x < xSize - 1; x++)
-		{
-			RoadNode::grid[y][x]->FillNeighbours(ySize - 1, xSize - 1);
-		}
-	}
+	//for (int y = 0; y < imageHeight - 1; y++)
+	//{
+	//	for (int x = 0; x < imageHeight - 1; x++)
+	//	{
+	//		RoadNode::grid[y][x]->FillNeighbours(ySize - 1, xSize - 1);
+	//	}
+	//}
 
 	std::cout << "RoadNodes setup successfully" << std::endl;
 }
@@ -309,22 +329,6 @@ int main()
 			}
 		}
 
-		if (drawNodes)
-		{
-			// Nodes
-			for (MstNode* node : mst->GetNodes())
-			{
-
-				sf::Vertex point[1] = { sf::Vertex(sf::Vector2f(node->position->x, node->position->y), sf::Color::Green) };
-
-				//sf::CircleShape point(1);
-				//point.setFillColor(sf::Color::Green);
-				//point.setPosition(node->position->x, node->position->y);
-
-				window.draw(point, 1, sf::Points);
-			}
-		}
-
 		if (drawRoads)
 		{
 			for (Road* road : Road::roads)
@@ -340,6 +344,22 @@ int main()
 				}
 
 				window.draw(roadVertices);
+			}
+		}
+
+		if (drawNodes)
+		{
+			// Nodes
+			for (MstNode* node : mst->GetNodes())
+			{
+
+				sf::Vertex point[1] = { sf::Vertex(sf::Vector2f(node->position->x, node->position->y), sf::Color::Green) };
+
+				//sf::CircleShape point(1);
+				//point.setFillColor(sf::Color::Green);
+				//point.setPosition(node->position->x, node->position->y);
+
+				window.draw(point, 1, sf::Points);
 			}
 		}
 

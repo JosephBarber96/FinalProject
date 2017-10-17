@@ -13,14 +13,18 @@ public:
 	~RoadNode();
 
 	bool checked;
+	int yIndex;
+	int xIndex;
 	float distance;
 	RoadNode* parent;
 	std::vector<RoadNode*> neighbours;
 
+	void FillNeighbours();
 	void FillNeighbours(int gridHeight, int gridWidth);
 	void SetCost(int newCost);
-
 	float GetCost() { return cost; }
+
+	static RoadNode* GetNodeAtPosition(int xPos, int yPos);
 
 	float cost;
 

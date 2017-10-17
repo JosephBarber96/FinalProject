@@ -38,10 +38,15 @@ void MinimumSpanningTree::SpawnPoints(int numberOfPoints, int minX, int minY, in
 void MinimumSpanningTree::SpawnPoint(int minX, int minY, int maxX, int maxY)
 {
 	int nodeX = rand() % (maxX - minX + 1) + minX;
-
 	int nodeY = rand() % (maxY - minY + 1) + minY;
 
-	MstNode* node = new MstNode(nodeX, nodeY);
+	int nodeXDifference = (nodeX % 5);
+	int nodeXToFive = nodeX - nodeXDifference;
+
+	int nodeYDifference = (nodeY % 5);
+	int nodeYToFive = (nodeY - nodeYDifference);
+
+	MstNode* node = new MstNode(nodeXToFive, nodeYToFive);
 	node->id = nodeCount++;
 	AddNode(node);
 

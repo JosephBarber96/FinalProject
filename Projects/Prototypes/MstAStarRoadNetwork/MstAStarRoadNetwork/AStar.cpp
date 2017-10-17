@@ -13,24 +13,36 @@ AStar::~AStar() {}
 std::vector<RoadNode*> AStar::PathFind(int startX, int startY, int endX, int endY)
 {
 	// Start, End
-	RoadNode* start = RoadNode::grid[startY][startX];
-	RoadNode* end = RoadNode::grid[endY][endX];
+	RoadNode* start = RoadNode::GetNodeAtPosition(startX, startY);
+	RoadNode* end = RoadNode::GetNodeAtPosition(endX, endY);
+
+	//RoadNode* start = RoadNode::grid[startY][startX];
+	//RoadNode* end = RoadNode::grid[endY][endX];
 
 	// Q : the set of all nodes
 	std::vector<RoadNode*> Q;
-	for (int y = 0; y < RoadNode::grid.size()-1; y++)
+	for (auto vec : RoadNode::grid)
 	{
-		for (int x = 0; x < RoadNode::grid[0].size()-1; x++)
+		for (auto node : vec)
 		{
-			RoadNode::grid[y][x]->distance = FLT_MAX;
-			RoadNode::grid[y][x]->parent = nullptr;
-			Q.push_back(RoadNode::grid[y][x]);
+			node->distance = FLT_MAX;
+			node->parent = nullptr;
+			Q.push_back(node);
 		}
 	}
 
+	//for (int y = 0; y < RoadNode::grid.size()-1; y++)
+	//{
+	//	for (int x = 0; x < RoadNode::grid[0].size()-1; x++)
+	//	{
+	//		RoadNode::grid[y][x]->distance = FLT_MAX;
+	//		RoadNode::grid[y][x]->parent = nullptr;
+	//		Q.push_back(RoadNode::grid[y][x]);
+	//	}
+	//}
+
 	// The start has a distance of 0
 	start->distance = 0;
-
 
 	while (!Q.empty())
 	{
@@ -83,6 +95,7 @@ std::vector<RoadNode*> AStar::ReconstructPath(RoadNode* goal)
 		road.push_back(goal);
 		goal = goal->parent;
 	} while (goal->parent != nullptr);
+	road.push_back(goal);
 
 	return road;
 }
