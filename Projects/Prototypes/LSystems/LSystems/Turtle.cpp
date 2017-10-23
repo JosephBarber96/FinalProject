@@ -6,9 +6,7 @@ Turtle::Turtle()
 	:
 	angle(0),
 	position(new Vec2(0, 0))
-{
-
-}
+{}
 
 Turtle::~Turtle() {}
 
@@ -72,6 +70,20 @@ void Turtle::PopPosition()
 
 	// Pop this off of the stack
 	posStack.pop();
+}
+
+void Turtle::PushPositionAndAngle()
+{
+	PushPosition();
+	angleStack.push(angle);
+}
+
+void Turtle::PopPositionAndAngle()
+{
+	PopPosition();
+
+	angle = angleStack.top();
+	angleStack.pop();
 }
 
 // Private

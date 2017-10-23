@@ -15,6 +15,8 @@ public:
 	void DrawLine(float length);
 	void PushPosition();
 	void PopPosition();
+	void PushPositionAndAngle();
+	void PopPositionAndAngle();
 
 	std::vector<Line*> getLines() { return lines; }
 
@@ -24,6 +26,7 @@ private:
 
 	float angle;
 	Vec2* position;	
+	std::stack<float> angleStack;
 	std::stack<Vec2*> posStack;
 	std::vector<Line*> lines;
 };

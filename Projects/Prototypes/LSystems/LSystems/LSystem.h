@@ -5,9 +5,11 @@ class Rule;
 class LSystem
 {
 public:
+	LSystem();
 	LSystem(std::string ax);
 	~LSystem();
 
+	void SetAxiom(std::string ax);
 	bool AddRule(Rule* newRule);
 	void Generate();
 

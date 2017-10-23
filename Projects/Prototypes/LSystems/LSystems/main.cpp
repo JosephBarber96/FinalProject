@@ -14,7 +14,7 @@
 
 Turtle turtle;
 const int orthoSize = 50;
-const int generationCount = 5;
+const int generationCount = 4;
 
 void Display()
 {
@@ -43,7 +43,7 @@ void InitGl()
 
 	// Coordinate system
 	// minx, maxx, miny, maxy
-	gluOrtho2D(-orthoSize, orthoSize, 0, orthoSize);
+	gluOrtho2D(-orthoSize, orthoSize, -orthoSize, orthoSize);
 }
 
 void SimpleLSystemTest()
@@ -62,6 +62,74 @@ void SimpleLSystemTest()
 	}
 }
 
+void KockCurve(LSystem &tree, float &angle)
+{
+	/*
+	Variables:
+		F = Draw Forward
+		- = Rotate left
+		+ = Rotate right
+	*/
+
+	angle = 90;
+
+	tree.SetAxiom("F");
+	tree.AddRule(new Rule('F', "F+F-F-F+F"));
+}
+
+void SierpinskiTriangle(LSystem &tree, float &angle)
+{
+	/*
+	Variables:
+		F = Draw Forward
+		G = Draw Forward
+		- = Rotate left
+		+ = Rotate right
+	*/
+
+	angle = 120;
+
+	tree.SetAxiom("F-G-G");
+	tree.AddRule(new Rule('F', "F-G+F+G-F"));
+	tree.AddRule(new Rule('G', "GG"));
+}
+
+void SymetricalTree(LSystem &tree, float &angle)
+{
+	/*
+	Variables:
+		F = Draw Forward
+		- = Rotate left
+		+ = Rotate right
+		[ = Push Position AND Angle
+		] = Push Position AND Angle
+	*/
+
+	angle = 30;
+	
+	tree.SetAxiom("F");
+	tree.AddRule(new Rule('F', "FF+[+F-F-F]-[-F+F+F]"));
+}
+
+void FractalPlant(LSystem &tree, float &angle)
+{
+	/*
+	Variables:
+		F = Draw Forward
+		- = Rotate left
+		+ = Rotate right
+		[ = Push Position AND Angle
+		] = Push Position AND Angle
+		X - Simply controls the flow of the L ssystem.
+	*/
+
+	angle = 25;
+
+	tree.SetAxiom("X");
+	tree.AddRule(new Rule('X', "F[-X][X]F[-X]+FX"));
+	tree.AddRule(new Rule('F', "FF"));
+}
+
 int main(int argc, char* argv[])
 {
 	turtle = Turtle();
@@ -69,23 +137,20 @@ int main(int argc, char* argv[])
 	float lineLength = 1.0f;
 	float angle;
 
-	LSystem tree = LSystem("F");
+	LSystem tree = LSystem();
 
-	// Ruleset 1:
-	tree.AddRule(new Rule('F', "FF+[+F-F-F]-[-F+F+F]"));
-	angle = 30;
+	// KockCurve(tree, angle);
+	// SierpinskiTriangle(tree, angle);
+	// SymetricalTree(tree, angle);
+	FractalPlant(tree, angle);
 
-	// Ruleset 2:
-	//tree.AddRule(new Rule('F', "F-G+F+G-F"));
-	//tree.AddRule(new Rule('G', "GG"));
-	//angle = 120;
 
 	for (int i = 0; i < generationCount; i++)
 	{
 		tree.Generate();
 	}
 
-	//std::cout << tree.getSentence() << std::endl;
+	// std::cout << tree.getSentence() << std::endl;
 
 
 
@@ -105,9 +170,17 @@ int main(int argc, char* argv[])
 		}
 		else if (c == '[')
 		{
-			turtle.PushPosition();
+			turtle.PushPositionAndAngle();
 		}
 		else if (c == ']')
+		{
+			turtle.PopPositionAndAngle();
+		}
+		else if (c == '{')
+		{
+			turtle.PushPosition();
+		}
+		else if (c == '}')
 		{
 			turtle.PopPosition();
 		}

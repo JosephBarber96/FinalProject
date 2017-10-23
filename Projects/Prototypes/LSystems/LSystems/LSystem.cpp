@@ -1,6 +1,12 @@
 #include "LSystem.h"
 #include "Rule.h"
 
+LSystem::LSystem()
+	:
+	axiom(""),
+	sentence("")
+{}
+
 LSystem::LSystem(std::string ax)
 	:
 	axiom(ax),
@@ -8,6 +14,12 @@ LSystem::LSystem(std::string ax)
 {}
 
 LSystem::~LSystem() {}
+
+void LSystem::SetAxiom(std::string ax)
+{
+	axiom = ax;
+	sentence = axiom;
+}
 
 bool LSystem::AddRule(Rule* newRule)
 {
@@ -24,6 +36,9 @@ bool LSystem::AddRule(Rule* newRule)
 
 void LSystem::Generate()
 {
+	if (axiom == "") 
+	{ return; }
+
 	std::string newSentence = "";
 
 	for (auto cha : sentence)
