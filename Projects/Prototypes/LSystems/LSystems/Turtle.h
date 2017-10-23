@@ -9,7 +9,9 @@ public:
 	Turtle();
 	~Turtle();
 
+	void FaceAngle(float deg);
 	void Rotate(float deg);
+	void Move(float length);
 	void DrawLine(float length);
 	void PushPosition();
 	void PopPosition();
