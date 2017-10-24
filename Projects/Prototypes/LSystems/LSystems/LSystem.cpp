@@ -24,7 +24,7 @@ void LSystem::SetAxiom(std::string ax)
 bool LSystem::AddRule(char key, std::string output)
 {
 	Rule* rule = new Rule(key, output);
-	AddRule(rule);
+	return AddRule(rule);
 }
 
 bool LSystem::AddRule(Rule* newRule)

@@ -173,7 +173,7 @@ void TurtleTree(LSystem &lsys, Turtle& turtle, int lineLength, float angle)
 
 int main(int argc, char* argv[])
 {
-	// SimpleLSystemTest();
+	SimpleLSystemTest();
 
 	turtle = Turtle();
 	// turtle.Reposition(0, -orthoSize);
