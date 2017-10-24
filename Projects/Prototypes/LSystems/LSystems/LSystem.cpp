@@ -21,6 +21,12 @@ void LSystem::SetAxiom(std::string ax)
 	sentence = axiom;
 }
 
+bool LSystem::AddRule(char key, std::string output)
+{
+	Rule* rule = new Rule(key, output);
+	AddRule(rule);
+}
+
 bool LSystem::AddRule(Rule* newRule)
 {
 	for (auto rule : rules)

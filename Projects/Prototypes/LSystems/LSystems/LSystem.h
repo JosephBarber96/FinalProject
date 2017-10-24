@@ -10,6 +10,7 @@ public:
 	~LSystem();
 
 	void SetAxiom(std::string ax);
+	bool AddRule(char key, std::string output);
 	bool AddRule(Rule* newRule);
 	void Generate();
 

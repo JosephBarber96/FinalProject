@@ -13,4 +13,3 @@ private:
 	Vec2* start;
 	Vec2* end;
 };
-

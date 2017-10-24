@@ -12,6 +12,16 @@ Turtle::~Turtle() {}
 
 // Public
 
+void Turtle::Reposition(Vec2* pos)
+{
+	position = pos;
+}
+
+void Turtle::Reposition(int newX, int newY)
+{
+	position = new Vec2(newX, newY);
+}
+
 void Turtle::FaceAngle(float deg)
 {
 	// Set our angle
@@ -57,6 +67,18 @@ void Turtle::DrawLine(float length)
 	AddLine(startPos, endPos);
 }
 
+void Turtle::Push()
+{
+	PushPosition();
+	PushAngle();
+}
+
+void Turtle::Pop()
+{
+	PopPosition();
+	PopAngle();
+}
+
 void Turtle::PushPosition()
 {
 	// Push our position onto the stack
@@ -72,16 +94,13 @@ void Turtle::PopPosition()
 	posStack.pop();
 }
 
-void Turtle::PushPositionAndAngle()
+void Turtle::PushAngle()
 {
-	PushPosition();
 	angleStack.push(angle);
 }
 
-void Turtle::PopPositionAndAngle()
+void Turtle::PopAngle()
 {
-	PopPosition();
-
 	angle = angleStack.top();
 	angleStack.pop();
 }

@@ -3,13 +3,13 @@
 class Rule
 {
 public:
-	Rule(char in, std::string out);
+	Rule(char k, std::string out);
 	~Rule();
 
-	char getInput() { return input; }
+	char getInput() { return key; }
 	std::string getOutput() { return output; }
 
 private:
-	char input;
+	char key;
 	std::string output;
 };

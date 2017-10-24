@@ -1,8 +1,8 @@
 #include "Rule.h"
 
-Rule::Rule(char in, std::string out)
+Rule::Rule(char k, std::string out)
 	:
-	input(in),
+	key(k),
 	output(out)
 {}
 

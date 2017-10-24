@@ -13,8 +13,8 @@
 #include "Line.h"
 
 Turtle turtle;
-const int orthoSize = 50;
-const int generationCount = 4;
+const int orthoSize = 22;
+const int generationCount = 5;
 
 void Display()
 {
@@ -49,7 +49,6 @@ void InitGl()
 void SimpleLSystemTest()
 {
 	LSystem lsys = LSystem("A");
-
 	lsys.AddRule(new Rule('A', "AB"));
 	lsys.AddRule(new Rule('B', "A"));
 
@@ -94,7 +93,7 @@ void SierpinskiTriangle(LSystem &tree, float &angle)
 	tree.AddRule(new Rule('G', "GG"));
 }
 
-void SymetricalTree(LSystem &tree, float &angle)
+void OriginalTree(LSystem &tree, float &angle)
 {
 	/*
 	Variables:
@@ -130,31 +129,24 @@ void FractalPlant(LSystem &tree, float &angle)
 	tree.AddRule(new Rule('F', "FF"));
 }
 
-int main(int argc, char* argv[])
+void Roads(LSystem &tree, float &angle)
 {
-	turtle = Turtle();
-	turtle.FaceAngle(90);
-	float lineLength = 1.0f;
-	float angle;
+	/*
+	Variables:
+		V = block_vertical
+		U = block_horizontal
+		X = road_vertical
+		Y = road_horizontal
+	*/
 
-	LSystem tree = LSystem();
+	tree.SetAxiom("V");
+	tree.AddRule(new Rule('V', "UXU"));
+	tree.AddRule(new Rule('U', "VYV"));
+}
 
-	// KockCurve(tree, angle);
-	// SierpinskiTriangle(tree, angle);
-	// SymetricalTree(tree, angle);
-	FractalPlant(tree, angle);
-
-
-	for (int i = 0; i < generationCount; i++)
-	{
-		tree.Generate();
-	}
-
-	// std::cout << tree.getSentence() << std::endl;
-
-
-
-	for (auto c : tree.getSentence())
+void TurtleTree(LSystem &lsys, Turtle& turtle, int lineLength, float angle)
+{
+	for (auto c : lsys.getSentence())
 	{
 		if (c == 'F' || c == 'G')
 		{
@@ -170,22 +162,42 @@ int main(int argc, char* argv[])
 		}
 		else if (c == '[')
 		{
-			turtle.PushPositionAndAngle();
+			turtle.Push();
 		}
 		else if (c == ']')
 		{
-			turtle.PopPositionAndAngle();
-		}
-		else if (c == '{')
-		{
-			turtle.PushPosition();
-		}
-		else if (c == '}')
-		{
-			turtle.PopPosition();
+			turtle.Pop();
 		}
 	}
+}
 
+int main(int argc, char* argv[])
+{
+	// SimpleLSystemTest();
+
+	turtle = Turtle();
+	// turtle.Reposition(0, -orthoSize);
+	turtle.Reposition(-orthoSize/2, -orthoSize / 2);
+	turtle.FaceAngle(90);
+	float lineLength = 1.0f;
+	float angle;
+
+	LSystem lsys = LSystem();
+
+	// KockCurve(lsys, angle);
+	SierpinskiTriangle(lsys, angle);
+	// OriginalTree(lsys, angle);
+	// FractalPlant(lsys, angle);
+
+	for (int i = 0; i < generationCount; i++)
+	{
+		lsys.Generate();
+	}
+
+	// std::cout << lsys.getSentence();
+
+	TurtleTree(lsys, turtle, lineLength, angle);
+	
 	// OpenGL
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);

@@ -9,14 +9,18 @@ public:
 	Turtle();
 	~Turtle();
 
+	void Reposition(Vec2* pos);
+	void Reposition(int newX, int newY);
 	void FaceAngle(float deg);
 	void Rotate(float deg);
 	void Move(float length);
 	void DrawLine(float length);
+	void Push();
+	void Pop();
 	void PushPosition();
 	void PopPosition();
-	void PushPositionAndAngle();
-	void PopPositionAndAngle();
+	void PushAngle();
+	void PopAngle();
 
 	std::vector<Line*> getLines() { return lines; }
 
@@ -30,4 +34,3 @@ private:
 	std::stack<Vec2*> posStack;
 	std::vector<Line*> lines;
 };
-
