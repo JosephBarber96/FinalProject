@@ -12,9 +12,14 @@
 #include "Turtle.h"
 #include "Line.h"
 
+LSystem lsys;
+
+// Plants
 Turtle turtle;
+float lineLengthForPlants;
+float angleForPlants;
 const int orthoSize = 22;
-const int generationCount = 5;
+const int generationCountForPlants = 5;
 
 void Display()
 {
@@ -171,32 +176,36 @@ void TurtleTree(LSystem &lsys, Turtle& turtle, int lineLength, float angle)
 	}
 }
 
-int main(int argc, char* argv[])
+void ForPlants()
 {
-	// SimpleLSystemTest();
-
 	turtle = Turtle();
-	// turtle.Reposition(0, -orthoSize);
-	turtle.Reposition(-orthoSize/2, -orthoSize / 2);
+	turtle.Reposition(0, -orthoSize);
+	// turtle.Reposition(-orthoSize / 2, -orthoSize / 2);
 	turtle.FaceAngle(90);
-	float lineLength = 1.0f;
-	float angle;
+	lineLengthForPlants = 1.0f;
 
-	LSystem lsys = LSystem();
+	// KockCurve(lsys, angleForPlants);
+	// SierpinskiTriangle(lsys, angleForPlants);
+	OriginalTree(lsys, angleForPlants);
+	// FractalPlant(lsys, angleForPlants);
 
-	// KockCurve(lsys, angle);
-	SierpinskiTriangle(lsys, angle);
-	// OriginalTree(lsys, angle);
-	// FractalPlant(lsys, angle);
-
-	for (int i = 0; i < generationCount; i++)
+	for (int i = 0; i < generationCountForPlants; i++)
 	{
 		lsys.Generate();
 	}
 
-	// std::cout << lsys.getSentence();
+	TurtleTree(lsys, turtle, lineLengthForPlants, angleForPlants);
+}
 
-	TurtleTree(lsys, turtle, lineLength, angle);
+int main(int argc, char* argv[])
+{
+	lsys = LSystem();
+
+	// SimpleLSystemTest();
+	// ForPlants();
+
+
+
 	
 	// OpenGL
 	glutInit(&argc, argv);
