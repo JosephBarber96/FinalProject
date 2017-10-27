@@ -7,6 +7,7 @@ Brown, B. (2011). Prim's Algorithm: Minimal Spanning Tree. [Online] 15th May 20
 [2]
 Chen G. Esch G. Wonka P. Mueller P. Zhang E. (2008). "Interactive Procedural Street Modeling" In Proceedings of SIGGRAPH 2008. ACM Trans. Graph. Article 103: 1-10.
 
+
 [3]
 Eppstein, D. (1996). Design and Analysis of Algorithms – Minimum Spanning Trees. [Online] 6th Feburary 1996. Available online: https://www.ics.uci.edu/~eppstein/161/960206.html [Date of access: 29 October 2017]
 
@@ -26,25 +27,29 @@ Havey, D. (2008). Tutorial #7: Voronoi diagrams* [Online] May 4, 2008. Available
 Ilangovan, K, P. (2009) Procedural City Generaror, MSc thesus, Bournemouth University. Available at: https://nccastaff.bournemouth.ac.uk/jmacey/MastersProjects/MSc09/Ilangovan/Thesis_i7834000.pdf (Accessed: 30 May 2017).
 
 [9]
-Kelly, G. Mccave, H. (2006). "A Survey of Procedural Techniques for City Generation". In *ITB Journal, No. 14*.
+Kelly, G. McCabe, H. (2006). "A Survey of Procedural Techniques for City Generation". In *ITB Journal, No. 14*.
 
 [10]
-Martek, C. (2012). "Procedural generation of road networks for large virtual environments." Rochester Institute of Technology.
+Kelly, G and McCabe, H. (2006). "Interactive generation of cities for real-time applications" In Proceedings of SIGGRAPH '06 ACM SIGGRAPH 2006 Research Posters - SIGGRAPH '06
 
 [11]
-Martz, P. (1997). *Generating Random Fractal Terrain*. [Online] 1997. Available Online: http://www.gameprogrammer.com/fractal.html [Date of access: 09 May 2016]
+Martek, C. (2012). "Procedural generation of road networks for large virtual environments." Rochester Institute of Technology.
 
 [12]
-Muller, P. Wonka, P. Haegler, S. Ulmer, A. Goo, L, V. (2006). "Procedural modeling of buildings" In Proceedings of SIGGRAPH 06' ACM SIGGRAPH 2006. Acm, New York, NY, USA, 614 - 623.
+Martz, P. (1997). *Generating Random Fractal Terrain*. [Online] 1997. Available Online: http://www.gameprogrammer.com/fractal.html [Date of access: 09 May 2016]
 
 [13]
-Parish, Y, I, H. Muller, Pascal. (2001). "Procedural modeling of cities". In Proceedings of the 28th annual conference on Computer graphics and interactive techniques (SIGGRAPH '01). Acm, New York, NY, USA, 301 - 308.
+Muller, P and Parish, Y, I, H.  (2001). "Procedural modeling of cities". In Proceedings of the 28th annual conference on Computer graphics and interactive techniques (SIGGRAPH '01). Acm, New York, NY, USA, 301 - 308.
 
 [14]
-Prusinkiewicx, P. and Janan, J. (1992). "Lindenmayer systems, fractals, and plants." New York, N.Y.: Springer-Verlag.
+Muller, P. Wonka, P. Haegler, S. Ulmer, A. Goo, L, V. (2006). "Procedural modeling of buildings" In Proceedings of SIGGRAPH 06' ACM SIGGRAPH 2006. Acm, New York, NY, USA, 614 - 623.
+
 
 [15]
-Red Blob Games. (2014) Introduction to A*. [Online] June 2016. Available online: http://www.redblobgames.com/pathfinding/a-star/introduction.html [Date of access: 29 October 2017].
+Prusinkiewicx, P. and Janan, J. (1992). "Lindenmayer systems, fractals, and plants." New York, N.Y.: Springer-Verlag.
 
 [16]
+Red Blob Games. (2014) Introduction to A*. [Online] June 2016. Available online: http://www.redblobgames.com/pathfinding/a-star/introduction.html [Date of access: 29 October 2017].
+
+[17]
 Sun, J. Yu, X. Baciu, G. Green, M. (2002). "Template-based generation of road networks for virtual city modeling". In *Proceedings of the ACM symposium on Virtual reality software and technology* (VRST '02). Acm, New Work, NY, USA, 33 - 40.
