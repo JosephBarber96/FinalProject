@@ -3,6 +3,8 @@
 #include <iostream>
 #include <math.h>
 #include <stdio.h>
+#include <ctime>
+#include <stdlib.h>
 
 #include <glut.h>
 
@@ -18,7 +20,7 @@ LSystem lsys;
 Turtle turtle;
 float lineLengthForPlants;
 float angleForPlants;
-const int orthoSize = 22;
+const int orthoSize = 100;
 const int generationCountForPlants = 5;
 
 void Display()
@@ -149,8 +151,10 @@ void Roads(LSystem &tree, float &angle)
 	tree.AddRule(new Rule('U', "VYV"));
 }
 
-void TurtleTree(LSystem &lsys, Turtle& turtle, int lineLength, float angle)
+void TurtleDrawLSystem(LSystem &lsys, Turtle& turtle, int lineLength, float angle)
 {
+	float rotAngle;
+
 	for (auto c : lsys.getSentence())
 	{
 		if (c == 'F' || c == 'G')
@@ -173,6 +177,27 @@ void TurtleTree(LSystem &lsys, Turtle& turtle, int lineLength, float angle)
 		{
 			turtle.Pop();
 		}
+		else if (c == 'A')
+		{
+			int rng = rand() % 100;
+
+			if (rng < 50)
+			{
+				rotAngle = 2;
+			}
+			else
+			{
+				rotAngle = -2;
+			}
+
+			turtle.Rotate(rotAngle);
+		}
+		else if (c == 'R')
+		{
+			// Negate the rotate angle (restore rotation)
+			//rotAngle *= -1;
+			//turtle.Rotate(rotAngle);
+		}
 	}
 }
 
@@ -194,18 +219,41 @@ void ForPlants()
 		lsys.Generate();
 	}
 
-	TurtleTree(lsys, turtle, lineLengthForPlants, angleForPlants);
+	TurtleDrawLSystem(lsys, turtle, lineLengthForPlants, angleForPlants);
 }
 
 int main(int argc, char* argv[])
 {
+
+	srand(time(NULL));
+
 	lsys = LSystem();
 
 	// SimpleLSystemTest();
 	// ForPlants();
 
+	turtle = Turtle();
+	turtle.Reposition(0, -orthoSize/2);
+	turtle.FaceAngle(90);
+	int roadLength = 2.0f;
+	float angle = 90.f;
+
+	// L system for roads
+
+	// F [ + F ] F [ - F ] F
+
+	int genCount = 3;
+
+	//lsys.SetAxiom("X");
+	//lsys.AddRule('X', "AFRX[+FX]AFRX[-FX]AFRX");
 
 
+	for (int i = 0; i < genCount; i++)
+	{
+		lsys.Generate();
+	}
+
+	TurtleDrawLSystem(lsys, turtle, roadLength, angle);
 	
 	// OpenGL
 	glutInit(&argc, argv);
