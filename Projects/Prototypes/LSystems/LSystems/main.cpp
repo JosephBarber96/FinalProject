@@ -23,7 +23,7 @@ Turtle turtle;
 RoadTurtle roadTurtle;
 float lineLengthForPlants;
 float angleForPlants;
-const int orthoSize = 200;
+const int orthoSize = 600;
 const int generationCountForPlants = 5;
 
 void Display()
@@ -306,6 +306,33 @@ void RoadDrawLSystem(LSystem& lsys, RoadTurtle& turtle, int lineLength, float an
 	}
 }
 
+void PruneRoads(RoadTurtle& turtle, float minLength)
+{
+	// Loop through all roads and mark any appropriate roads for deletion
+	for (int i = 0; i < turtle.getRoads().size()-1; i++)
+	{
+		if (turtle.getRoads()[i]->TotalLength() < minLength)
+		{
+			turtle.getRoads()[i]->markedForDeletion = true;
+		}
+	}
+
+	std::vector<Road*> list = turtle.getRoads();
+	std::vector<Road*>::iterator it = list.begin();
+
+	for (it; it != list.end();)
+	{
+		if ((*it)->markedForDeletion)
+		{
+			it = list.erase(it);
+		}
+		else
+			++it;
+	}
+
+	turtle.SetNewList(list);
+}
+
 void ForPlants()
 {
 
@@ -356,17 +383,11 @@ int main(int argc, char* argv[])
 	// random branching
 	//AFX[~FX]AFX[~FX]AFX
 
-	int genCount = 5;
+	int genCount = 6;
 
 	lsys.SetAxiom("X");
 
 	lsys.AddRule('X', "AFX[~FX]AFX[~FX]AFX");
-
-
-
-
-
-
 
 	for (int i = 0; i < genCount; i++)
 	{
@@ -374,6 +395,8 @@ int main(int argc, char* argv[])
 	}
 
 	RoadDrawLSystem(lsys, roadTurtle, roadLength, angle);
+	PruneRoads(roadTurtle, 5.5f);
+
 	
 	// OpenGL
 	glutInit(&argc, argv);

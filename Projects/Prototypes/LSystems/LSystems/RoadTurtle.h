@@ -25,6 +25,7 @@ public:
 	void AddRoad(Vec2* roadStart, Vec2* roadEnd);
 
 	std::vector<Road*> getRoads() { return roads; }
+	void SetNewList(std::vector<Road*> newList) { roads = newList; }
 
 	int roadStackSize() { return roadStack.size(); }
 	int transformStackSize() { return transformStack.size(); }

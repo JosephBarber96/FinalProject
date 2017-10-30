@@ -43,16 +43,70 @@ void RoadTurtle::ExtendRoad(float length)
 	// Get the vector of our angle
 	Vec2* moveVector = Vec2::AngleToVector(transform->rotation);
 
-	// Scale it for the length we have to move
-	Vec2* scaledMoveVector = *moveVector * length;
 
-	// Find out our ending position
-	Vec2* newPos = *ourPos + *scaledMoveVector;
+	int loopNum = 10;
+	// Scale it to the length we have to move in small increments
+	for (int i = 0; i < loopNum; i++)
+	{
+		// Scale by (length / LOOPNUM)
+		Vec2* scaledMoveVector = *moveVector * (length / loopNum);
 
-	// Add this new pos to our current road
-	currentRoad->AddPoint(newPos);
+		// Find out the new point
+		Vec2* newPos = *ourPos + *scaledMoveVector;
 
-	transform->position = newPos;
+		///////////////////////////////////////////////////
+
+		//// Check if this is too close to another node...
+
+		//// For every road..
+		//for (auto road : roads)
+		//{
+		//	// Skip the current road
+		//	if (*currentRoad == *road) { continue; }
+
+		//	// For every node in the road
+		//	for (auto node : currentRoad->points)
+		//	{
+
+		//		if (newPos == node)
+		//		{ 
+		//			continue;
+		//		}
+
+		//		// Skip current node
+		//		if (newPos->getX() == node->getX() && newPos->getX() == node->getY())
+		//		{ 
+		//			continue;
+		//		}
+
+		//		std::cout << "newpos (" << newPos->getX() << ", " << newPos->getY() << ") \t node: (" << node->getX() << ", " << node->getY() << std::endl;
+
+		//		float dist = Utility::DistanceBetween(ourPos, node);
+
+		//		dist *= 100;
+
+		//		std::cout << "Dist between: " << dist << std::endl;
+
+		//		if (dist < 0.01f)
+		//		{
+		//			std::cout << "Road id: " << currentRoad->id << "  Node too close ( " << dist << ")" << std::endl;
+		//			std::cout << "newPos = (" << newPos->getX() << ", " << newPos->getY() << ") \t node: (" << node->getX() << ", " << node->getY() << ")" << std::endl;
+		//		}
+		//	}
+		//}
+
+
+		///////////////////////////////////////////////////
+
+		// Add this new pos to our current road
+		currentRoad->AddPoint(newPos);
+
+		// Update ourPos
+		ourPos = newPos;
+
+		// This becomes our transform position
+		transform->position = newPos;
+	}
 }
 
 void RoadTurtle::Rotate(float deg)
