@@ -18,6 +18,11 @@ Vec2::Vec2(float newX, float newY)
 
 Vec2::~Vec2() {}
 
+float Vec2::Length()
+{
+	return sqrt(x * x + y * y);
+}
+
 Vec2* Vec2::AngleToVector(float degree)
 {
 	// https://math.stackexchange.com/questions/180874/convert-angle-radians-to-a-heading-vector
@@ -42,4 +47,9 @@ Vec2* Vec2::operator* (float scale)
 Vec2* Vec2::operator+ (Vec2 vec)
 {
 	return new Vec2(x + vec.x, y + vec.y);
+}
+
+Vec2* Vec2::operator/ (float scale)
+{
+	return new Vec2(x / scale, y / scale);
 }

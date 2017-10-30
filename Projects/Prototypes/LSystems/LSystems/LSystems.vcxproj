@@ -123,7 +123,10 @@
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="LSystem.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Road.cpp" />
+    <ClCompile Include="RoadTurtle.cpp" />
     <ClCompile Include="Rule.cpp" />
+    <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Turtle.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="Vec2.cpp" />
@@ -131,7 +134,10 @@
   <ItemGroup>
     <ClInclude Include="Line.h" />
     <ClInclude Include="LSystem.h" />
+    <ClInclude Include="Road.h" />
+    <ClInclude Include="RoadTurtle.h" />
     <ClInclude Include="Rule.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="Turtle.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="Vec2.h" />

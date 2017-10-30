@@ -13,14 +13,17 @@
 #include "Vec2.h"
 #include "Turtle.h"
 #include "Line.h"
+#include "Road.h"
+#include "RoadTurtle.h"
 
 LSystem lsys;
 
 // Plants
 Turtle turtle;
+RoadTurtle roadTurtle;
 float lineLengthForPlants;
 float angleForPlants;
-const int orthoSize = 100;
+const int orthoSize = 200;
 const int generationCountForPlants = 5;
 
 void Display()
@@ -29,11 +32,24 @@ void Display()
 
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glLineWidth(1.0f);
-	for (auto line : turtle.getLines())
+
+	//// Turtle lines
+	//for (auto line : turtle.getLines())
+	//{
+	//	glBegin(GL_LINES);
+	//	glVertex2f(line->getStart()->getX(), line->getStart()->getY());
+	//	glVertex2f(line->getEnd()->getX(), line->getEnd()->getY());
+	//	glEnd();
+	//}
+
+	// Roads
+	for (auto road : roadTurtle.getRoads())
 	{
-		glBegin(GL_LINES);
-		glVertex2f(line->getStart()->getX(), line->getStart()->getY());
-		glVertex2f(line->getEnd()->getX(), line->getEnd()->getY());
+		glBegin(GL_LINE_STRIP);
+		for (auto vec : road->points)
+		{
+			glVertex2f(vec->getX(), vec->getY());
+		}
 		glEnd();
 	}
 
@@ -161,6 +177,10 @@ void TurtleDrawLSystem(LSystem &lsys, Turtle& turtle, int lineLength, float angl
 		{
 			turtle.DrawLine(lineLength);
 		}
+		if (c == 'E')
+		{
+			turtle.DrawLine(lineLength * 10);
+		}
 		else if (c == '+')
 		{
 			turtle.Rotate(angle);
@@ -168,6 +188,19 @@ void TurtleDrawLSystem(LSystem &lsys, Turtle& turtle, int lineLength, float angl
 		else if (c == '-')
 		{
 			turtle.Rotate(-angle);
+		}
+		else if (c == '~')
+		{
+			int rng = rand() % 100;
+
+			if (rng < 50)
+			{
+				turtle.Rotate(angle);
+			}
+			else
+			{
+				turtle.Rotate(-angle);
+			}
 		}
 		else if (c == '[')
 		{
@@ -201,8 +234,81 @@ void TurtleDrawLSystem(LSystem &lsys, Turtle& turtle, int lineLength, float angl
 	}
 }
 
+void RoadDrawLSystem(LSystem& lsys, RoadTurtle& turtle, int lineLength, float angle)
+{
+	float rotAngle;
+
+	for (auto c : lsys.getSentence())
+	{
+		if (c == 'F' || c == 'G')
+		{
+			turtle.ExtendRoad(lineLength);
+		}
+		else if (c == 'E')
+		{
+			turtle.ExtendRoad(lineLength * 10);
+		}
+		else if (c == 'W')
+		{
+			int rng = rand() % 5 + 1;
+
+			turtle.ExtendRoad(lineLength * rng);
+		}
+		else if (c == '+')
+		{
+			turtle.Rotate(angle);
+		}
+		else if (c == '-')
+		{
+			turtle.Rotate(-angle);
+		}
+		else if (c == '~')
+		{
+			int rng = rand() % 100;
+
+			if (rng < 50)
+			{
+				turtle.Rotate(angle);
+			}
+			else
+			{
+				turtle.Rotate(-angle);
+			}
+		}
+		else if (c == '[')
+		{
+			turtle.Push();
+		}
+		else if (c == ']')
+		{
+			turtle.Pop();
+		}
+		else if (c == 'A')
+		{
+			int rng = rand() % 100;
+
+			if (rng < 50)
+			{
+				rotAngle = 2;
+			}
+			else
+			{
+				rotAngle = -2;
+			}
+
+			turtle.Rotate(rotAngle);
+		}
+		//else if (c == 'B')
+		//{
+		//	turtle.Branch();
+		//}
+
+	}
+}
+
 void ForPlants()
 {
+
 	turtle = Turtle();
 	turtle.Reposition(0, -orthoSize);
 	// turtle.Reposition(-orthoSize / 2, -orthoSize / 2);
@@ -224,28 +330,42 @@ void ForPlants()
 
 int main(int argc, char* argv[])
 {
-
 	srand(time(NULL));
-
 	lsys = LSystem();
 
 	// SimpleLSystemTest();
 	// ForPlants();
 
-	turtle = Turtle();
-	turtle.Reposition(0, -orthoSize/2);
-	turtle.FaceAngle(90);
-	int roadLength = 2.0f;
+	roadTurtle = RoadTurtle();
+	roadTurtle.SetStartingTransform(new Vec2(0, -orthoSize + orthoSize/10 ), 90);
+
+	int roadLength = 1.0f;
 	float angle = 90.f;
 
 	// L system for roads
 
-	// F [ + F ] F [ - F ] F
+	// original
+	//F[+F]F[-F]F
 
-	int genCount = 3;
+	// with branching
+	//F[+FX]XF[-FX]F
 
-	//lsys.SetAxiom("X");
-	//lsys.AddRule('X', "AFRX[+FX]AFRX[-FX]AFRX");
+	// rotation
+	//AFX[+FX]AFX[-FX]AFX
+
+	// random branching
+	//AFX[~FX]AFX[~FX]AFX
+
+	int genCount = 5;
+
+	lsys.SetAxiom("X");
+
+	lsys.AddRule('X', "AFX[~FX]AFX[~FX]AFX");
+
+
+
+
+
 
 
 	for (int i = 0; i < genCount; i++)
@@ -253,12 +373,12 @@ int main(int argc, char* argv[])
 		lsys.Generate();
 	}
 
-	TurtleDrawLSystem(lsys, turtle, roadLength, angle);
+	RoadDrawLSystem(lsys, roadTurtle, roadLength, angle);
 	
 	// OpenGL
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(500, 500);
+	glutInitWindowSize(800, 800);
 	glutCreateWindow("L-systems");
 	InitGl();
 
