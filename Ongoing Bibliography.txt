@@ -39,11 +39,10 @@ Martek, C. (2012). "Procedural generation of road networks for large virtual env
 Martz, P. (1997). *Generating Random Fractal Terrain*. [Online] 1997. Available Online: http://www.gameprogrammer.com/fractal.html [Date of access: 09 May 2016]
 
 [13]
-Muller, P and Parish, Y, I, H.  (2001). "Procedural modeling of cities". In Proceedings of the 28th annual conference on Computer graphics and interactive techniques (SIGGRAPH '01). Acm, New York, NY, USA, 301 - 308.
+Muller, P and Parish, Y, I, H.  (2001). "Procedural modeling of cities". In Proceedings of the 28th annual conference on Computer graphics and interactive techniques (SIGGRAPH '01). Acm, New York, NY, USA. 301 - 308.
 
 [14]
-Muller, P. Wonka, P. Haegler, S. Ulmer, A. Goo, L, V. (2006). "Procedural modeling of buildings" In Proceedings of SIGGRAPH 06' ACM SIGGRAPH 2006. Acm, New York, NY, USA, 614 - 623.
-
+Muller, P. Wonka, P. Haegler, S. Ulmer, A. Goo, L, V. (2006). "Procedural modeling of buildings" In Proceedings of SIGGRAPH 06' ACM SIGGRAPH 2006. Acm, New York, NY, USA. 614 - 623.
 
 [15]
 Prusinkiewicx, P. and Janan, J. (1992). "Lindenmayer systems, fractals, and plants." New York, N.Y.: Springer-Verlag.
@@ -52,7 +51,10 @@ Prusinkiewicx, P. and Janan, J. (1992). "Lindenmayer systems, fractals, and plan
 Red Blob Games. (2014) Introduction to A*. [Online] June 2016. Available online: http://www.redblobgames.com/pathfinding/a-star/introduction.html [Date of access: 29 September 2017].
 
 [17]
-Sun, J. Yu, X. Baciu, G. Green, M. (2002). "Template-based generation of road networks for virtual city modeling". In *Proceedings of the ACM symposium on Virtual reality software and technology* (VRST '02). Acm, New Work, NY, USA, 33 - 40.
+Runions, A. Lane, B and Prusinkiewicz, P. (2007) "Modeling trees with a space colonization algorithm" In Proceedings of the Third Eugographics conference on Natural Phenomena. Prague, Czech Republic. pp 63 - 70.
 
 [18]
+Sun, J. Yu, X. Baciu, G. Green, M. (2002). "Template-based generation of road networks for virtual city modeling". In Proceedings of the ACM symposium on Virtual reality software and technology (VRST '02). Acm, New Work, NY, USA, 33 - 40.
+
+[19]
 Tmwhere. (Date Unknown) Procedural City Generation. [Online] Date unnown. Available online: http://www.tmwhere.com/city_generation.html [Date of access: 27 October 2017].
