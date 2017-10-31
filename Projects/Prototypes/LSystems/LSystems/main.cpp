@@ -24,8 +24,8 @@ Turtle turtle;
 RoadTurtle roadTurtle;
 float lineLengthForPlants;
 float angleForPlants;
-const int orthoY = 2500;
-const int orthoX = 2500;
+const int orthoY = 50;
+const int orthoX = 50;
 const int generationCountForPlants = 5;
 
 void Display()
@@ -35,14 +35,14 @@ void Display()
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glLineWidth(1.0f);
 
-	//// Turtle lines
-	//for (auto line : turtle.getLines())
-	//{
-	//	glBegin(GL_LINES);
-	//	glVertex2f(line->getStart()->getX(), line->getStart()->getY());
-	//	glVertex2f(line->getEnd()->getX(), line->getEnd()->getY());
-	//	glEnd();
-	//}
+	// Turtle lines
+	for (auto line : turtle.getLines())
+	{
+		glBegin(GL_LINES);
+		glVertex2f(line->getStart()->getX(), line->getStart()->getY());
+		glVertex2f(line->getEnd()->getX(), line->getEnd()->getY());
+		glEnd();
+	}
 
 	// Roads
 	for (auto road : roadTurtle.getRoads())
@@ -359,8 +359,8 @@ void ForPlants()
 
 	// KockCurve(lsys, angleForPlants);
 	// SierpinskiTriangle(lsys, angleForPlants);
-	OriginalTree(lsys, angleForPlants);
-	// FractalPlant(lsys, angleForPlants);
+	// OriginalTree(lsys, angleForPlants);
+	FractalPlant(lsys, angleForPlants);
 
 	for (int i = 0; i < generationCountForPlants; i++)
 	{
@@ -376,36 +376,36 @@ int main(int argc, char* argv[])
 	lsys = LSystem();
 
 	// SimpleLSystemTest();
-	// ForPlants();
+	ForPlants();
 
-	roadTurtle = RoadTurtle();
-	roadTurtle.SetStartingTransform(new Vec2(0, -orthoY + orthoY/10 ), 90);
+	//roadTurtle = RoadTurtle();
+	//roadTurtle.SetStartingTransform(new Vec2(0, -orthoY + orthoY/10 ), 90);
 
-	int roadLength = 1.f;
-	float angle = 90.f;
+	//int roadLength = 1.f;
+	//float angle = 90.f;
 
-	// L system for roads
+	//// L system for roads
 
-	// original
-	//F[+F]F[-F]F
+	//// original
+	////F[+F]F[-F]F
 
-	// with branching
-	//F[+FX]XF[-FX]F
+	//// with branching
+	////F[+FX]XF[-FX]F
 
-	// rotation
-	//AFX[+FX]AFX[-FX]AFX
+	//// rotation
+	////AFX[+FX]AFX[-FX]AFX
 
-	// random branching
-	//AFX[~FX]AFX[~FX]AFX
+	//// random branching
+	////AFX[~FX]AFX[~FX]AFX
 
-	int genCount = 6;
+	//int genCount = 6;
 
-	lsys.SetAxiom("X");
-	
-	// Minor roads attempt 1
-	lsys.AddRule('X', "AWEX[~FQ]AWEX[~FQ]AWEX");
-	lsys.AddRule('Q', "EW[~EEL]QEEQ[~EEL]Q");
-	lsys.AddRule('L', "ELELEL");
+	//lsys.SetAxiom("X");
+	//
+	//// Minor roads attempt 1
+	//lsys.AddRule('X', "AWEX[~FQ]AWEX[~FQ]AWEX");
+	//lsys.AddRule('Q', "EW[~EEL]QEEQ[~EEL]Q");
+	//lsys.AddRule('L', "ELELEL");
 
 
 	// Minor roads attempt 2
@@ -413,13 +413,14 @@ int main(int argc, char* argv[])
 	//lsys.AddRule('Q', "AFQ [~FQ] AWQ [~FQ]AFQ");
 
 
-	for (int i = 0; i < genCount; i++)
-	{
-		lsys.Generate();
-	}
+	//for (int i = 0; i < genCount; i++)
+	//{
+	//	lsys.Generate();
+	//}
 
-	RoadDrawLSystem(lsys, roadTurtle, roadLength, angle);
-	PruneRoads(roadTurtle, 15.5f);
+	//RoadDrawLSystem(lsys, roadTurtle, roadLength, angle);
+	//PruneRoads(roadTurtle, 15.5f);
+
 
 	
 	// OpenGL
