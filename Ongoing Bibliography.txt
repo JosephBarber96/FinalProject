@@ -21,7 +21,7 @@ Goldman, R., Schaefer, S. and Ju, T. (2004). Turtle geometry in computer graphic
 Greuter, S. Parker, J. Stewart, N. Leach, G. (2003). "Real-time procedural generation of 'pseudo infinite' cities". In *Proceedings of the 1st international conference on Computer graphics and interactive techniques in Astralasia and South East Asia* (GRAPHITE '03) Acm, New York, Ny, USA, 87 - ff.
 
 [7]
-Havey, D. (2008). Tutorial #7: Voronoi diagrams* [Online] May 4, 2008. Available online: http://donhavey.com/blog/tutorials/tutorial-7-voronoi-diagrams/ [Date of access: 30 May 2017]
+Havey, D. (2008). Tutorial #7: Voronoi diagrams [Online] May 4, 2008. Available online: http://donhavey.com/blog/tutorials/tutorial-7-voronoi-diagrams/ [Date of access: 30 May 2017]
 
 [8]
 Ilangovan, K, P. (2009) Procedural City Generaror, MSc thesus, Bournemouth University. Available at: https://nccastaff.bournemouth.ac.uk/jmacey/MastersProjects/MSc09/Ilangovan/Thesis_i7834000.pdf (Accessed: 30 May 2017).

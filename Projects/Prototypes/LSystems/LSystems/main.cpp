@@ -23,7 +23,8 @@ Turtle turtle;
 RoadTurtle roadTurtle;
 float lineLengthForPlants;
 float angleForPlants;
-const int orthoSize = 600;
+const int orthoY = 3000;
+const int orthoX = 5000;
 const int generationCountForPlants = 5;
 
 void Display()
@@ -66,7 +67,7 @@ void InitGl()
 
 	// Coordinate system
 	// minx, maxx, miny, maxy
-	gluOrtho2D(-orthoSize, orthoSize, -orthoSize, orthoSize);
+	gluOrtho2D(-orthoX, orthoX, -orthoY, orthoY);
 }
 
 void SimpleLSystemTest()
@@ -236,7 +237,7 @@ void TurtleDrawLSystem(LSystem &lsys, Turtle& turtle, int lineLength, float angl
 
 void RoadDrawLSystem(LSystem& lsys, RoadTurtle& turtle, int lineLength, float angle)
 {
-	float rotAngle;
+	float rotAngle = 0;
 
 	for (auto c : lsys.getSentence())
 	{
@@ -287,14 +288,27 @@ void RoadDrawLSystem(LSystem& lsys, RoadTurtle& turtle, int lineLength, float an
 		{
 			int rng = rand() % 100;
 
-			if (rng < 50)
-			{
-				rotAngle = 2;
-			}
-			else
+			if (rng < 33)
 			{
 				rotAngle = -2;
 			}
+			else if (rng < 66)
+			{
+				rotAngle = 0;
+			}
+			else
+			{
+				rotAngle = 2;
+			}
+
+			//if (rng < 50)
+			//{
+			//	rotAngle = 2;
+			//}
+			//else
+			//{
+			//	rotAngle = -2;
+			//}
 
 			turtle.Rotate(rotAngle);
 		}
@@ -337,7 +351,7 @@ void ForPlants()
 {
 
 	turtle = Turtle();
-	turtle.Reposition(0, -orthoSize);
+	turtle.Reposition(0, -orthoY);
 	// turtle.Reposition(-orthoSize / 2, -orthoSize / 2);
 	turtle.FaceAngle(90);
 	lineLengthForPlants = 1.0f;
@@ -364,9 +378,9 @@ int main(int argc, char* argv[])
 	// ForPlants();
 
 	roadTurtle = RoadTurtle();
-	roadTurtle.SetStartingTransform(new Vec2(0, -orthoSize + orthoSize/10 ), 90);
+	roadTurtle.SetStartingTransform(new Vec2(0, -orthoY + orthoY/10 ), 90);
 
-	int roadLength = 1.0f;
+	int roadLength = 1.f;
 	float angle = 90.f;
 
 	// L system for roads
@@ -383,11 +397,24 @@ int main(int argc, char* argv[])
 	// random branching
 	//AFX[~FX]AFX[~FX]AFX
 
-	int genCount = 6;
+	int genCount = 4;
 
 	lsys.SetAxiom("X");
 
-	lsys.AddRule('X', "AFX[~FX]AFX[~FX]AFX");
+	//lsys.AddRule('X', "AFX[~FX]AFX[~FX]AFX");
+
+	lsys.AddRule('X', "AEWX[~FQ]AEWX[~FQ]AEWX");
+
+	lsys.AddRule('Q', "E Q [~EE L] Q EE Q [~EE L] Q");
+
+	lsys.AddRule('L', "ELELEL");
+
+	//lsys.AddRule('Q', "EQ [~EN] WQ [~AWWN] WQ");
+
+	//lsys.AddRule('N', "EWW");
+
+
+
 
 	for (int i = 0; i < genCount; i++)
 	{
@@ -401,7 +428,7 @@ int main(int argc, char* argv[])
 	// OpenGL
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(800, 800);
+	glutInitWindowSize(1333, 800);
 	glutCreateWindow("L-systems");
 	InitGl();
 
