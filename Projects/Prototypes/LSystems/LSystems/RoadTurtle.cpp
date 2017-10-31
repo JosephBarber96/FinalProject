@@ -79,17 +79,17 @@ void RoadTurtle::ExtendRoad(float length)
 		//			continue;
 		//		}
 
-		//		std::cout << "newpos (" << newPos->getX() << ", " << newPos->getY() << ") \t node: (" << node->getX() << ", " << node->getY() << std::endl;
+		//		//std::cout << "newpos (" << newPos->getX() << ", " << newPos->getY() << ") \t node: (" << node->getX() << ", " << node->getY() << std::endl;
 
-		//		float dist = Utility::DistanceBetween(ourPos, node);
+		//		float dist = Utility::DistanceBetween(newPos, node);
 
 		//		dist *= 100;
 
-		//		std::cout << "Dist between: " << dist << std::endl;
+		//		//std::cout << "Dist between: " << dist << std::endl;
 
-		//		if (dist < 0.01f)
+		//		if (dist < 0.1f)
 		//		{
-		//			std::cout << "Road id: " << currentRoad->id << "  Node too close ( " << dist << ")" << std::endl;
+		//			std::cout << "Road id: " << currentRoad->id << "  Node too close (dist = " << dist << ")" << std::endl;
 		//			std::cout << "newPos = (" << newPos->getX() << ", " << newPos->getY() << ") \t node: (" << node->getX() << ", " << node->getY() << ")" << std::endl;
 		//		}
 		//	}

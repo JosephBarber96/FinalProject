@@ -16,6 +16,7 @@ public:
 	void SetStartingTransform(Vec2* startPos, float startAngle);
 
 	void ExtendRoad(float length);
+	void ExtendUntilConnect(float length);
 	void Rotate(float deg);
 	void Branch();
 	void Push();

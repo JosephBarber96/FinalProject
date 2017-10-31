@@ -15,6 +15,7 @@
 #include "Line.h"
 #include "Road.h"
 #include "RoadTurtle.h"
+#include "Utility.h"
 
 LSystem lsys;
 
@@ -23,8 +24,8 @@ Turtle turtle;
 RoadTurtle roadTurtle;
 float lineLengthForPlants;
 float angleForPlants;
-const int orthoY = 3000;
-const int orthoX = 5000;
+const int orthoY = 2500;
+const int orthoX = 2500;
 const int generationCountForPlants = 5;
 
 void Display()
@@ -251,7 +252,7 @@ void RoadDrawLSystem(LSystem& lsys, RoadTurtle& turtle, int lineLength, float an
 		}
 		else if (c == 'W')
 		{
-			int rng = rand() % 5 + 1;
+			int rng = rand() % 10 + 5;
 
 			turtle.ExtendRoad(lineLength * rng);
 		}
@@ -397,23 +398,19 @@ int main(int argc, char* argv[])
 	// random branching
 	//AFX[~FX]AFX[~FX]AFX
 
-	int genCount = 4;
+	int genCount = 6;
 
 	lsys.SetAxiom("X");
-
-	//lsys.AddRule('X', "AFX[~FX]AFX[~FX]AFX");
-
-	lsys.AddRule('X', "AEWX[~FQ]AEWX[~FQ]AEWX");
-
-	lsys.AddRule('Q', "E Q [~EE L] Q EE Q [~EE L] Q");
-
+	
+	// Minor roads attempt 1
+	lsys.AddRule('X', "AWEX[~FQ]AWEX[~FQ]AWEX");
+	lsys.AddRule('Q', "EW[~EEL]QEEQ[~EEL]Q");
 	lsys.AddRule('L', "ELELEL");
 
-	//lsys.AddRule('Q', "EQ [~EN] WQ [~AWWN] WQ");
 
-	//lsys.AddRule('N', "EWW");
-
-
+	// Minor roads attempt 2
+	//lsys.AddRule('X', "X AW X [~Q] X");
+	//lsys.AddRule('Q', "AFQ [~FQ] AWQ [~FQ]AFQ");
 
 
 	for (int i = 0; i < genCount; i++)
@@ -422,13 +419,13 @@ int main(int argc, char* argv[])
 	}
 
 	RoadDrawLSystem(lsys, roadTurtle, roadLength, angle);
-	PruneRoads(roadTurtle, 5.5f);
+	PruneRoads(roadTurtle, 15.5f);
 
 	
 	// OpenGL
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(1333, 800);
+	glutInitWindowSize(500, 500);
 	glutCreateWindow("L-systems");
 	InitGl();
 
