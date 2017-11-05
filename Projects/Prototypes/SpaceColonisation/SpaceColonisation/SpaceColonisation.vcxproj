@@ -117,11 +117,19 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Node.cpp" />
+    <ClCompile Include="Road.cpp" />
+    <ClCompile Include="RoadNetwork.cpp" />
+    <ClCompile Include="Utility.cpp" />
     <ClCompile Include="UtilRandom.cpp" />
+    <ClCompile Include="Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Node.h" />
+    <ClInclude Include="Road.h" />
+    <ClInclude Include="RoadNetwork.h" />
+    <ClInclude Include="Utility.h" />
     <ClInclude Include="UtilRandom.h" />
+    <ClInclude Include="Vec2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

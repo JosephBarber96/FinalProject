@@ -6,7 +6,7 @@ public:
 	UtilRandom();
 	~UtilRandom();
 
-	std::default_random_engine generator;
+	std::mt19937 mt;
 
 	int Random(int min, int max);
 	static UtilRandom* Instance();	

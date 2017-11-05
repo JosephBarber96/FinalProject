@@ -1,8 +1,11 @@
 #include "UtilRandom.h"
 
-UtilRandom* UtilRandom::instance;
+UtilRandom* UtilRandom::instance = 0;
 
-UtilRandom::UtilRandom() {}
+UtilRandom::UtilRandom() 
+	:
+	mt(std::random_device()())
+{}
 
 UtilRandom::~UtilRandom() {}
 
@@ -10,7 +13,7 @@ int UtilRandom::Random(int min, int max)
 {
 	std::uniform_int_distribution<int> distribution(min, max);
 
-	return (distribution(generator));
+	return (distribution(mt));
 }
 
 UtilRandom* UtilRandom::Instance()
