@@ -1,80 +1,106 @@
+#include <iostream>
 #include "Node.h"
 #include "Vec2.h"
 #include "Utility.h"
-#include "Road.h"
-
-std::vector<Node*> Node::nodes;
+#include "Edge.h"
 
 Node::Node(int newX, int newY)
 {
 	pos = new Vec2(newX, newY);
-
-	nodes.push_back(this);
 }
 
 Node::Node(Vec2* newPos)
 {
 	pos = newPos;
-
-	nodes.push_back(this);
 }
 
 Node::~Node() {}
 
-void Node::Branch()
+void Node::Branch(std::vector<Node*> nodes, std::vector<Edge*> edges)
 {
+	// Shortest = null
 	Node* shortest = nullptr;
 
-	for (auto node : nodes)
+	float minDist = 75;
+
+	// For every node...
+	for (auto neighbour : nodes)
 	{
-		// Null check
-		if (shortest == nullptr && !node->marked)
-		{
-			//if (Utility::DistanceBetween(node->pos, pos) < maxDist)
-			//{
-				shortest = node;
-			//}	
-		}
+		if (neighbour->start) { continue; }
 
-		if (shortest == nullptr) { continue; }
-
-		// If the distance between myself and node is less than the distance between myself and shortest
-		if (Utility::DistanceBetween(node->pos, pos) < Utility::DistanceBetween(shortest->pos, pos)
-			// and the node isnt already in the network
-			&& !node->marked)
+		// If shortest is null
+		if (shortest == nullptr)
 		{
-			// Add a max distance
-			//if (Utility::DistanceBetween(node->pos, pos) < maxDist)
-			//{
-				// Check every road
-				bool intersect = false;
-				for (auto road : Road::getRoads())
+			// If neighbour doesn't have a parent
+			if (neighbour->parent == nullptr)
+			{
+				// And is within the minDistance...
+				if (Utility::DistanceBetween(neighbour->getPos(), pos) < minDist)
 				{
-					// Check for any intersections
-					if (Utility::DoIntersect(road->parent->pos, road->child->pos,
-						node->pos, pos))
+					// And it doesn't create a road intersection...
+					bool intersection = false;
+					// For each road
+					for (auto edge : edges)
 					{
-						intersect = true;
-						break;
+						if (Utility::Intersect(neighbour->getPos(), pos, edge->child->getPos(), edge->parent->getPos()))
+						{
+							// std::cout << "Intersection found whilst assigning shortest. Breaking." << std::endl;
+							intersection = true;
+							break;
+						}
+					}
+
+					// If no intersection...
+					if (!intersection)
+					{
+						// It becomes the shortest
+						shortest = neighbour;
 					}
 				}
+			}
+		}
 
-				// If no intersections
-				if (!intersect)
+		// Else
+		else
+		{
+			// If neighbour doesn't already have a parent
+			if (neighbour->parent == nullptr)
+			{
+				// If neighbour is closer than shortset
+				if (Utility::DistanceBetween(neighbour->getPos(), pos) < Utility::DistanceBetween(shortest->getPos(), pos))
 				{
-					shortest = node;
+
+					// If this connection doesn't create an road intersection...
+					bool intersection = false;
+					// For each road
+					for (auto edge : edges)
+					{
+						if (Utility::Intersect(neighbour->getPos(), pos, edge->child->getPos(), edge->parent->getPos()))
+						{
+							// std::cout << "Intersection found. Breaking." << std::endl;
+							intersection = true;
+							break;
+						}
+					}
+
+					// If no intersection...
+					if (!intersection)
+					{
+						// neighbour is our new shortest
+						shortest = neighbour;
+					}
 				}
-			
-				
-			//}		
+			}
 		}
 	}
 
-	// Null check
+	// If shortest still isn't null
 	if (shortest != nullptr)
-	{ 
+	{
+		// Add shortest to our children
 		children.push_back(shortest);
-		shortest->marked = true;
-	}
 
+		// Shortest's parent is this
+		shortest->parent = this;
+	}
 }

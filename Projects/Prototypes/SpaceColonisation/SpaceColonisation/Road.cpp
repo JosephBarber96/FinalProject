@@ -5,12 +5,14 @@ std::vector<Road*> Road::roads;
 
 Road::Road() {}
 
-Road::Road(Node* par, Node* chi)
-	:
-	parent(par),
-	child(chi)
+Road::Road(Node* start)
 {
-	roads.push_back(this);
+	AddPoint(start);
 }
 
 Road::~Road() {}
+
+void Road::AddPoint(Node* point)
+{
+	points.push_back(point);
+}

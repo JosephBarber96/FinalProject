@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 class Vec2;
+class Edge;
 class Node
 {
 public:
@@ -9,17 +10,14 @@ public:
 	~Node();
 
 	std::vector<Node*> children;
-	bool marked = false;
+	Node* parent = nullptr;
+	bool start = false;
 
 	Vec2* getPos() { return pos; }
-	static std::vector<Node*> getNodes() { return nodes; }
 
-	void Branch();
+	void Branch(std::vector<Node*> nodes, std::vector<Edge*> edges);
 
 private:
-	//! List of all nodes
-	static std::vector<Node*> nodes;
 	Vec2* pos;
-
 };
 
