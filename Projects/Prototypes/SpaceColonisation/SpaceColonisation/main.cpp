@@ -55,6 +55,12 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
+	sf::Sprite populationSprite;
+	sf::Texture populationTexture;
+	populationTexture.loadFromFile(populationMapFileName);
+	populationTexture.setSmooth(true);
+	populationSprite.setTexture(populationTexture);
+
 	// SFML Window
 	winX = populationMap.getSize().x;
 	winY = populationMap.getSize().y;
@@ -126,6 +132,12 @@ int main(int argc, char* argv[])
 			window.clear();
 
 			// Draw...
+
+			// Draw the population map
+			if (drawPopulationMap)
+			{
+				window.draw(populationSprite);
+			}
 
 			// Draw the quad tree
 			if (drawQuadTree)
