@@ -54,7 +54,10 @@ Red Blob Games. (2014) Introduction to A*. [Online] June 2016. Available online:
 Runions, A. Lane, B and Prusinkiewicz, P. (2007) "Modeling trees with a space colonization algorithm" In Proceedings of the Third Eugographics conference on Natural Phenomena. Prague, Czech Republic. pp 63 - 70.
 
 [18]
-Sun, J. Yu, X. Baciu, G. Green, M. (2002). "Template-based generation of road networks for virtual city modeling". In Proceedings of the ACM symposium on Virtual reality software and technology (VRST '02). Acm, New Work, NY, USA, 33 - 40.
+Samet, H. (1995). Spatial Data Structures. Addison-Wesley.
 
 [19]
+Sun, J. Yu, X. Baciu, G. Green, M. (2002). "Template-based generation of road networks for virtual city modeling". In Proceedings of the ACM symposium on Virtual reality software and technology (VRST '02). Acm, New Work, NY, USA, 33 - 40.
+
+[20]
 Tmwhere. (Date Unknown) Procedural City Generation. [Online] Date unnown. Available online: http://www.tmwhere.com/city_generation.html [Date of access: 27 October 2017].
