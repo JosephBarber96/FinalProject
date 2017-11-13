@@ -1,8 +1,9 @@
 #include <queue>
 #include <vector>
+#include <iostream>
 
 #include "PopulationBox.h"
-#include "vec2.h"
+#include "Vec2.h"
 
 PopulationBox::PopulationBox() {}
 
@@ -23,6 +24,8 @@ std::vector<Vec2*> getNeighbours(Vec2* current, int maxX, int maxY)
 
 	// Down (+1 y)
 	if (current->getY() < maxY) neighbours.push_back(new Vec2(current->getX(), current->getY() + 1));
+
+	return neighbours;
 }
 
 void PopulationBox::FloodFill(sf::Image popMap, int startX, int startY)
@@ -45,6 +48,9 @@ void PopulationBox::FloodFill(sf::Image popMap, int startX, int startY)
 			Vec2* current = frontier.front();
 			frontier.pop();
 
+			// Add this to the vecsInPopulation
+			vecsInPopulation.push_back(current);
+
 			// Get each of the items neighbours...
 			std::vector<Vec2*> neighbours = getNeighbours(current, popMap.getSize().x, popMap.getSize().y);
 
@@ -54,8 +60,34 @@ void PopulationBox::FloodFill(sf::Image popMap, int startX, int startY)
 				// If this neighour is a black pixel...
 				if (popMap.getPixel(vec->getX(), vec->getY()).toInteger() == 255)
 				{
-					// Push it into nextGen
-					nextGen.push_back(vec);
+					// Ensure that it is not already in nextGen or vecsInPopulation
+					bool found = false;
+					for (auto v : nextGen)
+					{
+						if (v->getX() == vec->getX() && v->getY() == vec->getY())
+						{
+							found = true;
+							break;
+						}
+					}
+					if (!found)
+					{
+						for (auto v : vecsInPopulation)
+						{
+							if (v->getX() == vec->getX() && v->getY() == vec->getY())
+							{
+								found = true;
+								break;
+							}
+						}
+					}
+
+					// If not...
+					if (!found)
+					{
+						// Push it into nextGen
+						nextGen.push_back(vec);
+					}
 				}
 			}
 		}
@@ -67,7 +99,7 @@ void PopulationBox::FloodFill(sf::Image popMap, int startX, int startY)
 		for (auto vec : nextGen) frontier.push(vec);
 
 		// Empty nextGen
-		while (nextGen.size() != 0) nextGen.erase(nextGen.begin());
+		nextGen.clear();
 	}
 
 	FindBoundaries(vecsInPopulation);
@@ -75,8 +107,8 @@ void PopulationBox::FloodFill(sf::Image popMap, int startX, int startY)
 
 bool PopulationBox::inBounds(int x, int y)
 {
-	bool inX = (x > lowestX && x < highestX);
-	bool inY = (y > lowestY && y < highestY);
+	bool inX = (x >= lowestX && x <= highestX);
+	bool inY = (y >= lowestY && y <= highestY);
 
 	return (inX && inY);
 }
@@ -95,9 +127,8 @@ void PopulationBox::FindBoundaries(std::vector<Vec2*> points)
 		else if (vec->getX() > highestX) { highestX = vec->getX(); }
 		if (!highestYFound) { highestYFound = true; highestY = vec->getY(); }
 		else if (vec->getY() > highestY) { highestY = vec->getY(); }
-
-
 	}
 
-
+	highestX++;
+	highestY++;
 }

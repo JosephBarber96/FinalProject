@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <SFML\Graphics.hpp>
+class Vec2;
 class PopulationBox
 {
 public:

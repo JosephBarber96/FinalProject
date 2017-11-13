@@ -333,9 +333,7 @@ void FindDataPoints(sf::Image populationMap)
 {
 	int ySize = populationMap.getSize().y;
 	int xSize = populationMap.getSize().x;
-
 	
-
 	for (int y = 0; y < ySize; y++)
 	{
 		for (int x = 0; x < xSize; x++)
@@ -363,6 +361,8 @@ void FindDataPoints(sf::Image populationMap)
 				{
 					PopulationBox* box = new PopulationBox();
 					box->FloodFill(populationMap, x, y);
+
+					popBoxes.push_back(box);
 				}
 			}
 		}
