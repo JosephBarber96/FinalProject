@@ -6,7 +6,7 @@
 #include <ctime>
 #include <stdlib.h>
 
-#include <glut.h>
+#include <SFML\Graphics.hpp>
 
 #include "LSystem.h"
 #include "Rule.h"
@@ -16,6 +16,7 @@
 #include "Road.h"
 #include "RoadTurtle.h"
 #include "Utility.h"
+#include "PopulationBox.h"
 
 LSystem lsys;
 
@@ -24,52 +25,10 @@ Turtle turtle;
 RoadTurtle roadTurtle;
 float lineLengthForPlants;
 float angleForPlants;
-const int orthoY = 50;
-const int orthoX = 50;
+int winX, winY;
 const int generationCountForPlants = 5;
 
-void Display()
-{
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glLineWidth(1.0f);
-
-	// Turtle lines
-	for (auto line : turtle.getLines())
-	{
-		glBegin(GL_LINES);
-		glVertex2f(line->getStart()->getX(), line->getStart()->getY());
-		glVertex2f(line->getEnd()->getX(), line->getEnd()->getY());
-		glEnd();
-	}
-
-	// Roads
-	for (auto road : roadTurtle.getRoads())
-	{
-		glBegin(GL_LINE_STRIP);
-		for (auto vec : road->points)
-		{
-			glVertex2f(vec->getX(), vec->getY());
-		}
-		glEnd();
-	}
-
-	glutSwapBuffers();
-	glutPostRedisplay();
-}
-
-void InitGl()
-{
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-	// matrix mode
-	glMatrixMode(GL_PROJECTION);
-
-	// Coordinate system
-	// minx, maxx, miny, maxy
-	gluOrtho2D(-orthoX, orthoX, -orthoY, orthoY);
-}
+std::vector<PopulationBox*> popBoxes;
 
 void SimpleLSystemTest()
 {
@@ -352,7 +311,7 @@ void ForPlants()
 {
 
 	turtle = Turtle();
-	turtle.Reposition(0, -orthoY);
+	turtle.Reposition(0, 0);
 	// turtle.Reposition(-orthoSize / 2, -orthoSize / 2);
 	turtle.FaceAngle(90);
 	lineLengthForPlants = 1.0f;
@@ -370,69 +329,189 @@ void ForPlants()
 	TurtleDrawLSystem(lsys, turtle, lineLengthForPlants, angleForPlants);
 }
 
+void FindDataPoints(sf::Image populationMap)
+{
+	int ySize = populationMap.getSize().y;
+	int xSize = populationMap.getSize().x;
+
+	
+
+	for (int y = 0; y < ySize; y++)
+	{
+		for (int x = 0; x < xSize; x++)
+		{
+			auto color = populationMap.getPixel(x, y).toInteger();
+
+			if (color == 255)
+			{
+				//Ensure that this pixel isn't already within a population box
+				bool foundWithin = false;
+				if (popBoxes.size() > 0)
+				{
+					for (auto box : popBoxes)
+					{
+						if (box->inBounds(x, y))
+						{
+							foundWithin = true;
+							break;
+						}
+					}
+				}
+
+				// If its not, create a populationBox and floodFill...
+				if (!foundWithin)
+				{
+					PopulationBox* box = new PopulationBox();
+					box->FloodFill(populationMap, x, y);
+				}
+			}
+		}
+	}
+}
+
 int main(int argc, char* argv[])
 {
+	// Read in population data
+	std::string populationMapFileName = "Populationmap.bmp";
+	sf::Image populationMap;
+	if (!populationMap.loadFromFile(populationMapFileName))
+	{
+		std::cerr << "Could not find / open population map" << std::endl;
+		return -1;
+	}
+
+	FindDataPoints(populationMap);
+
+	// Create drawable sprite for bitmap
+	sf::Sprite populationSprite;
+	sf::Texture populationTexture;
+	populationTexture.loadFromFile(populationMapFileName);
+	populationTexture.setSmooth(true);
+	populationSprite.setTexture(populationTexture);
+
+	// SFML window
+	winX = populationMap.getSize().x;
+	winY = populationMap.getSize().y;
+	sf::RenderWindow window(sf::VideoMode(winX, winY), "L-Systems");
+
+	// Seed random
 	srand(time(NULL));
+
+	// L-System
 	lsys = LSystem();
 
 	// SimpleLSystemTest();
-	ForPlants();
+	// ForPlants();
 
+	// Road Turtle
 	//roadTurtle = RoadTurtle();
-	//roadTurtle.SetStartingTransform(new Vec2(0, -orthoY + orthoY/10 ), 90);
+	//roadTurtle.SetStartingTransform(new Vec2(winX/2, 0), 90);
 
-	//int roadLength = 1.f;
-	//float angle = 90.f;
+	// Road turtle data
+	int roadLength = 1.f;
+	float angle = 90.f;
 
-	//// L system for roads
+	// L system for roads
 
-	//// original
-	////F[+F]F[-F]F
+	// original
+	//F[+F]F[-F]F
 
-	//// with branching
-	////F[+FX]XF[-FX]F
+	// with branching
+	//F[+FX]XF[-FX]F
 
-	//// rotation
-	////AFX[+FX]AFX[-FX]AFX
+	// rotation
+	//AFX[+FX]AFX[-FX]AFX
 
-	//// random branching
-	////AFX[~FX]AFX[~FX]AFX
+	// random branching
+	//AFX[~FX]AFX[~FX]AFX
 
-	//int genCount = 6;
+	int genCount = 6;
 
-	//lsys.SetAxiom("X");
+	lsys.SetAxiom("X");
+	lsys.AddRule('X', "AFX[~FX]AFX[~FX]AFX");
+	
+
+	//-------------------------------------------
+	//! L-System ruleset attempts
 	//
-	//// Minor roads attempt 1
+	// Minor roads attempt 1
 	//lsys.AddRule('X', "AWEX[~FQ]AWEX[~FQ]AWEX");
 	//lsys.AddRule('Q', "EW[~EEL]QEEQ[~EEL]Q");
 	//lsys.AddRule('L', "ELELEL");
-
-
+	//
 	// Minor roads attempt 2
 	//lsys.AddRule('X', "X AW X [~Q] X");
 	//lsys.AddRule('Q', "AFQ [~FQ] AWQ [~FQ]AFQ");
+	//-------------------------------------------
 
-
-	//for (int i = 0; i < genCount; i++)
-	//{
-	//	lsys.Generate();
-	//}
+	for (int i = 0; i < genCount; i++)
+	{
+		lsys.Generate();
+	}
 
 	//RoadDrawLSystem(lsys, roadTurtle, roadLength, angle);
-	//PruneRoads(roadTurtle, 15.5f);
-
-
+	//PruneRoads(roadTurtle, 5.5f);
 	
-	// OpenGL
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(500, 500);
-	glutCreateWindow("L-systems");
-	InitGl();
+	while (window.isOpen())
+	{
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed) { window.close(); }
+		}
 
-	glutDisplayFunc(Display);
-	glutMainLoop();
+		// Clear
+		window.clear();
 
-	system("PAUSE");
+		// Draw..
+
+		// Population map
+		window.draw(populationSprite);
+
+		// Turtle lines
+		for (auto line : turtle.getLines())
+		{
+			sf::Vertex linePoints[2] =
+			{
+				sf::Vertex(sf::Vector2f(line->getStart()->getX(), line->getStart()->getY()), sf::Color::Red),
+				sf::Vertex(sf::Vector2f(line->getEnd()->getX(), line->getEnd()->getY()), sf::Color::Red)
+			};
+
+			window.draw(linePoints, 2, sf::LineStrip);
+		}
+
+		// Roads
+		for (auto road : roadTurtle.getRoads())
+		{
+			sf::VertexArray roadVertices(sf::LineStrip, road->points.size());
+			int counter = 0;
+			for (auto point : road->points)
+			{
+				roadVertices[counter].position = sf::Vector2f(point->getX(), point->getY());
+				roadVertices[counter].color = sf::Color(255, 0, 255);
+				counter++;
+			}
+			window.draw(roadVertices);
+
+		}
+
+		// Draw boundary
+		for (auto box : popBoxes)
+		{
+			sf::Vertex boundaryPoints[5] =
+			{
+				sf::Vertex(sf::Vector2f(box->getLowestX(), box->getLowestY()), sf::Color::Red),
+				sf::Vertex(sf::Vector2f(box->getLowestX(), box->getHighestY()), sf::Color::Red),
+				sf::Vertex(sf::Vector2f(box->getHighestX(), box->getHighestY()), sf::Color::Red),
+				sf::Vertex(sf::Vector2f(box->getHighestX(), box->getLowestY()), sf::Color::Red),
+				sf::Vertex(sf::Vector2f(box->getLowestX(), box->getLowestY()), sf::Color::Red)
+			};
+			window.draw(boundaryPoints, 5, sf::LineStrip);
+		}
+
+		// Display
+		window.display();
+	}
+
 	return 0;
 }
