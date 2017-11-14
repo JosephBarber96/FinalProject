@@ -16,7 +16,6 @@ public:
 	Vec2* operator+ (Vec2 vec);
 	Vec2* operator/ (float scale);
 
-private:
+protected:
 	float x, y;
 };
-

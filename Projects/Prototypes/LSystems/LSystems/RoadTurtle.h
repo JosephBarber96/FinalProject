@@ -4,6 +4,7 @@
 class Transform;
 class Vec2;
 class Road;
+class PopulationPoint;
 class RoadTurtle
 {
 public:
@@ -11,6 +12,7 @@ public:
 	~RoadTurtle();
 
 	void SetPos(Vec2* newPos);
+	void SetPos(PopulationPoint* newPos);
 	void SetAngle(float deg);
 
 	void SetStartingTransform(Vec2* startPos, float startAngle);
@@ -21,16 +23,20 @@ public:
 	void Branch();
 	void Push();
 	void Pop();
+	bool FindNewTarget(std::vector<PopulationPoint*>& popPoints);
 
+	void SetCurrentTarget(PopulationPoint* newTarget);
 	void AddRoad(Road* road);
 	void AddRoad(Vec2* roadStart, Vec2* roadEnd);
-
-	std::vector<Road*> getRoads() { return roads; }
 	void SetNewList(std::vector<Road*> newList) { roads = newList; }
 
-	int roadStackSize() { return roadStack.size(); }
-	int transformStackSize() { return transformStack.size(); }
+	int roadStackSize() const { return roadStack.size(); }
+	int transformStackSize() const { return transformStack.size(); }
+	PopulationPoint* getCurrentTarget() const { return currentTarget; }
+	Transform* getTransform() const { return transform; }
+	std::vector<Road*> getRoads() const { return roads; }
 private:
+	PopulationPoint* currentTarget;
 	Transform* transform;
 	Road* currentRoad;
 	std::vector<Road*> roads;

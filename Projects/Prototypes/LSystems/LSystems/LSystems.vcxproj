@@ -124,6 +124,7 @@
     <ClCompile Include="LSystem.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PopulationBox.cpp" />
+    <ClCompile Include="PopulationPoint.cpp" />
     <ClCompile Include="Road.cpp" />
     <ClCompile Include="RoadTurtle.cpp" />
     <ClCompile Include="Rule.cpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="Line.h" />
     <ClInclude Include="LSystem.h" />
     <ClInclude Include="PopulationBox.h" />
+    <ClInclude Include="PopulationPoint.h" />
     <ClInclude Include="Road.h" />
     <ClInclude Include="RoadTurtle.h" />
     <ClInclude Include="Rule.h" />

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <ctime>
 #include <stdlib.h>
+#include <algorithm>
 
 #include <SFML\Graphics.hpp>
 
@@ -17,8 +18,10 @@
 #include "RoadTurtle.h"
 #include "Utility.h"
 #include "PopulationBox.h"
+#include "PopulationPoint.h"
+#include "Transform.h"
 
-LSystem lsys;
+LSystem roadLSys;
 
 // Plants
 Turtle turtle;
@@ -29,6 +32,7 @@ int winX, winY;
 const int generationCountForPlants = 5;
 
 std::vector<PopulationBox*> popBoxes;
+std::vector<PopulationPoint*> popPoints;
 
 void SimpleLSystemTest()
 {
@@ -204,6 +208,23 @@ void RoadDrawLSystem(LSystem& lsys, RoadTurtle& turtle, int lineLength, float an
 		if (c == 'F' || c == 'G')
 		{
 			turtle.ExtendRoad(lineLength);
+
+			// Once we have extended our road, we check to see if we have hit a popPoint and thus need to change our angle
+
+			// If we are close to the popPoint...
+			if (Utility::DistanceBetween(turtle.getTransform()->position, turtle.getCurrentTarget()) < 1)
+			{
+				// We've hit it.
+				std::cout << "Turtle hit target at: (" << turtle.getCurrentTarget()->getX() << ", " 
+					<< turtle.getCurrentTarget()->getY() << ")." << std::endl;
+
+				// Set this point as marked.
+				turtle.getCurrentTarget()->setMarked();
+
+				// Find a new target. If we cannot find one then we are finished, return.
+				if (!turtle.FindNewTarget(popPoints)) return;
+			}
+
 		}
 		else if (c == 'E')
 		{
@@ -260,23 +281,8 @@ void RoadDrawLSystem(LSystem& lsys, RoadTurtle& turtle, int lineLength, float an
 			{
 				rotAngle = 2;
 			}
-
-			//if (rng < 50)
-			//{
-			//	rotAngle = 2;
-			//}
-			//else
-			//{
-			//	rotAngle = -2;
-			//}
-
 			turtle.Rotate(rotAngle);
 		}
-		//else if (c == 'B')
-		//{
-		//	turtle.Branch();
-		//}
-
 	}
 }
 
@@ -319,14 +325,14 @@ void ForPlants()
 	// KockCurve(lsys, angleForPlants);
 	// SierpinskiTriangle(lsys, angleForPlants);
 	// OriginalTree(lsys, angleForPlants);
-	FractalPlant(lsys, angleForPlants);
+	FractalPlant(roadLSys, angleForPlants);
 
 	for (int i = 0; i < generationCountForPlants; i++)
 	{
-		lsys.Generate();
+		roadLSys.Generate();
 	}
 
-	TurtleDrawLSystem(lsys, turtle, lineLengthForPlants, angleForPlants);
+	TurtleDrawLSystem(roadLSys, turtle, lineLengthForPlants, angleForPlants);
 }
 
 void FindDataPoints(sf::Image populationMap)
@@ -369,6 +375,23 @@ void FindDataPoints(sf::Image populationMap)
 	}
 }
 
+void SetPopulationPoints()
+{
+	for (auto box : popBoxes)
+	{
+		int width = box->getHighestX() - box->getLowestX();
+		int midX = box->getLowestX() + (width / 2);
+
+		int height = box->getHighestY() - box->getLowestY();
+		int midY = box->getLowestY() + (height / 2);
+
+		popPoints.push_back(new PopulationPoint(midX, midY));
+	}
+
+	// Sort them from left->right
+	std::sort(popPoints.begin(), popPoints.end(), [](PopulationPoint* a, PopulationPoint* b) -> bool { return (a->getX() < b->getX()); });
+}
+
 int main(int argc, char* argv[])
 {
 	// Read in population data
@@ -380,7 +403,11 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
+	// Identify and encapsulate the areas of the highest population
 	FindDataPoints(populationMap);
+
+	// Place nodes in the populationBoxes
+	SetPopulationPoints();
 
 	// Create drawable sprite for bitmap
 	sf::Sprite populationSprite;
@@ -398,39 +425,51 @@ int main(int argc, char* argv[])
 	srand(time(NULL));
 
 	// L-System
-	lsys = LSystem();
+	roadLSys = LSystem();
 
+	// Calls for L-System testing and calling the Plant L-Systems
 	// SimpleLSystemTest();
 	// ForPlants();
 
 	// Road Turtle
-	//roadTurtle = RoadTurtle();
+	roadTurtle = RoadTurtle();
+
+	// Set the turtles starting transform to the left-most popBox 
 	//roadTurtle.SetStartingTransform(new Vec2(winX/2, 0), 90);
+
+	// Set position (on the first popPoint)
+	roadTurtle.SetStartingTransform(popPoints[0], 0);
+
+	// Set this popBox as marked
+	popPoints[0]->setMarked();
+
+	roadTurtle.FindNewTarget(popPoints);
 
 	// Road turtle data
 	int roadLength = 1.f;
 	float angle = 90.f;
 
+	//----------------------
 	// L system for roads
-
 	// original
 	//F[+F]F[-F]F
-
 	// with branching
 	//F[+FX]XF[-FX]F
-
 	// rotation
 	//AFX[+FX]AFX[-FX]AFX
-
 	// random branching
 	//AFX[~FX]AFX[~FX]AFX
+	//----------------------
 
 	int genCount = 6;
 
-	lsys.SetAxiom("X");
-	lsys.AddRule('X', "AFX[~FX]AFX[~FX]AFX");
-	
+	roadLSys.SetAxiom("X");
+	roadLSys.AddRule('X', "FX[~FM]FX[~FM]FX");
+	roadLSys.AddRule('M', "FM[~FM]FM");
+	//roadLSys.AddRule('M', "FM[~F]FM[~F]FM");
 
+	//lsys.AddRule('X', "AFX[~FX]AFX[~FX]AFX");
+	
 	//-------------------------------------------
 	//! L-System ruleset attempts
 	//
@@ -446,11 +485,11 @@ int main(int argc, char* argv[])
 
 	for (int i = 0; i < genCount; i++)
 	{
-		lsys.Generate();
+		roadLSys.Generate();
 	}
 
-	//RoadDrawLSystem(lsys, roadTurtle, roadLength, angle);
-	//PruneRoads(roadTurtle, 5.5f);
+	RoadDrawLSystem(roadLSys, roadTurtle, roadLength, angle);
+	PruneRoads(roadTurtle, 5.5f);
 	
 	while (window.isOpen())
 	{

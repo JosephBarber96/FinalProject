@@ -1,10 +1,14 @@
+#define _USE_MATH_DEFINES
+
 #include <iostream>
+#include <math.h>
 
 #include "RoadTurtle.h"
 #include "Road.h"
 #include "Vec2.h"
 #include "Transform.h"
 #include "Utility.h"
+#include "PopulationPoint.h"
 
 
 RoadTurtle::RoadTurtle() {}
@@ -14,6 +18,11 @@ RoadTurtle::~RoadTurtle() {}
 void RoadTurtle::SetPos(Vec2* newPos)
 {
 	transform->position = newPos;
+}
+
+void RoadTurtle::SetPos(PopulationPoint* newPos)
+{
+	transform->position = new Vec2(newPos->getX(), newPos->getY());
 }
 
 void RoadTurtle::SetAngle(float deg)
@@ -139,6 +148,55 @@ void RoadTurtle::Pop()
 
 	transform = transformStack.top();
 	transformStack.pop();
+}
+
+bool RoadTurtle::FindNewTarget(std::vector<PopulationPoint*>& popPoints)
+{
+	auto lowestDist = FLT_MAX;
+	PopulationPoint* closest = nullptr;
+
+	for (auto point : popPoints)
+	{
+		if (point->getMarked()) { continue; }
+
+		float thisDist = Utility::DistanceBetween(point, transform->position);
+
+		if (thisDist < lowestDist)
+		{
+			lowestDist = thisDist;
+			closest = point;
+		}
+	}
+
+	if (closest == nullptr) return false;
+
+	SetCurrentTarget(closest);
+	return true;
+}
+
+void RoadTurtle::SetCurrentTarget(PopulationPoint* newTarget)
+{
+	currentTarget = newTarget;
+
+	float x1 = transform->position->getX();
+	float y1 = transform->position->getY();
+	float x2 = currentTarget->getX();
+	float y2 = currentTarget->getY();
+
+	//auto dot = x1*x2 + y1*y2;
+	//auto det = x1*y2 - y1*x2;
+	//auto angle = atan2f(det, dot);
+
+	float angle = atan2(y1 - y2, x1 - x2);
+	angle = angle * 180 / M_PI;
+
+	transform->rotation = angle;
+	transform->rotation += 180;
+
+	std::cout << "New target." << 
+		"Turtle pos (" << transform->position->getX() << ", " << transform->position->getY() << ") " 
+		<< "Target pos (" << currentTarget->getX() << ", " << currentTarget->getY() << ") "
+		<< "Rotation: " << transform->rotation << std::endl;
 }
 
 void RoadTurtle::AddRoad(Road* newRoad)
