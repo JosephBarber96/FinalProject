@@ -17,13 +17,13 @@ int main()
 
 	Road* road;
 
-	road = new Road(100, 100, 100, 400);
-	road = new Road(100, 400, 400, 400);
-	road = new Road(400, 400, 400, 100);
-	road = new Road(400, 100, 100, 100);
+	road = new Road(100, 100, 120, 400);
+	road = new Road(120, 400, 410, 380);
+	road = new Road(410, 380, 400, 120);
+	road = new Road(400, 120, 100, 100);
 
-	float distBetweenRoads = 100.f;
-	float angle = 70.f;
+	float distBetweenRoads = 14.f;
+	float angle = 13.f;
 
 	Road::getRoads()[0]->CreateMinorRoads(distBetweenRoads, angle);
 
@@ -74,8 +74,6 @@ int main()
 
 			window.draw(shape);
 		}
-
-
 
 		// Display
 		window.display();

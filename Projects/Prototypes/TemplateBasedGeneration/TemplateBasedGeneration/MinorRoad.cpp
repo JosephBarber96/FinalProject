@@ -76,18 +76,54 @@ bool MinorRoad::Collision()
 
 Vec2* MinorRoad::getIntersectionPoint()
 {
+	// To hold all of the points of intersection
+	std::vector<Vec2*> iPoints;
+
 	// Find all of the intersections
 	for (auto road : Road::getRoads())
 	{
 		if (*road == *parent) continue;
 
-		Vec2* ip = Utility::GetIntersectionPoint(start, end, road->start, road->end);
+		Vec2* ip;
+
+		ip = Utility::GetIntersectionPoint(start, end, road->start, road->end);
 
 		if (ip != nullptr)
 		{
-			intersectionPoints.push_back(ip);
-			return ip;
+			iPoints.push_back(ip);
 		}
+	}
+
+	// Return null if we don't find any points
+	if (iPoints.size() == 0) { return nullptr; }
+
+	// Otherwise, find the closest pointer...
+
+	// Local function for use within the lambda
+	Vec2* beginning = start;
+
+	// Lambda
+	auto closestTo = [beginning](Vec2* a, Vec2* b) -> bool
+	{
+		return
+			(
+				Utility::DistanceBetween(a, beginning)
+				<
+				Utility::DistanceBetween(b, beginning)
+				);
+	};
+
+	// Sort
+	std::sort(iPoints.begin(), iPoints.end(), closestTo);
+
+	if (*iPoints[0] == *beginning)
+	{
+		return iPoints[1];
+		return nullptr;
+	}
+	else
+	{
+		return iPoints[0];
 	}
 
 	return nullptr;
