@@ -115,13 +115,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Line.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MinorRoad.cpp" />
+    <ClCompile Include="Road.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Line.h" />
+    <ClInclude Include="MinorRoad.h" />
+    <ClInclude Include="Road.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="Vec2.h" />
   </ItemGroup>

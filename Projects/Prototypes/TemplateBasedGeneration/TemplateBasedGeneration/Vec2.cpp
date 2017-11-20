@@ -23,6 +23,19 @@ float Vec2::Length()
 	return sqrt(x * x + y * y);
 }
 
+Vec2* Vec2::Normalized()
+{
+	float length = Length();
+	if (length != 0)
+	{
+		float newX = x / length;
+		float newY = y / length;
+
+		return new Vec2(newX, newY);
+	}
+	return nullptr;
+}
+
 Vec2* Vec2::AngleToVector(float degree)
 {
 	// https://math.stackexchange.com/questions/180874/convert-angle-radians-to-a-heading-vector

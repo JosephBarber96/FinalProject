@@ -11,6 +11,7 @@ public:
 	float getX() { return x; }
 	float getY() { return y; }
 	float Length();
+	Vec2* Normalized();
 
 	bool operator== (Vec2 vec);
 	Vec2* operator* (float scale);

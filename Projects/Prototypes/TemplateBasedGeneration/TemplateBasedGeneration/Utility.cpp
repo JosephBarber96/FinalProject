@@ -3,7 +3,7 @@
 
 #include "Utility.h"
 #include "Vec2.h"
-#include "Line.h"
+#include "Road.h"
 
 namespace Utility
 {
@@ -19,7 +19,7 @@ namespace Utility
 	}
 
 	//! http://www.softwareandfinance.com/Visual_CPP/VCPP_Intersection_Two_lines_EndPoints.html
-	Vec2* GetIntersectionPoint(Line* a, Line* b)
+	Vec2* GetIntersectionPoint(Vec2* start1, Vec2* end1, Vec2* start2, Vec2* end2)
 	{
 		float m1, c1, m2, c2;
 		float x1, y1, x2, y2;
@@ -27,10 +27,10 @@ namespace Utility
 		float intersectionX, intersectionY;
 
 		// Get the values for line 1
-		x1 = a->start->getX();
-		y1 = a->start->getY();
-		x2 = a->end->getX();
-		y2 = a->end->getY();
+		x1 = start1->getX();
+		y1 = start1->getY();
+		x2 = end1->getX();
+		y2 = end1->getY();
 
 		dx = x2 - x1;
 		dy = y2 - y1;
@@ -39,10 +39,10 @@ namespace Utility
 		c1 = y1 - m1 * x1;
 
 		// Get the values for line2;
-		x1 = b->start->getX();
-		y1 = b->start->getY();
-		x2 = b->end->getX();
-		y2 = b->end->getY();
+		x1 = start2->getX();
+		y1 = start2->getY();
+		x2 = end2->getX();
+		y2 = end2->getY();
 
 		dx = x2 - x1;
 		dy = y2 - y1;

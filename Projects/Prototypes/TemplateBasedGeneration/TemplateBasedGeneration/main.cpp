@@ -3,34 +3,29 @@
 
 #include <SFML\Graphics.hpp>
 
-#include "Line.h"
+#include "Road.h"
+#include "MinorRoad.h"
 #include "Vec2.h"
 #include "Utility.h"
 
-std::vector<Line*> majorLines;
-std::vector<Line*> minorLines;
 std::vector<Vec2*> intersectionPoints;
-
+int minX, minY, maxX, maxY;
 
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(500, 500), "Template-based generation");
 
-	majorLines.push_back(new Line(100, 100, 400, 400));
-	majorLines.push_back(new Line(200, 100, 400, 300));
+	Road* road;
 
-	minorLines.push_back(new Line(100, 400, 400, 100));
+	road = new Road(100, 100, 100, 400);
+	road = new Road(100, 400, 400, 400);
+	road = new Road(400, 400, 400, 100);
+	road = new Road(400, 100, 100, 100);
 
-	for (auto majorLine : majorLines)
-	{
-		for (auto minorLine : minorLines)
-		{
-			Vec2* ip = Utility::GetIntersectionPoint(majorLine, minorLine);
+	float distBetweenRoads = 100.f;
+	float angle = 70.f;
 
-			if (ip != nullptr) intersectionPoints.push_back(ip);
-		}
-	}
-
+	Road::getRoads()[0]->CreateMinorRoads(distBetweenRoads, angle);
 
 	while (window.isOpen())
 	{
@@ -46,25 +41,25 @@ int main()
 		// Draw
 
 		// Lines
-		for (Line* line : majorLines)
+		for (Road* r : Road::getRoads())
 		{
 			const int sz = 2;
 			sf::Vertex linePoints[sz] =
 			{
-				sf::Vertex(sf::Vector2f(line->start->getX(), line->start->getY()), sf::Color::Red),
-				sf::Vertex(sf::Vector2f(line->end->getX(), line->end->getY()), sf::Color::Red)
+				sf::Vertex(sf::Vector2f(r->start->getX(), r->start->getY()), sf::Color::Red),
+				sf::Vertex(sf::Vector2f(r->end->getX(), r->end->getY()), sf::Color::Red)
 			};
 
 			window.draw(linePoints, sz, sf::LineStrip);
 		}
 
-		for (Line* line : minorLines)
+		for (MinorRoad* mr : MinorRoad::getMinorRoads())
 		{
 			const int sz = 2;
 			sf::Vertex linePoints[sz] =
 			{
-				sf::Vertex(sf::Vector2f(line->start->getX(), line->start->getY()), sf::Color::Blue),
-				sf::Vertex(sf::Vector2f(line->end->getX(), line->end->getY()), sf::Color::Blue)
+				sf::Vertex(sf::Vector2f(mr->start->getX(), mr->start->getY()), sf::Color::Blue),
+				sf::Vertex(sf::Vector2f(mr->end->getX(), mr->end->getY()), sf::Color::Blue)
 			};
 
 			window.draw(linePoints, sz, sf::LineStrip);
@@ -79,6 +74,8 @@ int main()
 
 			window.draw(shape);
 		}
+
+
 
 		// Display
 		window.display();
