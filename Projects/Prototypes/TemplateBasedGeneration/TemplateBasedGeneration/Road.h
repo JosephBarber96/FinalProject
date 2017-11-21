@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-
 class Vec2;
 class Road
 {
@@ -10,15 +9,12 @@ public:
 	Road(float startX, float startY, float endX, float endY);
 	~Road();
 
+	float angle;
 	Vec2* start;
 	Vec2* end;
+	Vec2* directionNormalized;
 
-	void CreateMinorRoads(float distBetweenRoads, float Angle);
-
-	bool operator== (Road b);
-
-	static std::vector<Road*> getRoads() { return roads; }
-
-private:
-	static std::vector<Road*> roads;
+	bool operator==(Road road);
 };
+
+

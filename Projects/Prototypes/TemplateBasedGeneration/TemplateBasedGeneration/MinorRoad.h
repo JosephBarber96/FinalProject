@@ -1,26 +1,31 @@
 #pragma once
 #include <vector>
-class Road;
+#include "Road.h"
+class MajorRoad;
 class Vec2;
-class MinorRoad
+class MinorRoad : public Road
 {
 public:
-	MinorRoad(Vec2* newStart, float angle, Road* parent);
-	MinorRoad(float startX, float startY, float angle, Road* newParent);
+	MinorRoad(Vec2* newStart, float newAngle, Road* parent, bool addToMinorRoads);
+	MinorRoad(float startX, float startY, float newAngle, Road* newParent, bool addToMinorRoads);
 	~MinorRoad();
 
-	Vec2* start;
-	Vec2* end;
-	Vec2* dirNormalized;
 	Road* parent;
 
 	void ExtendUntilHit();
-	bool Collision();
-	Vec2* getIntersectionPoint();
+	void Branch(int distBetweenBranches);
+	void BranchExtend();
+	bool CollisionWithMajorRoad();
+	bool CollisionWithMinorRoad();
+	Vec2* GetIntersectionPointWithMajorRoad();
+	Vec2* GetIntersectionPointWithMinorRoad();
+	std::vector<MinorRoad*> getBranches() const { return branches; }
 
 	static std::vector<MinorRoad*> getMinorRoads() { return minorRoads; }
 
 private:
+	std::vector<MinorRoad*> branches;
+	Vec2* GetCorrectIntersectionPoint(std::vector<Vec2*> iPoints);
 	static std::vector<MinorRoad*> minorRoads;
 };
 

@@ -1,6 +1,6 @@
 #pragma once
 class Vec2;
-class Road;
+class MajorRoad;
 namespace Utility
 {
 	float DegreeToRadians(float degree);
