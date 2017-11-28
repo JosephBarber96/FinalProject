@@ -3,8 +3,17 @@
 #include <random>
 #include <ctime>
 
-#include <SFML\Graphics.hpp>
+/*
+	Requires C++ Boost Library for 1.65s for windows
+	https://dl.bintray.com/boostorg/release/1.65.1/binaries/
+	(boost_1_65_1-msvc-10.0-32.exe)
+
+	include directory: C:\local\boost_1_65_1
+*/
 #include<boost\polygon\voronoi.hpp>
+#include <SFML\Graphics.hpp>
+
+#include "UtilRandom.h"
 
 using namespace std;
 using namespace boost::polygon;
@@ -16,16 +25,29 @@ typedef voronoi_diagram<double> VD;
 int winX = 500;
 int winY = 500;
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[])	
 {
 	srand(time(NULL));
+
+	int difX = (winX / 3);
+	int difY = (winY / 3);
+
+	int maxX = winX - difX;
+	int minX = 0 + difX;
+
+	int maxY = winY - difY;
+	int minY = 0 + difY;
+
+	std::cout << "maxX: " << maxX << " / minxX: " << minX << " / maxY: " << maxY << " / minY " << minY << std::endl;
 
 	vector<point_type> points;
 	int pointNum = 25;
 	for (int i = 0; i < pointNum; i++)
 	{
-		double px = rand() % winX - 0;
-		double py = rand() % winY - 0;
+		double px = UtilRandom::Instance()->Random(minX, maxX);
+		double py = UtilRandom::Instance()->Random(minY, maxY);
+
+		std::cout << "Node created on: " << px << ", " << py << std::endl;
 
 		points.push_back(point_type(px, py));
 	}
