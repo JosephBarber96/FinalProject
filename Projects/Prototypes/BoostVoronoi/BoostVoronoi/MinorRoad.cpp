@@ -53,7 +53,11 @@ Vec2* MinorRoad::GetIntersectionPoint(std::vector<Road> &majorRoads)
 	for (auto road : majorRoads)
 	{
 		// Skip our parent
-		if (road == *parent) { continue; }
+		if (parent != nullptr)
+		{		
+			if (road == *parent) { continue; }
+		}
+
 
 		//Vec2* ip = Utility::GetIntersectionPoint(start, end, road.start, road.end);
 		Vec2* ip = Utility::New_GetLineIntersectionPoint(start, end, road.start, road.end);

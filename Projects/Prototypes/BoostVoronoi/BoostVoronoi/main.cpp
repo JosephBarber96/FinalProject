@@ -128,34 +128,12 @@ int main(int argc, char* argv[])
 		points.push_back(point_type(px, py));
 	}
 
-	//int numPoints = 10;
-	//for (int i = 0; i < numPoints; i++)
-	//{
-	//	double px = UtilRandom::Instance()->Random(50, 450);
-	//	double py = UtilRandom::Instance()->Random(50, 450);
-
-	//	points.push_back(point_type(px, py));
-	//}
-
-	//points.push_back(point_type(239, 260));
-	//points.push_back(point_type(125, 135));
-	//points.push_back(point_type(135, 365));
-	//points.push_back(point_type(365, 375));
-	//points.push_back(point_type(375, 125));
-
 	// Construct the voronoi diagram
 	VD vd;
 	construct_voronoi(points.begin(), points.end(), &vd);
 
-	// Create roads from voronoi edges
+	// Create major roads from voronoi edges
 	std::vector<Road> majorRoads;
-
-	//majorRoads.push_back(Road(90, 110, 125, 300));
-	//majorRoads.push_back(Road(125, 300, 225, 450));
-	//majorRoads.push_back(Road(225, 450, 400, 190));
-	//majorRoads.push_back(Road(400, 190, 300, 90));
-	//majorRoads.push_back(Road(300, 90, 90, 110));
-
 	for (auto const &edge : vd.edges())
 	{
 		if (edge.vertex0() != NULL && edge.vertex1() != NULL)
@@ -184,14 +162,69 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// Branch from each of the roads
-	float distBetweenRoads = 30.f;
-	float angle; // = 45;
+	// Create minor roads
 	std::vector<MinorRoad> minorRoads;
-	for (auto road : majorRoads)
+	float distBetweenRoads; // = 15.f;
+	float angle; // = 45;
+	for (auto const &point : points)
 	{
+		distBetweenRoads = UtilRandom::Instance()->Random(13, 20);
 		angle = UtilRandom::Instance()->Random(20, 160);
-		road.CreateMinorRoads(distBetweenRoads, angle, minorRoads, majorRoads);
+
+		// Extend a minor road from the center until it hits a major road
+		MinorRoad mr = MinorRoad(point.x(), point.y(), angle, nullptr);
+		mr.Extend(majorRoads);
+
+		// Do this again, in the opposite direction
+		MinorRoad mrOpposite = MinorRoad(point.x(), point.y(), angle+180, nullptr);
+		mrOpposite.Extend(majorRoads);
+
+		// We can use the end points of these two roads to construct one road going across
+		Road road = Road(mr.end, mrOpposite.end);
+
+		// Branch left outwards from this road
+		road.CreateMinorRoads(distBetweenRoads, 0, minorRoads, majorRoads);
+		// Branch right outwards from this road
+		road.CreateMinorRoads(distBetweenRoads, 1, minorRoads, majorRoads);
+
+		if (*mr.start == *mr.end || *mrOpposite.start == *mrOpposite.end)
+		{
+
+		}
+		else
+		{
+
+		}
+
+		// -------------------------------------------------------------------------------------------------
+
+		// Do the same thing again, but rotated 90 degrees
+		angle += 90;
+
+		// Extend a minor road from the center until it hits a major road
+		MinorRoad mrRotated = MinorRoad(point.x(), point.y(), angle, nullptr);
+		mrRotated.Extend(majorRoads);
+
+		// Do this again, in the opposite direction
+		MinorRoad mrOppositeRotated = MinorRoad(point.x(), point.y(), angle + 180, nullptr);
+		mrOppositeRotated.Extend(majorRoads);
+
+		// We can use the end points of these two roads to construct one road going across
+		Road roadRotated = Road(mrRotated.end, mrOppositeRotated.end);
+
+		// Branch left outwards from this road
+		roadRotated.CreateMinorRoads(distBetweenRoads, 0, minorRoads, majorRoads);
+		// Branch right outwards from this road
+		roadRotated.CreateMinorRoads(distBetweenRoads, 1, minorRoads, majorRoads);
+
+		if (*mrRotated.start == *mrRotated.end || *mrOppositeRotated.start == *mrOppositeRotated.end)
+		{
+
+		}
+		else
+		{
+
+		}
 	}
 
 	// Create window
@@ -210,25 +243,14 @@ int main(int argc, char* argv[])
 
 		// Draw
 
-		// vertices
-		for (auto const &point : points)
-		{
-			sf::CircleShape shape;
-			shape.setPosition(point.x(), point.y());
-			shape.setRadius(1);
-			shape.setFillColor(sf::Color::Green);
-
-			window.draw(shape);
-		}
-
 		// Minor roads
 		for (MinorRoad road : minorRoads)
 		{
 			const int sz = 2;
 			sf::Vertex va[2] =
 			{
-				sf::Vertex(sf::Vector2f(road.start->getX(), road.start->getY()), sf::Color::Yellow),
-				sf::Vertex(sf::Vector2f(road.end->getX(), road.end->getY()), sf::Color::Yellow)
+				sf::Vertex(sf::Vector2f(road.start->getX(), road.start->getY()), sf::Color(0, 100, 255, 80)),
+				sf::Vertex(sf::Vector2f(road.end->getX(), road.end->getY()), sf::Color(0, 100, 255, 80))
 			};
 			window.draw(va, sz, sf::LineStrip);
 		}
@@ -242,7 +264,19 @@ int main(int argc, char* argv[])
 				sf::Vertex(sf::Vector2f(road.start->getX(), road.start->getY()), sf::Color::Red),
 				sf::Vertex(sf::Vector2f(road.end->getX(), road.end->getY()), sf::Color::Red)
 			};
+
 			window.draw(va, sz, sf::LineStrip);
+		}
+
+		// vertices
+		for (auto const &point : points)
+		{
+			sf::CircleShape shape;
+			shape.setPosition(point.x(), point.y());
+			shape.setRadius(1);
+			shape.setFillColor(sf::Color::Green);
+
+			window.draw(shape);
 		}
 
 

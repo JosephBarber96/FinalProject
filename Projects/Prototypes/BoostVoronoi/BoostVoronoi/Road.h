@@ -10,7 +10,7 @@ public:
 	Road(float startX, float startY, float endX, float endY);
 	~Road();
 
-	void CreateMinorRoads(float distanceBetweenRoads, float Angle, std::vector<MinorRoad> &minorRoads, std::vector<Road> &majorRoads);
+	void CreateMinorRoads(float distanceBetweenRoads, bool left, std::vector<MinorRoad> &minorRoads, std::vector<Road> &majorRoads);
 
 	float angle;
 	Vec2* start;

@@ -25,7 +25,7 @@ Road::Road(float startX, float startY, float endX, float endY)
 Road::~Road() {}
 
 
-void Road::CreateMinorRoads(float distanceBetweenRoads, float minorAngle, std::vector<MinorRoad> &minorRoads, std::vector<Road> &majorRoads)
+void Road::CreateMinorRoads(float distanceBetweenRoads, bool left, std::vector<MinorRoad> &minorRoads, std::vector<Road> &majorRoads)
 {
 	// Get the length of the road
 	float length = Utility::DistanceBetween(start, end);
@@ -55,8 +55,11 @@ void Road::CreateMinorRoads(float distanceBetweenRoads, float minorAngle, std::v
 			return;
 		}
 
+		// Do we create the road branching left or right from this major road
+		float minorAngle = (left) ? angle - 90 : angle + 90;
+
 		// Create a minor road
-		MinorRoad minorRoad = MinorRoad(roadSpawningPoint->getX(), roadSpawningPoint->getY(), /*minorAngle*/ angle-90, this);
+		MinorRoad minorRoad = MinorRoad(roadSpawningPoint->getX(), roadSpawningPoint->getY(), /*minorAngleArg*/ minorAngle, this);
 		minorRoad.Extend(majorRoads);
 		minorRoads.push_back(minorRoad);
 
