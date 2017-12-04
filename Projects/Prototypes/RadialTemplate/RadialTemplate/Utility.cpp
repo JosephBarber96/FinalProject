@@ -19,7 +19,7 @@ namespace Utility
 	}
 
 	//! http://www.softwareandfinance.com/Visual_CPP/VCPP_Intersection_Two_lines_EndPoints.html
-	Vec2* GetIntersectionPoint(Vec2* start1, Vec2* end1, Vec2* start2, Vec2* end2)
+	Vec2* GetIntersectionPointWithSlope(Vec2* start1, Vec2* end1, Vec2* start2, Vec2* end2)
 	{
 		float m1, c1, m2, c2;
 		float x1, y1, x2, y2;
@@ -60,6 +60,51 @@ namespace Utility
 			intersectionY = m1 * intersectionX + c1;
 
 			return new Vec2(intersectionX, intersectionY);
+		}
+	}
+
+	//https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+	Vec2* GetLineIntersectionPointWithFiniteLine(Vec2* line1Start, Vec2* line1End, Vec2* line2Start, Vec2* line2End)
+	{
+		float p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y;
+
+		p0_x = line1Start->getX();
+		p0_y = line1Start->getY();
+
+		p1_x = line1End->getX();
+		p1_y = line1End->getY();
+
+		p2_x = line2Start->getX();
+		p2_y = line2Start->getY();
+
+		p3_x = line2End->getX();
+		p3_y = line2End->getY();
+
+		// ---
+
+		float s1_x, s1_y, s2_x, s2_y;
+		s1_x = p1_x - p0_x;     s1_y = p1_y - p0_y;
+		s2_x = p3_x - p2_x;     s2_y = p3_y - p2_y;
+
+		float s, t;
+		s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+		t = (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+
+		// Collision detexted
+		if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+		{
+			//
+			float i_x, i_y;
+
+			i_x = p0_x + (t * s1_x);
+			i_y = p0_y + (t * s1_y);
+
+			return new Vec2(i_x, i_y);
+		}
+		else
+		{
+			// No collision
+			return nullptr;
 		}
 	}
 }

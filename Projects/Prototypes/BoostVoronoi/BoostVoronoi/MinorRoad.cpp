@@ -91,10 +91,10 @@ Vec2* MinorRoad::GetBestIntersectionPoint(std::vector<Vec2*> &iPoints)
 	if (*iPoints[0] == *beginning)
 	{
 		index = 1;
-	}
 
-	// If that was the only one, return null
-	if (iPoints.size() == 1) { return nullptr; }
+		// If that was the only one, return null
+		if (iPoints.size() == 1) { return nullptr; }
+	}
 
 	do
 	{
