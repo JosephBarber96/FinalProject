@@ -4,72 +4,85 @@
 
 #include <SFML\Graphics.hpp>
 
-int winSize = 500;
+#include "Circle.h"
+#include "Vec2.h"
+#include "Road.h"
 
-struct Vec
-{
-	float x, y;
-};
-
-struct Road
-{
-	Vec start, end;
-};
+int winSize = 700;
 
 int main()
 {
+	// How large is the bounding box?
+	float size = winSize;
 
-	// Create the points (normalized) for the circle
-	// Refference: https://www.opengl.org/discussion_boards/showthread.php/167955-drawing-a-smooth-circle
-	std::vector<Vec> points;
-	float circlePoints = 100;
-	for (int i = 0; i < circlePoints; i++)
+	// 1 dial will occur every x meters
+	int numOfCircles = size / 80;
+	std::vector<Circle> dials;
+	int circlePoints = 100;
+	for (int i = 0; i < numOfCircles; i++)
 	{
-		double angle = 2 * M_PI * i / circlePoints;
+		Circle circle;
 
-		double x = cos(angle);
-		double y = sin(angle);
+		// Create the points (normalized) for the circle
+		// Refference: https://www.opengl.org/discussion_boards/showthread.php/167955-drawing-a-smooth-circle
+		for (int j = 0; j < circlePoints; j++)
+		{
+			double angle = 2 * M_PI * j / circlePoints;
 
-		Vec point;
-		point.x = x;
-		point.y = y;
+			double x = cos(angle);
+			double y = sin(angle);
 
-		points.push_back(point);
+			circle.AddPoint(x, y);
+		}
+		dials.push_back(circle);
 	}
 
-	// Convert these into SFML screen space
-	for (Vec &vec : points)
+	/*
+		Space these out evenly, whilst also converting
+		into SFML screen space
+	*/
+	int counter = 1;
+	for (Circle &cir : dials)
 	{
-		vec.x *= winSize / 2.5;
-		vec.y *= winSize / 2.5;
+		for (Vec2* v : cir.points)
+		{
+			v->x *= (counter * 100);
+			v->y *= (counter * 100);
 
-		vec.x += winSize / 2;
-		vec.y += winSize / 2;
+			v->x += winSize / 2;
+			v->y += winSize / 2;
+		}
+		counter++;
 	}
 
 	// Create roads between these points
 	std::vector<Road> roads;
-	for (int i = 0; i < circlePoints-1; i++)
+	for (const Circle &cir : dials)
 	{
-		Road road;
-		road.start = points[i];
-
-		if (i < circlePoints-2)
+		for (int i = 0; i < circlePoints - 1; i++)
 		{
-			road.end = points[i + 1];
-		}
+			Road road;
+			road.start = cir.points[i];
 
-		/* Loop back around when we get to the last one */
-		else
-		{
-			road.start = points[0];
-		}
+			if (i < circlePoints - 2)
+			{
+				road.end = cir.points[i+1];
+			}
+			else
+			{
+				road.end = cir.points[0];
+			}
 
-		roads.push_back(road);
+			roads.push_back(road);
+		}
 	}
 
+	// Create points going outwards
+	int outwardsRoads = 5;
 
-	sf::RenderWindow window(sf::VideoMode(500, 500), "Radial template");
+
+
+	sf::RenderWindow window(sf::VideoMode(winSize, winSize), "Radial template");
 
 	while (window.isOpen())
 	{
@@ -85,15 +98,19 @@ int main()
 		// Draw
 
 		// Points
-		for (const Vec &vec : points)
+		for (const Circle &circle : dials)
 		{
-			sf::CircleShape shape;
-			shape.setPosition(vec.x, vec.y);
-			shape.setRadius(1);
-			shape.setFillColor(sf::Color::Green);
+			for (const Vec2* vec : circle.points)
+			{
+				sf::CircleShape shape;
+				shape.setPosition(vec->x, vec->y);
+				shape.setRadius(1);
+				shape.setFillColor(sf::Color::Yellow);
 
-			window.draw(shape);
+				window.draw(shape);
+			}
 		}
+
 
 		// Roads
 		for (const Road &road : roads)
@@ -101,12 +118,25 @@ int main()
 			const int sz = 2;
 			sf::Vertex roadPoints[2] =
 			{
-				sf::Vertex(sf::Vector2f(road.start.x, road.start.y), sf::Color::Blue),
-				sf::Vertex(sf::Vector2f(road.end.x, road.end.y), sf::Color::Blue)
+				sf::Vertex(sf::Vector2f(road.start->x, road.start->y), sf::Color::Blue),
+				sf::Vertex(sf::Vector2f(road.end->x, road.end->y), sf::Color::Blue)
 			};
 
 			window.draw(roadPoints, sz, sf::LineStrip);
 		}
+
+		// Roads
+		//for (const Road &road : roads)
+		//{
+		//	const int sz = 2;
+		//	sf::Vertex roadPoints[2] =
+		//	{
+		//		sf::Vertex(sf::Vector2f(road.start.x, road.start.y), sf::Color::Blue),
+		//		sf::Vertex(sf::Vector2f(road.end.x, road.end.y), sf::Color::Blue)
+		//	};
+
+		//	window.draw(roadPoints, sz, sf::LineStrip);
+		//}
 
 		// Display
 		window.display();
