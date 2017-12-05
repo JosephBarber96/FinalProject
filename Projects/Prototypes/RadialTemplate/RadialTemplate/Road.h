@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 class Vec2;
+class MinorRoad;
 class Road
 {
 public:
@@ -9,11 +10,14 @@ public:
 	Road(float startX, float startY, float endX, float endY);
 	~Road();
 
+	void CreateMinorRoads(float distanceBetweenRoads, bool left, std::vector<MinorRoad> &minorRoads, std::vector<Road> &colliders);
 	void ExtendUntilHit(std::vector<Road> &colliders);
 	std::vector<Vec2*> GetAllIntersectionPoints(std::vector<Road> &colliders);
 
 	Vec2* start;
 	Vec2* end;
+
+	bool operator==(Road road);
 
 private:
 	Vec2* GetIntersectionPoint(std::vector<Road> &colliders);

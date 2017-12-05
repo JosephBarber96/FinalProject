@@ -1,8 +1,11 @@
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <algorithm>
 
 #include "Road.h"
 #include "Vec2.h"
 #include "Utility.h"
+#include "MinorRoad.h"
 
 Road::Road() {}
 
@@ -18,6 +21,61 @@ Road::Road(float startX, float startY, float endX, float endY)
 {}
 
 Road::~Road() {}
+
+void Road::CreateMinorRoads(float distanceBetweenRoads, bool left, std::vector<MinorRoad> &minorRoads, std::vector<Road> &colliders)
+{
+	float angle;
+
+	// Get the length of the road
+	float length = Utility::DistanceBetween(start, end);
+
+	// How far have we traveled so far
+	int distCounter = 0;
+
+	// The road spawning position - it starts on our starting position
+	Vec2* roadSpawningPoint = new Vec2(start->getX(), start->getY());
+
+	// Our normalized direction
+	Vec2* dir = new Vec2(end->getX() - start->getX(), end->getY() - start->getY());
+	Vec2* dirNormalized = dir->Normalized();
+
+	// our facing angle
+	angle = atan2f(dir->getY(), dir->getX()) * 180 / M_PI;
+
+	// Loop
+	for (;;)
+	{
+		/*
+		Sometimes dir can be equal to (0, 0) which causes dirNormalized
+		to be a nullptr
+		*/
+		if (roadSpawningPoint == nullptr || dirNormalized == nullptr)
+		{
+			return;
+		}
+
+		// Do we create the road branching left or right from this major road
+		float minorAngle = (left) ? angle - 90 : angle + 90;
+
+		// Create a minor road
+		MinorRoad minorRoad = MinorRoad(roadSpawningPoint->getX(), roadSpawningPoint->getY(), /*minorAngleArg*/ minorAngle, this);
+		minorRoad.Extend(colliders);
+		minorRoads.push_back(minorRoad);
+
+		// Move along the road
+		roadSpawningPoint = new Vec2(roadSpawningPoint->getX() + (dirNormalized->getX() * distanceBetweenRoads),
+			roadSpawningPoint->getY() + (dirNormalized->getY() * distanceBetweenRoads));
+
+		// How far have we traveled along this major road
+		distCounter += distanceBetweenRoads;
+
+		// If we have traveled the length of the road, return
+		if (distCounter > length) { return; }
+
+		// If we're too close tot he end of the road, return
+		if (Utility::DistanceBetween(roadSpawningPoint, end) < distanceBetweenRoads) { return; }
+	}
+}
 
 void Road::ExtendUntilHit(std::vector<Road> &colliders)
 {
@@ -129,4 +187,13 @@ Vec2* Road::FindBestIntersectionPoint(std::vector<Vec2*> &iPoints)
 		if (index >= iPoints.size()) { return nullptr; }
 
 	} while (true);
+}
+
+bool Road::operator==(Road b)
+{
+	return
+		(
+			this->start == b.start
+			&&
+			this->end == b.end);
 }

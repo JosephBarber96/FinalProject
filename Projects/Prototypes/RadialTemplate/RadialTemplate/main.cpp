@@ -10,13 +10,15 @@
 #include "Road.h"
 #include "BoundingBox.h"
 #include "Box.h"
+#include "UtilRandom.h"
+#include "MinorRoad.h"
 
 int winSize = 700;
 
 int main()
 {
-	// Bouding box will have a 20% boundary
-	float bbMargin = winSize / 10;
+	// Bouding box will have a boundary
+	float bbMargin = winSize / 18;
 	float bbX = 0 + bbMargin;
 	float bbW = winSize - (2 * bbMargin);
 	float bbY = 0 + bbMargin;
@@ -50,7 +52,7 @@ int main()
 	}
 
 	// 1 dial will occur every x meters
-	int metersPerCircle = 90;
+	int metersPerCircle = 70;
 	int numOfCircles = winSize / metersPerCircle;
 	std::vector<Circle> dials;
 	int circlePoints = 80;
@@ -151,7 +153,7 @@ int main()
 	/*
 		Create roads going outwards
 	*/
-	int numOfOutwardsRoads = 7;
+	int numOfOutwardsRoads = 9;
 	std::vector<Road> outwardsRoads;
 	for (int i = 0; i < numOfOutwardsRoads; i++)
 	{
@@ -245,8 +247,16 @@ int main()
 		for (int road = 0; road < outRoads; road++)
 		{
 			// If we're on the final layer of intersections, break.
-			if (layer + 1 == intersectionLayers) { break; }
-
+			if (layer > 0)
+			{
+				if (intersectionPoints[layer].size() < intersectionPoints[layer - 1].size()) { break; }
+			}
+			if (layer < intersectionLayers - 1)
+			{
+				if (intersectionPoints[layer].size() > intersectionPoints[layer + 1].size()) { break; }
+			}
+			
+			
 			/*
 				[layer] [road]
 
@@ -302,6 +312,116 @@ int main()
 		}
 	}
 
+	/*
+		Put a point in the center of each block
+	*/
+	std::vector<Vec2*> centerPoints;
+	for (auto &box : boxes)
+	{
+		Vec2* leftMost, * rightMost, * topMost, * bottomMost;
+
+		// leftMost
+		leftMost = box.bottomLeft;
+		if (box.topLeft->x < leftMost->x) { leftMost = box.topLeft; }
+		if (box.topRight->x < leftMost->x) { leftMost = box.topRight; }
+		if (box.bottomRight->x < leftMost->x) { leftMost = box.bottomRight; }
+		
+		// rightMost
+		rightMost = box.bottomLeft;
+		if (box.topLeft->x > rightMost->x) { rightMost = box.topLeft; }
+		if (box.topRight->x > rightMost->x) { rightMost = box.topRight; }
+		if (box.bottomRight->x > rightMost->x) { rightMost = box.bottomRight; }
+
+		// topMost
+		topMost = box.bottomLeft;
+		if (box.topLeft->y > topMost->y) { topMost = box.topLeft; }
+		if (box.topRight->y > topMost->y) { topMost = box.topRight; }
+		if (box.bottomRight->y > topMost->y) { topMost = box.bottomRight; }
+
+		// bottomMost
+		bottomMost = box.bottomLeft;
+		if (box.topLeft->y < bottomMost->y) { bottomMost = box.topLeft; }
+		if (box.topRight->y < bottomMost->y) { bottomMost = box.topRight; }
+		if (box.bottomRight->y < bottomMost->y) { bottomMost = box.bottomRight; }
+
+		int minX = leftMost->x;
+		int maxX = rightMost->x;
+		int minY = bottomMost->y;
+		int maxY = topMost->y;
+
+		int width = maxX - minX;
+		int height = maxY - minY;
+
+		int middleX = minX + width / 2;
+		int middleY = minY + height / 2;
+		
+		centerPoints.push_back(new Vec2(middleX, middleY));
+
+		// Random
+		//int pointX = UtilRandom::Instance()->Random(minX, maxX);
+		//int pointY = UtilRandom::Instance()->Random(minY, maxY);
+		//centerPoints.push_back(new Vec2(pointX, pointY));
+	}
+
+	// Append all of the roads into one vector;
+	std::vector<Road> allMajorRoads;
+	allMajorRoads.insert(allMajorRoads.end(), circleRoads.begin(), circleRoads.end());
+	allMajorRoads.insert(allMajorRoads.end(), outwardsRoads.begin(), outwardsRoads.end());
+
+	// Create minor roads in a raster template in each segment
+	float distBetweenRoads = 15;
+	float angle = 45;
+	std::vector<MinorRoad> minorRoads;
+	for (auto const &point : centerPoints)
+	{
+		angle += 5;
+		//distBetweenRoads = UtilRandom::Instance()->Random(13, 20);
+		//angle = UtilRandom::Instance()->Random(20, 160);
+
+		/*
+			Dir Horizontal
+		*/
+
+		// Extend a minor road from the center until it hits a major road
+		MinorRoad mr = MinorRoad(point->x, point->y, angle, nullptr);
+		mr.Extend(allMajorRoads);
+
+		// Do this again, in the opposite direction
+		MinorRoad mrOpposite = MinorRoad(point->x, point->y, angle + 180, nullptr);
+		mrOpposite.Extend(allMajorRoads);
+
+		// We can use the end points of these two roads to construct one road going across
+		Road road = Road(mr.end, mrOpposite.end);
+
+		// Branch left outwards from this road
+		road.CreateMinorRoads(distBetweenRoads, 0, minorRoads, allMajorRoads);
+		// Branch right outwards from this road
+		road.CreateMinorRoads(distBetweenRoads, 1, minorRoads, allMajorRoads);
+
+		/*
+			Dir vertical
+		*/
+
+		angle += 90;
+
+		// Extend a minor road from the center until it hits a major road
+		MinorRoad mrRotated = MinorRoad(point->x, point->y, angle, nullptr);
+		mrRotated.Extend(allMajorRoads);
+
+		// Do this again, in the opposite direction
+		MinorRoad mrOppositeRotated = MinorRoad(point->x, point->y, angle + 180, nullptr);
+		mrOppositeRotated.Extend(allMajorRoads);
+
+		// We can use the end points of these two roads to construct one road going across
+		Road roadRotated = Road(mrRotated.end, mrOppositeRotated.end);
+
+		// Branch left outwards from this road
+		roadRotated.CreateMinorRoads(distBetweenRoads, 0, minorRoads, allMajorRoads);
+		// Branch right outwards from this road
+		roadRotated.CreateMinorRoads(distBetweenRoads, 1, minorRoads, allMajorRoads);
+
+	}
+
 	sf::RenderWindow window(sf::VideoMode(winSize, winSize), "Radial template");
 
 	while (window.isOpen())
@@ -350,8 +470,20 @@ int main()
 			const int sz = 2;
 			sf::Vertex roadPoints[sz] =
 			{
-				sf::Vertex(sf::Vector2f(road.start->x, road.start->y), sf::Color::Yellow),
-				sf::Vertex(sf::Vector2f(road.end->x, road.end->y), sf::Color::Yellow)
+				sf::Vertex(sf::Vector2f(road.start->x, road.start->y), sf::Color::Blue),
+				sf::Vertex(sf::Vector2f(road.end->x, road.end->y), sf::Color::Blue)
+			};
+
+			window.draw(roadPoints, sz, sf::LineStrip);
+		}
+
+		for (const MinorRoad &road : minorRoads)
+		{
+			const int sz = 2;
+			sf::Vertex roadPoints[sz] =
+			{
+				sf::Vertex(sf::Vector2f(road.start->x, road.start->y), sf::Color(255, 165, 0, 255)),
+				sf::Vertex(sf::Vector2f(road.end->x, road.end->y), sf::Color(255, 165, 0, 255))
 			};
 
 			window.draw(roadPoints, sz, sf::LineStrip);
@@ -371,37 +503,48 @@ int main()
 		}
 
 		// intersectionPoints
-		for (auto ipContainer : intersectionPoints)
-		{
-			for (Vec2* ip : ipContainer)
-			{
-				sf::CircleShape shape;
-				shape.setPosition(ip->x - 1, ip->y - 1);
-				shape.setRadius(3);
-				shape.setFillColor(sf::Color::Red);
+		//for (auto ipContainer : intersectionPoints)
+		//{
+		//	for (Vec2* ip : ipContainer)
+		//	{
+		//		sf::CircleShape shape;
+		//		shape.setPosition(ip->x - 1, ip->y - 1);
+		//		shape.setRadius(3);
+		//		shape.setFillColor(sf::Color::Red);
 
-				window.draw(shape);
-			}
-		}
+		//		window.draw(shape);
+		//	}
+		//}
 
-		// Box
-		for (Box &box : boxes)
-		{
-			sf::Vertex boxPoints[5] =
-			{
-				// top left
-				sf::Vertex(sf::Vector2f(box.topLeft->x, box.topLeft->y), sf::Color(255, 0, 255, 255)),
-				// top right
-				sf::Vertex(sf::Vector2f(box.topRight->x, box.topRight->y), sf::Color(255, 0, 255, 255)),
-				// bottom right
-				sf::Vertex(sf::Vector2f(box.bottomRight->x, box.bottomRight->y), sf::Color(255, 0, 255, 255)),
-				// bottom left
-				sf::Vertex(sf::Vector2f(box.bottomLeft->x, box.bottomLeft->y), sf::Color(255, 0, 255, 255)),
-				// top left again to finish off the box
-				sf::Vertex(sf::Vector2f(box.topLeft->x, box.topLeft->y), sf::Color(255, 0, 255, 255)),
-			};
-			window.draw(boxPoints, 5, sf::LineStrip);
-		}
+		// Boxs
+		//for (Box &box : boxes)
+		//{
+		//	sf::Vertex boxPoints[5] =
+		//	{
+		//		// top left
+		//		sf::Vertex(sf::Vector2f(box.topLeft->x, box.topLeft->y), sf::Color(255, 0, 255, 255)),
+		//		// top right
+		//		sf::Vertex(sf::Vector2f(box.topRight->x, box.topRight->y), sf::Color(255, 0, 255, 255)),
+		//		// bottom right
+		//		sf::Vertex(sf::Vector2f(box.bottomRight->x, box.bottomRight->y), sf::Color(255, 0, 255, 255)),
+		//		// bottom left
+		//		sf::Vertex(sf::Vector2f(box.bottomLeft->x, box.bottomLeft->y), sf::Color(255, 0, 255, 255)),
+		//		// top left again to finish off the box
+		//		sf::Vertex(sf::Vector2f(box.topLeft->x, box.topLeft->y), sf::Color(255, 0, 255, 255)),
+		//	};
+		//	window.draw(boxPoints, 5, sf::LineStrip);
+		//}
+
+		// Center points
+		//for (auto vec : centerPoints)
+		//{
+		//	sf::CircleShape shape;
+		//	shape.setPosition(vec->x, vec->y);
+		//	shape.setRadius(2);
+		//	shape.setFillColor(sf::Color::Cyan);
+
+		//	window.draw(shape);
+		//}
 
 		// Display
 		window.display();
