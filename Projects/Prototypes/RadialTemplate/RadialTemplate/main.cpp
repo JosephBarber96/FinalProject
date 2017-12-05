@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <vector>
+#include <algorithm>
 
 #include <SFML\Graphics.hpp>
 
@@ -8,6 +9,7 @@
 #include "Vec2.h"
 #include "Road.h"
 #include "BoundingBox.h"
+#include "Box.h"
 
 int winSize = 700;
 
@@ -19,7 +21,7 @@ int main()
 	float bbW = winSize - (2 * bbMargin);
 	float bbY = 0 + bbMargin;
 	float bbH = winSize - (2 * bbMargin);
-	BoundingBox bb = BoundingBox(bbX-1, bbW+1, bbY+2, bbH-2);
+	BoundingBox bb = BoundingBox(bbX - 1, bbW + 1, bbY + 2, bbH - 2);
 
 	/*
 		Roads to represent the bb
@@ -47,13 +49,11 @@ int main()
 		bbRoads.push_back(Road(bottomLeft.x, bottomLeft.y, topLeft.x, topLeft.y));
 	}
 
-
-
 	// 1 dial will occur every x meters
 	int metersPerCircle = 90;
 	int numOfCircles = winSize / metersPerCircle;
 	std::vector<Circle> dials;
-	int circlePoints = 100;
+	int circlePoints = 80;
 	for (int i = 0; i < numOfCircles; i++)
 	{
 		Circle circle;
@@ -91,7 +91,7 @@ int main()
 	}
 
 	// Create roads between these points
-	std::vector<Road> roads;
+	std::vector<Road> circleRoads;
 	for (const Circle &cir : dials)
 	{
 		for (int i = 0; i < circlePoints - 1; i++)
@@ -101,20 +101,19 @@ int main()
 
 			if (i < circlePoints - 2)
 			{
-				road.end = cir.points[i+1];
+				road.end = cir.points[i + 1];
 			}
 			else
 			{
 				road.end = cir.points[0];
 			}
 
-			roads.push_back(road);
+			circleRoads.push_back(road);
 		}
 	}
 
-
 	/*
-		Remove any points or roads that do not 
+		Remove any points or roads that do not
 		fit within our bounding box
 	*/
 	// points
@@ -135,13 +134,13 @@ int main()
 		}
 	}
 	// roads
-	for (std::vector<Road>::iterator iter = roads.begin(); iter != roads.end(); /* no incrementing in loop */)
+	for (std::vector<Road>::iterator iter = circleRoads.begin(); iter != circleRoads.end(); /* no incrementing in loop */)
 	{
 		// If one of the roads points is outside of the bounding box
 		if (!bb.isWithin((*iter).start) || !bb.isWithin((*iter).end))
 		{
 			// Remove it
-			iter = roads.erase(iter);
+			iter = circleRoads.erase(iter);
 		}
 		else
 		{
@@ -188,6 +187,121 @@ int main()
 		road.ExtendUntilHit(bbRoads);
 	}
 
+
+	/*
+		Find the points of intersection for each outward road
+	*/
+
+	/*
+		They will be stored in a 2D container, in order to store them
+		in "layers" (index 0 = first circle dial, index = 1 second, etc).
+	*/
+	std::vector<std::vector<Vec2*>> intersectionPoints;
+
+	auto comparePoints = [](Vec2* lhs, Vec2* rhs) -> bool
+	{
+		return (lhs->x == rhs->x && lhs->y == rhs->y);
+	};
+
+	// For each road
+	for (Road road : outwardsRoads)
+	{
+		// Get all of the intersection points for this road
+		std::vector<Vec2*> iPoints = road.GetAllIntersectionPoints(circleRoads);
+
+		// Delete any duplicate points for intersection
+		iPoints.erase(unique(iPoints.begin(), iPoints.end(), comparePoints), iPoints.end());
+
+		// counter keeps track of the layer
+		int layer = 0;
+
+		// Add each point to a new layer
+		for (Vec2* ip : iPoints)
+		{
+			// Add layers as neccessary
+			if (intersectionPoints.size() <= layer)
+			{
+				intersectionPoints.push_back(std::vector<Vec2*>());
+			}
+
+			// Add this point to the correct layer
+			intersectionPoints[layer].push_back(ip);
+
+			// layer++
+			layer++;
+		}
+	}
+
+	/*
+		Draw boxes between each of these points
+	*/
+
+	std::vector<Box> boxes;
+	int intersectionLayers = intersectionPoints.size();
+	int outRoads = intersectionPoints[1].size();
+
+	for (int layer = 0; layer < intersectionLayers; layer++)
+	{
+		for (int road = 0; road < outRoads; road++)
+		{
+			// If we're on the final layer of intersections, break.
+			if (layer + 1 == intersectionLayers) { break; }
+
+			/*
+				[layer] [road]
+
+				[0][1] = first layer, 2nd road
+				[1][1] = first layer, 2nd road
+			*/
+			Box box;
+
+			/*
+				Our current layer, current road
+			*/
+			Vec2* bottomLeft = intersectionPoints[layer][road];
+
+			
+			/***********************
+				Layer +1, same road
+			************************/
+			Vec2* topLeft = intersectionPoints[layer + 1][road];
+
+			/*********************
+				Layer +1, road +1
+			**********************/
+			Vec2* topRight;
+
+			// Wrap around?
+			if (road + 1 == outRoads)
+			{
+				topRight = intersectionPoints[layer + 1][0];
+			}
+			else
+			{
+				topRight = intersectionPoints[layer + 1][road + 1];
+			}
+
+			/***********************
+				same layer, road +1
+			************************/
+			Vec2* bottomRight;
+
+			// Wrap around?
+			if (road + 1 == outRoads)
+			{
+				bottomRight = intersectionPoints[layer][0];
+			}
+			else
+			{
+				bottomRight = intersectionPoints[layer][road + 1];
+			}
+
+			box = Box(topLeft, topRight, bottomLeft, bottomRight);
+
+			boxes.push_back(box);
+		}
+	}
+
 	sf::RenderWindow window(sf::VideoMode(winSize, winSize), "Radial template");
 
 	while (window.isOpen())
@@ -219,10 +333,10 @@ int main()
 
 
 		// Roads
-		for (const Road &road : roads)
+		for (const Road &road : circleRoads)
 		{
 			const int sz = 2;
-			sf::Vertex roadPoints[2] =
+			sf::Vertex roadPoints[sz] =
 			{
 				sf::Vertex(sf::Vector2f(road.start->x, road.start->y), sf::Color::Blue),
 				sf::Vertex(sf::Vector2f(road.end->x, road.end->y), sf::Color::Blue)
@@ -234,7 +348,7 @@ int main()
 		for (const Road &road : outwardsRoads)
 		{
 			const int sz = 2;
-			sf::Vertex roadPoints[2] =
+			sf::Vertex roadPoints[sz] =
 			{
 				sf::Vertex(sf::Vector2f(road.start->x, road.start->y), sf::Color::Yellow),
 				sf::Vertex(sf::Vector2f(road.end->x, road.end->y), sf::Color::Yellow)
@@ -243,23 +357,51 @@ int main()
 			window.draw(roadPoints, sz, sf::LineStrip);
 		}
 
-		// Bounding box
-		const int sz = 5;
-		sf::Vertex boundingBoxPoint[sz] =
+		// The roads of the bounding box
+		for (const Road &road : bbRoads)
 		{
-			// Top left
-			sf::Vertex(sf::Vector2f(bb.xOrigin, bb.yOrigin), sf::Color::Green),
-			// Top right
-			sf::Vertex(sf::Vector2f(bb.xOrigin + bb.width, bb.yOrigin), sf::Color::Green),
-			// Bottom right
-			sf::Vertex(sf::Vector2f(bb.xOrigin + bb.width, bb.yOrigin + bb.height), sf::Color::Green),
-			// Bottom left
-			sf::Vertex(sf::Vector2f(bb.xOrigin, bb.yOrigin + bb.height), sf::Color::Green),
-			// Top left again to finish off the line strip
-			sf::Vertex(sf::Vector2f(bb.xOrigin, bb.yOrigin), sf::Color::Green)
-		};
+			const int sz = 2;
+			sf::Vertex bbRoadPoints[sz] =
+			{
+				sf::Vertex(sf::Vector2f(road.start->x, road.start->y), sf::Color::Green),
+				sf::Vertex(sf::Vector2f(road.end->x, road.end->y), sf::Color::Green)
+			};
 
-		window.draw(boundingBoxPoint, sz, sf::LineStrip);
+			window.draw(bbRoadPoints, sz, sf::LineStrip);
+		}
+
+		// intersectionPoints
+		for (auto ipContainer : intersectionPoints)
+		{
+			for (Vec2* ip : ipContainer)
+			{
+				sf::CircleShape shape;
+				shape.setPosition(ip->x - 1, ip->y - 1);
+				shape.setRadius(3);
+				shape.setFillColor(sf::Color::Red);
+
+				window.draw(shape);
+			}
+		}
+
+		// Box
+		for (Box &box : boxes)
+		{
+			sf::Vertex boxPoints[5] =
+			{
+				// top left
+				sf::Vertex(sf::Vector2f(box.topLeft->x, box.topLeft->y), sf::Color(255, 0, 255, 255)),
+				// top right
+				sf::Vertex(sf::Vector2f(box.topRight->x, box.topRight->y), sf::Color(255, 0, 255, 255)),
+				// bottom right
+				sf::Vertex(sf::Vector2f(box.bottomRight->x, box.bottomRight->y), sf::Color(255, 0, 255, 255)),
+				// bottom left
+				sf::Vertex(sf::Vector2f(box.bottomLeft->x, box.bottomLeft->y), sf::Color(255, 0, 255, 255)),
+				// top left again to finish off the box
+				sf::Vertex(sf::Vector2f(box.topLeft->x, box.topLeft->y), sf::Color(255, 0, 255, 255)),
+			};
+			window.draw(boxPoints, 5, sf::LineStrip);
+		}
 
 		// Display
 		window.display();

@@ -34,6 +34,26 @@ void Road::ExtendUntilHit(std::vector<Road> &colliders)
 	end = GetIntersectionPoint(colliders);
 }
 
+std::vector<Vec2*> Road::GetAllIntersectionPoints(std::vector<Road> &colliders)
+{
+	// To hold the points of intersection
+	std::vector<Vec2*> iPoints;
+
+	// For all roads
+	for (auto road : colliders)
+	{
+		//Vec2* ip = Utility::GetIntersectionPoint(start, end, road.start, road.end);
+		Vec2* ip = Utility::GetLineIntersectionPointWithFiniteLine(start, end, road.start, road.end);
+
+		if (ip != nullptr)
+		{
+			iPoints.push_back(ip);
+		}
+	}
+
+	return iPoints;
+}
+
 Vec2* Road::GetIntersectionPoint(std::vector<Road> &colliders)
 {
 	// To hold all of the points of intersection

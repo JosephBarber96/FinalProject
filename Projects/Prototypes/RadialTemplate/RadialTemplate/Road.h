@@ -10,11 +10,12 @@ public:
 	~Road();
 
 	void ExtendUntilHit(std::vector<Road> &colliders);
-	Vec2* GetIntersectionPoint(std::vector<Road> &colliders);
+	std::vector<Vec2*> GetAllIntersectionPoints(std::vector<Road> &colliders);
 
 	Vec2* start;
 	Vec2* end;
 
 private:
+	Vec2* GetIntersectionPoint(std::vector<Road> &colliders);
 	Vec2* FindBestIntersectionPoint(std::vector<Vec2*> &iPoints);
 };
