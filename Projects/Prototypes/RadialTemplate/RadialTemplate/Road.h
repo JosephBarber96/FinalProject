@@ -12,6 +12,7 @@ public:
 
 	void CreateMinorRoads(float distanceBetweenRoads, bool left, std::vector<MinorRoad> &minorRoads, std::vector<Road> &colliders);
 	void ExtendUntilHit(std::vector<Road> &colliders);
+	void CutOffAtIntersection(std::vector<Road> &colliders);
 	std::vector<Vec2*> GetAllIntersectionPoints(std::vector<Road> &colliders);
 
 	Vec2* start;

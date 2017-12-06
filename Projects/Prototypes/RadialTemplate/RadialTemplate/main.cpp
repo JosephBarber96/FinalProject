@@ -3,6 +3,14 @@
 #include <vector>
 #include <algorithm>
 
+/*
+Requires C++ Boost Library for 1.65s for windows
+https://dl.bintray.com/boostorg/release/1.65.1/binaries/
+(boost_1_65_1-msvc-10.0-32.exe)
+
+include directory: C:\local\boost_1_65_1
+*/
+#include<boost\polygon\voronoi.hpp>
 #include <SFML\Graphics.hpp>
 
 #include "Circle.h"
@@ -13,7 +21,15 @@
 #include "UtilRandom.h"
 #include "MinorRoad.h"
 
+using namespace boost::polygon;
+
+typedef int coordinate_type;
+typedef point_data<coordinate_type> point_type;
+typedef voronoi_diagram<double> VD;
+
 int winSize = 700;
+
+void CreateRasterMinorRoads(std::vector<Box> &boxes, std::vector<Road> &allMajorRoads);
 
 int main()
 {
@@ -312,20 +328,33 @@ int main()
 		}
 	}
 
+	// Append all of the roads into one vector;
+	std::vector<Road> allMajorRoads;
+	allMajorRoads.insert(allMajorRoads.end(), circleRoads.begin(), circleRoads.end());
+	allMajorRoads.insert(allMajorRoads.end(), outwardsRoads.begin(), outwardsRoads.end());
+
+	// CreateRasterMinorRoads(boxes, allMajorRoads);
+
 	/*
-		Put a point in the center of each block
+		Create voronoi minor roads
 	*/
-	std::vector<Vec2*> centerPoints;
-	for (auto &box : boxes)
+
+	// Points
+
+	// for each box...
+	int pointsPerBox = 17;
+	std::vector<Road> voronoiRoads;
+	for (const auto &box : boxes)
 	{
-		Vec2* leftMost, * rightMost, * topMost, * bottomMost;
+		// Find the edge points of the box
+		Vec2* leftMost, *rightMost, *topMost, *bottomMost;
 
 		// leftMost
 		leftMost = box.bottomLeft;
 		if (box.topLeft->x < leftMost->x) { leftMost = box.topLeft; }
 		if (box.topRight->x < leftMost->x) { leftMost = box.topRight; }
 		if (box.bottomRight->x < leftMost->x) { leftMost = box.bottomRight; }
-		
+
 		// rightMost
 		rightMost = box.bottomLeft;
 		if (box.topLeft->x > rightMost->x) { rightMost = box.topLeft; }
@@ -345,81 +374,114 @@ int main()
 		if (box.bottomRight->y < bottomMost->y) { bottomMost = box.bottomRight; }
 
 		int minX = leftMost->x;
+		//minX = minX - minX;
 		int maxX = rightMost->x;
+		//maxX = maxX + maxX;
 		int minY = bottomMost->y;
+		//minY = minY - minY;
 		int maxY = topMost->y;
+		//maxY = maxY + maxY;
 
-		int width = maxX - minX;
-		int height = maxY - minY;
+		// Place points in the boundaries of the box
+		std::vector<point_type> voronoiBoxPoints;
 
-		int middleX = minX + width / 2;
-		int middleY = minY + height / 2;
-		
-		centerPoints.push_back(new Vec2(middleX, middleY));
+		for (int i = 0; i < pointsPerBox; i++)
+		{
+			double pointX = UtilRandom::Instance()->Random(minX, maxX);
+			double pointY = UtilRandom::Instance()->Random(minY, maxY);
 
-		// Random
-		//int pointX = UtilRandom::Instance()->Random(minX, maxX);
-		//int pointY = UtilRandom::Instance()->Random(minY, maxY);
-		//centerPoints.push_back(new Vec2(pointX, pointY));
+			voronoiBoxPoints.push_back(point_type(pointX, pointY));
+		}
+
+		// Construct the voronoi diagram
+		VD vd;
+		construct_voronoi(voronoiBoxPoints.begin(), voronoiBoxPoints.end(), &vd);
+
+		// Create roads from the voronoi edges
+		for (auto const &edge : vd.edges())
+		{
+			if (edge.vertex0() != NULL && edge.vertex1() != NULL)
+			{
+				int sX = edge.vertex0()->x();
+				int sY = edge.vertex0()->y();
+
+				int eX = edge.vertex1()->x();
+				int eY = edge.vertex1()->y();
+
+				Vec2* roadStart, *roadEnd;
+
+				/* if sX and sY are in bounds, its the start */
+				if (sX >= minX && sX <= maxX
+					&& sY >= minY && sY <= maxY)
+				{
+					roadStart = new Vec2(sX, sY);
+					roadEnd = new Vec2(eX, eY);
+				}
+				// else, end is start
+				else
+				{
+					roadStart = new Vec2(eX, eY);
+					roadEnd = new Vec2(sX, sY);
+				}
+
+				Road road = Road(roadStart, roadEnd);
+
+				/* If this road already exists, don't push it back */
+				bool exists = false;
+				for (auto r : voronoiRoads)
+				{
+					if (*road.start == *r.end && *road.end == *r.start
+						||
+						*road.start == *r.start && *road.end == *r.end)
+					{
+						exists = true;
+						break;
+					}
+				}
+				if (!exists)
+				{
+					if (*road.start == *road.end)
+					{
+
+					}
+					else
+					{
+						road.CutOffAtIntersection(allMajorRoads);
+						road.CutOffAtIntersection(bbRoads);
+
+						if (road.start->x >= minX && road.start->x <= maxX && road.start->y >= minY && road.start->y <= maxY
+							&&
+							road.end->x >= minX && road.end->x <= maxX && road.end->y >= minY && road.end->y <= maxY)
+						{
+							voronoiRoads.push_back(road);
+						}
+
+
+
+						
+					}
+				}
+
+				//// Collect all points of intersection
+				//std::vector<Vec2*> ips = road.GetAllIntersectionPoints(allMajorRoads);
+				//vdips.insert(vdips.end(), ips.begin(), ips.end());
+
+			}
+		}
 	}
 
-	// Append all of the roads into one vector;
-	std::vector<Road> allMajorRoads;
-	allMajorRoads.insert(allMajorRoads.end(), circleRoads.begin(), circleRoads.end());
-	allMajorRoads.insert(allMajorRoads.end(), outwardsRoads.begin(), outwardsRoads.end());
+	// Clip the roads after
+	/*
+		We clip them after because they have to remain un-modified 
+		whilst we are creating all of the roads so that we can 
+		check against any dupes being created.
+	*/
 
-	// Create minor roads in a raster template in each segment
-	float distBetweenRoads = 15;
-	float angle = 45;
-	std::vector<MinorRoad> minorRoads;
-	for (auto const &point : centerPoints)
+
+	for (Road &road : voronoiRoads)
 	{
-		angle += 5;
-		//distBetweenRoads = UtilRandom::Instance()->Random(13, 20);
-		//angle = UtilRandom::Instance()->Random(20, 160);
-
-		/*
-			Dir Horizontal
-		*/
-
-		// Extend a minor road from the center until it hits a major road
-		MinorRoad mr = MinorRoad(point->x, point->y, angle, nullptr);
-		mr.Extend(allMajorRoads);
-
-		// Do this again, in the opposite direction
-		MinorRoad mrOpposite = MinorRoad(point->x, point->y, angle + 180, nullptr);
-		mrOpposite.Extend(allMajorRoads);
-
-		// We can use the end points of these two roads to construct one road going across
-		Road road = Road(mr.end, mrOpposite.end);
-
-		// Branch left outwards from this road
-		road.CreateMinorRoads(distBetweenRoads, 0, minorRoads, allMajorRoads);
-		// Branch right outwards from this road
-		road.CreateMinorRoads(distBetweenRoads, 1, minorRoads, allMajorRoads);
-
-		/*
-			Dir vertical
-		*/
-
-		angle += 90;
-
-		// Extend a minor road from the center until it hits a major road
-		MinorRoad mrRotated = MinorRoad(point->x, point->y, angle, nullptr);
-		mrRotated.Extend(allMajorRoads);
-
-		// Do this again, in the opposite direction
-		MinorRoad mrOppositeRotated = MinorRoad(point->x, point->y, angle + 180, nullptr);
-		mrOppositeRotated.Extend(allMajorRoads);
-
-		// We can use the end points of these two roads to construct one road going across
-		Road roadRotated = Road(mrRotated.end, mrOppositeRotated.end);
-
-		// Branch left outwards from this road
-		roadRotated.CreateMinorRoads(distBetweenRoads, 0, minorRoads, allMajorRoads);
-		// Branch right outwards from this road
-		roadRotated.CreateMinorRoads(distBetweenRoads, 1, minorRoads, allMajorRoads);
-
+		//road.CutOffAtIntersection(allMajorRoads);
+		//road.CutOffAtIntersection(bbRoads);
 	}
 
 	sf::RenderWindow window(sf::VideoMode(winSize, winSize), "Radial template");
@@ -453,31 +515,19 @@ int main()
 
 
 		// Roads
+		for (const Road &road : voronoiRoads)
+		{
+			const int sz = 2;
+			sf::Vertex roadPoints[sz] =
+			{
+				sf::Vertex(sf::Vector2f(road.start->x, road.start->y), sf::Color::Blue),
+				sf::Vertex(sf::Vector2f(road.end->x, road.end->y), sf::Color::Blue)
+			};
+
+			window.draw(roadPoints, sz, sf::LineStrip);
+		}
+
 		for (const Road &road : circleRoads)
-		{
-			const int sz = 2;
-			sf::Vertex roadPoints[sz] =
-			{
-				sf::Vertex(sf::Vector2f(road.start->x, road.start->y), sf::Color::Blue),
-				sf::Vertex(sf::Vector2f(road.end->x, road.end->y), sf::Color::Blue)
-			};
-
-			window.draw(roadPoints, sz, sf::LineStrip);
-		}
-
-		for (const Road &road : outwardsRoads)
-		{
-			const int sz = 2;
-			sf::Vertex roadPoints[sz] =
-			{
-				sf::Vertex(sf::Vector2f(road.start->x, road.start->y), sf::Color::Blue),
-				sf::Vertex(sf::Vector2f(road.end->x, road.end->y), sf::Color::Blue)
-			};
-
-			window.draw(roadPoints, sz, sf::LineStrip);
-		}
-
-		for (const MinorRoad &road : minorRoads)
 		{
 			const int sz = 2;
 			sf::Vertex roadPoints[sz] =
@@ -488,6 +538,30 @@ int main()
 
 			window.draw(roadPoints, sz, sf::LineStrip);
 		}
+
+		for (const Road &road : outwardsRoads)
+		{
+			const int sz = 2;
+			sf::Vertex roadPoints[sz] =
+			{
+				sf::Vertex(sf::Vector2f(road.start->x, road.start->y), sf::Color(255, 165, 0, 255)),
+				sf::Vertex(sf::Vector2f(road.end->x, road.end->y), sf::Color(255, 165, 0, 255))
+			};
+
+			window.draw(roadPoints, sz, sf::LineStrip);
+		}
+
+		//for (const MinorRoad &road : minorRoads)
+		//{
+		//	const int sz = 2;
+		//	sf::Vertex roadPoints[sz] =
+		//	{
+		//		sf::Vertex(sf::Vector2f(road.start->x, road.start->y), sf::Color(255, 165, 0, 255)),
+		//		sf::Vertex(sf::Vector2f(road.end->x, road.end->y), sf::Color(255, 165, 0, 255))
+		//	};
+
+		//	window.draw(roadPoints, sz, sf::LineStrip);
+		//}
 
 		// The roads of the bounding box
 		for (const Road &road : bbRoads)
@@ -515,6 +589,7 @@ int main()
 		//		window.draw(shape);
 		//	}
 		//}
+
 
 		// Boxs
 		//for (Box &box : boxes)
@@ -550,4 +625,112 @@ int main()
 		window.display();
 	}
 	return 0;
+}
+
+void CreateRasterMinorRoads(std::vector<Box> &boxes, std::vector<Road> &allMajorRoads)
+{
+	/*
+	Put a point in the center of each block
+	*/
+	std::vector<Vec2*> centerPoints;
+	for (auto &box : boxes)
+	{
+		Vec2* leftMost, *rightMost, *topMost, *bottomMost;
+
+		// leftMost
+		leftMost = box.bottomLeft;
+		if (box.topLeft->x < leftMost->x) { leftMost = box.topLeft; }
+		if (box.topRight->x < leftMost->x) { leftMost = box.topRight; }
+		if (box.bottomRight->x < leftMost->x) { leftMost = box.bottomRight; }
+
+		// rightMost
+		rightMost = box.bottomLeft;
+		if (box.topLeft->x > rightMost->x) { rightMost = box.topLeft; }
+		if (box.topRight->x > rightMost->x) { rightMost = box.topRight; }
+		if (box.bottomRight->x > rightMost->x) { rightMost = box.bottomRight; }
+
+		// topMost
+		topMost = box.bottomLeft;
+		if (box.topLeft->y > topMost->y) { topMost = box.topLeft; }
+		if (box.topRight->y > topMost->y) { topMost = box.topRight; }
+		if (box.bottomRight->y > topMost->y) { topMost = box.bottomRight; }
+
+		// bottomMost
+		bottomMost = box.bottomLeft;
+		if (box.topLeft->y < bottomMost->y) { bottomMost = box.topLeft; }
+		if (box.topRight->y < bottomMost->y) { bottomMost = box.topRight; }
+		if (box.bottomRight->y < bottomMost->y) { bottomMost = box.bottomRight; }
+
+		int minX = leftMost->x;
+		int maxX = rightMost->x;
+		int minY = bottomMost->y;
+		int maxY = topMost->y;
+
+		int width = maxX - minX;
+		int height = maxY - minY;
+
+		int middleX = minX + width / 2;
+		int middleY = minY + height / 2;
+
+		centerPoints.push_back(new Vec2(middleX, middleY));
+
+		// Random
+		//int pointX = UtilRandom::Instance()->Random(minX, maxX);
+		//int pointY = UtilRandom::Instance()->Random(minY, maxY);
+		//centerPoints.push_back(new Vec2(pointX, pointY));
+	}
+
+	// Create minor roads in a raster template in each segment
+	float distBetweenRoads = 15;
+	float angle = 45;
+	std::vector<MinorRoad> minorRoads;
+	for (auto const &point : centerPoints)
+	{
+		angle += 5;
+		//distBetweenRoads = UtilRandom::Instance()->Random(13, 20);
+		//angle = UtilRandom::Instance()->Random(20, 160);
+
+		/*
+		Dir Horizontal
+		*/
+
+		// Extend a minor road from the center until it hits a major road
+		MinorRoad mr = MinorRoad(point->x, point->y, angle, nullptr);
+		mr.Extend(allMajorRoads);
+
+		// Do this again, in the opposite direction
+		MinorRoad mrOpposite = MinorRoad(point->x, point->y, angle + 180, nullptr);
+		mrOpposite.Extend(allMajorRoads);
+
+		// We can use the end points of these two roads to construct one road going across
+		Road road = Road(mr.end, mrOpposite.end);
+
+		// Branch left outwards from this road
+		road.CreateMinorRoads(distBetweenRoads, 0, minorRoads, allMajorRoads);
+		// Branch right outwards from this road
+		road.CreateMinorRoads(distBetweenRoads, 1, minorRoads, allMajorRoads);
+
+		/*
+		Dir vertical
+		*/
+
+		angle += 90;
+
+		// Extend a minor road from the center until it hits a major road
+		MinorRoad mrRotated = MinorRoad(point->x, point->y, angle, nullptr);
+		mrRotated.Extend(allMajorRoads);
+
+		// Do this again, in the opposite direction
+		MinorRoad mrOppositeRotated = MinorRoad(point->x, point->y, angle + 180, nullptr);
+		mrOppositeRotated.Extend(allMajorRoads);
+
+		// We can use the end points of these two roads to construct one road going across
+		Road roadRotated = Road(mrRotated.end, mrOppositeRotated.end);
+
+		// Branch left outwards from this road
+		roadRotated.CreateMinorRoads(distBetweenRoads, 0, minorRoads, allMajorRoads);
+		// Branch right outwards from this road
+		roadRotated.CreateMinorRoads(distBetweenRoads, 1, minorRoads, allMajorRoads);
+
+	}
 }

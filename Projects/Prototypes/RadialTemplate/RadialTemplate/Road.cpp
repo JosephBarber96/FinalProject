@@ -90,6 +90,22 @@ void Road::ExtendUntilHit(std::vector<Road> &colliders)
 	end = new Vec2(start->x + (dir->x * scaleAmount), start->y + (dir->y * scaleAmount));
 
 	end = GetIntersectionPoint(colliders);
+
+	if (end == nullptr) { end = start; }
+}
+
+void Road::CutOffAtIntersection(std::vector<Road> &colliders)
+{
+	Vec2* intersection = GetIntersectionPoint(colliders);
+	
+	if (intersection == nullptr)
+	{
+		end = end;
+	}
+	else
+	{
+		end = intersection;
+	}
 }
 
 std::vector<Vec2*> Road::GetAllIntersectionPoints(std::vector<Road> &colliders)
