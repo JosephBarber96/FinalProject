@@ -17,6 +17,7 @@
 #include "V2.h"
 #include "QuadTree.h"
 #include "debug_mode.h"
+#include "DiamondSquare.h"
 
 int winX;
 int winY;
@@ -30,8 +31,10 @@ bool drawNodes = true;
 bool drawElevationMap = false;
 bool drawRoads = true;
 
-void CreateRoadNodes(sf::Image image)
+void CreateRoadNodesFromSFImage(sf::Image image)
 {
+	std::cout << "Creating Road Nodes..." << std::endl;
+
 	int imageWidth = image.getSize().x;
 	int imageHeight = image.getSize().y;
 
@@ -103,6 +106,57 @@ void CreateRoadNodes(sf::Image image)
 	std::cout << "RoadNodes setup successfully" << std::endl;
 }
 
+void CreateRoadNodesFromDiaSqu(std::vector<std::vector<RoadNode>> roadNodes, DiamondSquare ds)
+{
+	std::cout << "Creating Road Nodes..." << std::endl;
+
+	int imageWidth = 1024;
+	int imageHeight = 1024;
+
+	int yIndex = 0;
+	int xIndex = 0;
+
+	for (int y = 0; y < imageHeight; y++)
+	{
+		if (y % 5 != 0) { continue; }
+
+		/*if (y % 100 == 0)*/ { std::cout << "Creating on y = " << y << std::endl; }
+
+		RoadNode::grid.push_back(std::vector<RoadNode*>());
+		for (int x = 0; x < imageWidth; x++)
+		{
+			if (x % 5 != 0) { continue; }
+
+			// Grab the cost of this node
+			auto cost = (ds.Points()[y][x]->z + abs(ds.Lowest())) * 2;
+
+			RoadNode* node = new RoadNode(x, y);
+			node->yIndex = yIndex;
+			node->xIndex = xIndex;
+
+			node->SetCost(cost);
+
+			RoadNode::grid[yIndex].push_back(node);
+
+			xIndex++;
+		}
+		yIndex++;
+		xIndex = 0;
+	}
+
+	std::cout << "Filling neighbours..." << std::endl;
+
+	for (auto vec : RoadNode::grid)
+	{
+		for (auto node : vec)
+		{
+			node->FillNeighbours();
+		}
+	}
+
+	std::cout << "RoadNodes setup successfully" << std::endl;
+}
+
 void SearchImageForPixelData(sf::Image image)
 {
 	int xSize = image.getSize().x;
@@ -155,7 +209,7 @@ int main()
 	// Create a window
 	winX = populationMap.getSize().x;
 	winY = populationMap.getSize().y;
-	sf::RenderWindow window(sf::VideoMode(winX, winY), "Road network prototype");
+	std::cout << "Win_x: " << winX << " Win_y: " << winY << std::endl;
 
 	// Create a sprite to display this image;
 	sf::Texture populationTexture;
@@ -234,33 +288,53 @@ int main()
 	std::cout << "The complete MST has " << mst->GetTreeEdges().size() << " edges." << std::endl;
 
 	// Now that we've sorted the MST, we have to set up road nodes and use A* to pathfind the roads.
+	// Create nodes for the roads...
 
-	// Read elevation data
-	std::string elevationMapFileName = "elevationMap.bmp";
-	sf::Image evelationMap;
-	if (!evelationMap.loadFromFile(elevationMapFileName))
-	{
-		std::cerr << "Could not find/open elevationMap" << std::endl;
-		return -1;
-	}
+	/********************************************
+		Create roads from a heightmap using SFML
+	*********************************************/
 
-	// Create a sprite to display this image;
-	sf::Texture elevationTexture;
-	if (!elevationTexture.loadFromFile(elevationMapFileName))
-	{
-		return -1;
-	}
-	elevationTexture.setSmooth(true);
+	//std::string elevationMapFileName = "elevationMap.bmp";
+	//sf::Image evelationMap;
+	//if (!evelationMap.loadFromFile(elevationMapFileName))
+	//{
+	//	std::cerr << "Could not find/open elevationMap" << std::endl;
+	//	return -1;
+	//}
 
-	sf::Sprite elevationSprite;
-	elevationSprite.setTexture(elevationTexture);
-	elevationSprite.setPosition(0, 0);
+	//// Create a sprite to display this image;
+	//sf::Texture elevationTexture;
+	//if (!elevationTexture.loadFromFile(elevationMapFileName))
+	//{
+	//	return -1;
+	//}
+	//elevationTexture.setSmooth(true);
 
-	// Create nodes for the roads
-	CreateRoadNodes(evelationMap);
+	//sf::Sprite elevationSprite;
+	//elevationSprite.setTexture(elevationTexture);
+	//elevationSprite.setPosition(0, 0);
 
-	int counter = 0;
+	//CreateRoadNodesFromSFImage(evelationMap);
+
+
+	/**************************************************************
+		Create roads from a diamondsquare terrain (added 12/12/17)
+	***************************************************************/
+
+	int divisions = 1024;
+	int size = 5;
+	int height = 50;
+	std::cout << "Generating DiamondSquare terrain." << std::endl;
+	DiamondSquare ds = DiamondSquare(divisions, size, height);
+	ds.Generate();
+	ds.CreatePoints();
+	ds.CalcuateBoundaryPoints();
+
+	std::vector<std::vector<RoadNode>> roadNodes;
+	CreateRoadNodesFromDiaSqu(roadNodes, ds);
+
 	// Construct a road from each edge
+	int counter = 0;
 	for (Edge edge : mst->GetTreeEdges())
 	{
 		std::cout << "Creating node for edge: " << ++counter << std::endl;
@@ -271,6 +345,7 @@ int main()
 		road->nodes = AStar::PathFind(edge.start->position->x, edge.start->position->y, edge.end->position->x, edge.end->position->y);
 	}
 
+	sf::RenderWindow window(sf::VideoMode(winX, winY), "Road network prototype");
 
 	// Display
 	while (window.isOpen())
@@ -319,7 +394,7 @@ int main()
 		// Elevation map
 		if (drawElevationMap)
 		{
-			window.draw(elevationSprite);
+			// window.draw(elevationSprite);
 		}
 
 		// Quad tree
@@ -379,14 +454,12 @@ int main()
 			// Nodes
 			for (MstNode* node : mst->GetNodes())
 			{
+				sf::CircleShape shape;
+				shape.setRadius(1);
+				shape.setPosition(node->position->x, node->position->y);
+				shape.setFillColor(sf::Color::Green);
 
-				sf::Vertex point[1] = { sf::Vertex(sf::Vector2f(node->position->x, node->position->y), sf::Color::Green) };
-
-				//sf::CircleShape point(1);
-				//point.setFillColor(sf::Color::Green);
-				//point.setPosition(node->position->x, node->position->y);
-
-				window.draw(point, 1, sf::Points);
+				window.draw(shape);
 			}
 		}
 
