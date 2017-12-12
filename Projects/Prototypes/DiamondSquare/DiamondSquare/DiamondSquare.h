@@ -16,6 +16,7 @@ public:
 	float x, y, z;
 };
 
+class RoadNode;
 class DiamondSquare
 {
 public:
@@ -26,6 +27,7 @@ public:
 	void Print();
 	void CalcuateBoundaryPoints();
 	void CreatePoints();
+	std::vector<std::vector<RoadNode*>> CreatePointsAndPassBackRoadNodes();
 
 	int Lowest() { return lowest; }
 	int Highest() { return highest; }

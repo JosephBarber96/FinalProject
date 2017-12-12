@@ -4,6 +4,7 @@
 
 #include "DiamondSquare.h"
 #include "UtilRandom.h"
+#include "RoadNode.h"
 
 DiamondSquare::DiamondSquare(int div, float siz, float hei)
 	:
@@ -132,6 +133,8 @@ void DiamondSquare::CalcuateBoundaryPoints()
 	}
 	// Convert it into positive space
 	highest += abs(lowest);
+
+	std::cout << "Highest: " << highest << std::endl;
 }
 
 void DiamondSquare::CreatePoints()
@@ -156,6 +159,37 @@ void DiamondSquare::CreatePoints()
 	}
 
 	points.erase(points.end() - 1);
+}
+
+std::vector<std::vector<RoadNode*>> DiamondSquare::CreatePointsAndPassBackRoadNodes()
+{
+	std::vector<std::vector<RoadNode*>> roadNodes;
+	roadNodes.push_back(std::vector<RoadNode*>());
+
+	points = std::vector<std::vector<Vec3*>>();
+	points.push_back(std::vector<Vec3*>());
+
+	int vertsperLine = getDivisions() + 1;
+	int x = 0;
+	int y = 0;
+	for (auto tri : Verts())
+	{
+		points[points.size() - 1].push_back(new Vec3(x, y, tri.y));
+		roadNodes[roadNodes.size() - 1].push_back(new RoadNode(x, y, ((tri.y + abs(lowest)))));
+		x++;
+		if (x == vertsperLine)
+		{
+			points.push_back(std::vector<Vec3*>());
+			roadNodes.push_back(std::vector<RoadNode*>());
+			x = 0;
+			y++;
+		}
+	}
+
+	points.erase(points.end() - 1);
+	roadNodes.erase(roadNodes.end() - 1);
+
+	return roadNodes;
 }
 
 void DiamondSquare::DiaSqu(int row, int col, int size, float heightOffset)

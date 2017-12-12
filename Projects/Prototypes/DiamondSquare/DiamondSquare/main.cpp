@@ -5,20 +5,94 @@
 #include <SFML\Graphics.hpp>
 
 #include "DiamondSquare.h"
+#include "QuadTree.h"
+#include "MinimumSpanningTree.h"
+#include "RoadNode.h"
+#include "Node.h"
+#include "MstNode.h"
+#include "V2.h"
+#include "Edge.h"
+#include "Road.h"
+#include "Pathfinding.h"
 
+const int winSize = 256;
 
 int main()
 {
-	int divisions = 512;
+	/************************
+		Population data
+	*************************/
+	std::string populationMapFileName = "PopulatioNmap.bmp";
+	sf::Image populationMap;
+	if (!populationMap.loadFromFile(populationMapFileName))
+	{
+		std::cerr << "Could not find/open populationMap" << std::endl;
+		return -1;
+	}
+	std::cout << "Creating QuadTree..." << std::endl;
+	QuadTree* qt = new QuadTree(nullptr, 0, 0, winSize, winSize, populationMap);
+
+	/************************
+			MST
+	*************************/
+	std::cout << "Creating MST..." << std::endl;
+	MinimumSpanningTree mst = MinimumSpanningTree();
+
+	for (auto quad : qt->Children())
+	{
+		mst.SpawnPoint(quad->xOrigin, quad->yOrigin, (quad->xOrigin + quad->width), (quad->yOrigin + quad->height));
+	}
+
+	// Assign neighbours
+	float maximumDistanceBetweenNeighbours = winSize / 4;
+	mst.AssignNighbours(maximumDistanceBetweenNeighbours);
+
+	// Create edges
+	mst.CreateAllEdges();
+
+	// Sort the MST
+	mst.Sort();
+
+	/************************
+		Height/terrain data
+	*************************/
+	std::cout << "Generating DiamondSquare terrain..." << std::endl;
+	int divisions = winSize;
 	int size = 5;
 	int height = 50;
 	DiamondSquare ds = DiamondSquare(divisions, size, height);
 	ds.Generate();
-	// ds.Print();
 	ds.CreatePoints();
 	ds.CalcuateBoundaryPoints();
+	// ds.Print();
 
-	sf::RenderWindow window(sf::VideoMode(512, 512), "Window");
+	/****************************************
+		Creating roadnodes from terrain data
+	*****************************************/
+	std::vector<std::vector<RoadNode*>> roadNodes;
+	roadNodes = ds.CreatePointsAndPassBackRoadNodes();
+
+	/***************************************************
+		Pathfind roads using the mst edges
+		and roadnodes generated from the diamondsquare
+		terrain
+	****************************************************/
+	std::vector<Road*> roads;
+	int counter = 0;
+	for (Edge edge : mst.GetTreeEdges())
+	{
+		std::cout << "Pathfinding road: " << counter++ << std::endl;
+		Road* road = new Road();
+		road->nodes = Pathfinding::PathFind(roadNodes,
+			edge.start->position->x,
+			edge.start->position->y,
+			edge.end->position->x,
+			edge.end->position->y);
+
+		roads.push_back(road);
+	}
+
+	sf::RenderWindow window(sf::VideoMode(winSize, winSize), "Window");
 
 	while (window.isOpen())
 	{
@@ -30,6 +104,10 @@ int main()
 
 		window.clear();
 		
+
+		/*************************
+			Terrain (Heightmap)
+		**************************/
 		int numOfVerts = ds.Points().size() * ds.Points()[0].size();
 		sf::VertexArray vertPoints(sf::Points, numOfVerts);
 		int counter = 0;
@@ -55,6 +133,22 @@ int main()
 			}
 		}
 		window.draw(vertPoints); 
+
+		/*
+			Roads
+		*/
+		for (Road* road : roads)
+		{
+			sf::VertexArray roadVertices(sf::LineStrip, road->nodes.size());
+			int nodeCounter = 0;
+			for (RoadNode* node : road->nodes)
+			{
+				roadVertices[nodeCounter].position = sf::Vector2f(node->position->x, node->position->y);
+				roadVertices[nodeCounter].color = sf::Color(255, 0, 255);
+				nodeCounter++;
+			}
+			window.draw(roadVertices);
+		}
 
 		window.display();
 	}
