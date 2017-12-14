@@ -15,7 +15,8 @@
 #include "Road.h"
 #include "Pathfinding.h"
 
-const int winSize = 256;
+const int winSize = 512;
+int offsetForRoadNodes = 2;
 
 int main()
 {
@@ -59,7 +60,7 @@ int main()
 	std::cout << "Generating DiamondSquare terrain..." << std::endl;
 	int divisions = winSize;
 	int size = 5;
-	int height = 50;
+	int height = 64;
 	DiamondSquare ds = DiamondSquare(divisions, size, height);
 	ds.Generate();
 	ds.CreatePoints();
@@ -70,7 +71,7 @@ int main()
 		Creating roadnodes from terrain data
 	*****************************************/
 	std::vector<std::vector<RoadNode*>> roadNodes;
-	roadNodes = ds.CreatePointsAndPassBackRoadNodes();
+	roadNodes = ds.CreatePointsAndPassBackRoadNodes(offsetForRoadNodes);
 
 	/***************************************************
 		Pathfind roads using the mst edges
@@ -78,16 +79,20 @@ int main()
 		terrain
 	****************************************************/
 	std::vector<Road*> roads;
-	int counter = 0;
+	std::cout << "Pathfinding roads..." << std::endl;
 	for (Edge edge : mst.GetTreeEdges())
 	{
-		std::cout << "Pathfinding road: " << counter++ << std::endl;
+		if (edge.start->position->x == edge.end->position->x && edge.start->position->y == edge.end->position->y)
+		{ 
+			continue; 
+		}
 		Road* road = new Road();
 		road->nodes = Pathfinding::PathFind(roadNodes,
-			edge.start->position->x,
-			edge.start->position->y,
-			edge.end->position->x,
-			edge.end->position->y);
+			edge.start->position->x / offsetForRoadNodes,
+			edge.start->position->y / offsetForRoadNodes,
+			edge.end->position->x / offsetForRoadNodes,
+			edge.end->position->y / offsetForRoadNodes,
+			offsetForRoadNodes);
 
 		roads.push_back(road);
 	}
@@ -148,6 +153,19 @@ int main()
 				nodeCounter++;
 			}
 			window.draw(roadVertices);
+		}
+
+		/*
+			Points
+		*/
+		for (auto node : mst.GetNodes())
+		{
+			sf::CircleShape shape;
+			shape.setPosition(node->position->x, node->position->y);
+			shape.setFillColor(sf::Color::Green);
+			shape.setRadius(1);
+
+			window.draw(shape);
 		}
 
 		window.display();

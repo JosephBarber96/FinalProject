@@ -161,7 +161,7 @@ void DiamondSquare::CreatePoints()
 	points.erase(points.end() - 1);
 }
 
-std::vector<std::vector<RoadNode*>> DiamondSquare::CreatePointsAndPassBackRoadNodes()
+std::vector<std::vector<RoadNode*>> DiamondSquare::CreatePointsAndPassBackRoadNodes(int offsetForRoadNodes)
 {
 	std::vector<std::vector<RoadNode*>> roadNodes;
 	roadNodes.push_back(std::vector<RoadNode*>());
@@ -170,17 +170,34 @@ std::vector<std::vector<RoadNode*>> DiamondSquare::CreatePointsAndPassBackRoadNo
 	points.push_back(std::vector<Vec3*>());
 
 	int vertsperLine = getDivisions() + 1;
+	int xIndex = 0;
+	int yIndex = 0;
 	int x = 0;
 	int y = 0;
 	for (auto tri : Verts())
 	{
 		points[points.size() - 1].push_back(new Vec3(x, y, tri.y));
-		roadNodes[roadNodes.size() - 1].push_back(new RoadNode(x, y, ((tri.y + abs(lowest)))));
+
+		// Only insert RoadNode on every Nth loop
+		if (x % offsetForRoadNodes == 0 && y % offsetForRoadNodes == 0)
+		{
+			roadNodes[roadNodes.size() - 1].push_back(new RoadNode(xIndex, yIndex, x, y, ((tri.y + abs(lowest)))));
+			xIndex++;
+		}
+
 		x++;
 		if (x == vertsperLine)
 		{
 			points.push_back(std::vector<Vec3*>());
-			roadNodes.push_back(std::vector<RoadNode*>());
+
+			// Only insert RoadNode on every Nth loop
+			if (y % offsetForRoadNodes == 0)
+			{
+				roadNodes.push_back(std::vector<RoadNode*>());
+				yIndex++;
+				xIndex = 0;
+			}
+			
 			x = 0;
 			y++;
 		}

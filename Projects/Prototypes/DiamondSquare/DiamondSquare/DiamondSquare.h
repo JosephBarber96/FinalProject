@@ -27,7 +27,7 @@ public:
 	void Print();
 	void CalcuateBoundaryPoints();
 	void CreatePoints();
-	std::vector<std::vector<RoadNode*>> CreatePointsAndPassBackRoadNodes();
+	std::vector<std::vector<RoadNode*>> CreatePointsAndPassBackRoadNodes(int offsetForRoadNodes);
 
 	int Lowest() { return lowest; }
 	int Highest() { return highest; }

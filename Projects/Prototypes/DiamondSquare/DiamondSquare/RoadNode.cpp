@@ -3,19 +3,25 @@
 
 RoadNode::RoadNode() {}
 
-RoadNode::RoadNode(V2* vec)
+RoadNode::RoadNode(int _xIndex, int _yIndex, V2* vec)
 	:
-	Node(new V2(vec->x, vec->y))
+	Node(new V2(vec->x, vec->y)),
+	xIndex(_xIndex),
+	yIndex(_yIndex)
 {}
 
-RoadNode::RoadNode(int x, int y)
-	:
-	Node(x, y)
-{}
-
-RoadNode::RoadNode(int x, int y, float _cost)
+RoadNode::RoadNode(int _xIndex, int _yIndex, int x, int y)
 	:
 	Node(x, y),
+	xIndex(_xIndex),
+	yIndex(_yIndex)
+{}
+
+RoadNode::RoadNode(int _xIndex, int _yIndex, int x, int y, float _cost)
+	:
+	Node(x, y),
+	xIndex(_xIndex),
+	yIndex(_yIndex),
 	cost(_cost)
 {}
 
@@ -26,28 +32,28 @@ std::vector<RoadNode*> RoadNode::GetNeighbors(std::vector<std::vector<RoadNode*>
 	std::vector<RoadNode*> myNeighbours;
 
 	// Up
-	if (position->y > 0) { myNeighbours.push_back(grid[position->y - 1][position->x]); }
+	if (yIndex > 0) { myNeighbours.push_back(grid[yIndex - 1][xIndex]); }
 
 	// Up-right
-	if (position->y > 0 && position->x < grid[0].size()-1) { myNeighbours.push_back(grid[position->y - 1][position->x + 1]); }
+	if (yIndex > 0 && xIndex < grid[0].size()-1) { myNeighbours.push_back(grid[yIndex-1][xIndex+1]); }
 
 	// Right
-	if (position->x < grid[0].size()-1) { myNeighbours.push_back(grid[position->y][position->x + 1]); }
+	if (xIndex < grid[0].size()-1) { myNeighbours.push_back(grid[yIndex][xIndex+1]); }
 
 	// Down-right
-	if (position->y < grid.size()-1 && position->x < grid[0].size()-1) { myNeighbours.push_back(grid[position->y + 1][position->x + 1]); }
+	if (yIndex < grid.size()-1 && xIndex < grid[0].size()-1) { myNeighbours.push_back(grid[yIndex+1][xIndex+1]); }
 
 	// Down
-	if (position->y < grid.size()-1) { myNeighbours.push_back(grid[position->y + 1][position->x]); }
+	if (yIndex < grid.size()-1) { myNeighbours.push_back(grid[yIndex+1][xIndex]); }
 
 	// Down-left
-	if (position->y < grid.size()-1 && position->x > 0) { myNeighbours.push_back(grid[position->y + 1][position->x - 1]); }
+	if (yIndex < grid.size()-1 && xIndex > 0) { myNeighbours.push_back(grid[yIndex+1][xIndex-1]); }
 
 	// Left
-	if (position->x > 0) { myNeighbours.push_back(grid[position->y][position->x - 1]); }
+	if (xIndex > 0) { myNeighbours.push_back(grid[yIndex][xIndex-1]); }
 
 	// Up-left
-	if (position->y > 0 && position->x > 0) { myNeighbours.push_back(grid[position->y - 1][position->x - 1]); }
+	if (yIndex > 0 && xIndex > 0) { myNeighbours.push_back(grid[yIndex-1][xIndex-1]); }
 
 	return myNeighbours;
 }

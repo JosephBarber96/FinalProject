@@ -8,7 +8,7 @@
 
 namespace Pathfinding
 {
-	std::vector<RoadNode*> PathFind(std::vector<std::vector<RoadNode*>> grid, int startX, int startY, int endX, int endY)
+	std::vector<RoadNode*> PathFind(std::vector<std::vector<RoadNode*>> grid, int startX, int startY, int endX, int endY, int offsetPerRoadNode)
 	{
 		// Start, End
 		RoadNode* start = grid[startY][startX];
@@ -35,43 +35,32 @@ namespace Pathfinding
 		start->distance = 0;
 		start->checked = true;
 
-		int counter = 0;
 		while (!Q.empty())
 		{
-			std::cout << "Counter: " << counter++ << std::endl;
-			//u is node in Q with the smallest distance
+			//u is node in Q with the smallest distance...
 
-			// Only the nodes we've checked...
-			std::vector<RoadNode*> QChecked;
-			for (auto node : Q)
-			{
-				if (node->checked)
-				{
-					QChecked.push_back(node);
-				}
-			}
-
-			// Sort Q by distance
-			std::sort(QChecked.begin(), QChecked.end(), [end](const RoadNode* lhs, const RoadNode *rhs) -> bool
+			// Sort it
+			std::sort(Q.begin(), Q.end(), [end](const RoadNode* lhs, const RoadNode *rhs) -> bool
 			{
 				return (lhs->distance + V2::Length(*lhs->position - *end->position)
 					<
 					(rhs->distance + V2::Length(*rhs->position - *end->position)));
 			});
-			RoadNode* u = QChecked.front();
+
+			// Pick the front
+			RoadNode* u = Q.front();
 
 			// Remove u from Q
 			Q.erase(std::remove(Q.begin(), Q.end(), u), Q.end());
 
-
 			// For each neighbour of u
 			for (RoadNode* neighbour : u->GetNeighbors(grid))
 			{
-				if (neighbour->checked) continue;
+				//if (neighbour->checked) continue;
 				// Skip non-walkables
 				// if (!neighbour->isWalkable) continue;
 
-				neighbour->checked = true;
+				//neighbour->checked = true;
 
 				auto alt = neighbour->GetCost() + V2::Length(*neighbour->position - *end->position);
 
