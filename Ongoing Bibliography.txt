@@ -7,7 +7,6 @@ Brown, B. (2011). Prim's Algorithm: Minimal Spanning Tree. [Online] 15th May 20
 [2]
 Chen G. Esch G. Wonka P. Mueller P. Zhang E. (2008). "Interactive Procedural Street Modeling" In Proceedings of SIGGRAPH 2008. ACM Trans. Graph. Article 103: 1-10.
 
-
 [3]
 Eppstein, D. (1996). Design and Analysis of Algorithms – Minimum Spanning Trees. [Online] 6th Feburary 1996. Available online: https://www.ics.uci.edu/~eppstein/161/960206.html [Date of access: 29 October 2017]
 
@@ -48,16 +47,19 @@ Muller, P. Wonka, P. Haegler, S. Ulmer, A. Goo, L, V. (2006). "Procedural modeli
 Prusinkiewicx, P. and Janan, J. (1992). "Lindenmayer systems, fractals, and plants." New York, N.Y.: Springer-Verlag.
 
 [16]
-Red Blob Games. (2014) Introduction to A*. [Online] June 2016. Available online: http://www.redblobgames.com/pathfinding/a-star/introduction.html [Date of access: 29 September 2017].
+Rose, T and Bakaoukas, A. (2016). "Algorithms and Approaches for Procedural Terrain Generation - A Brief Review of Current Techniques". 2016 8th International Conference on Games and Virtual Worlds for Serious Applications (VS-GAMES). 1-2.
 
 [17]
-Runions, A. Lane, B and Prusinkiewicz, P. (2007) "Modeling trees with a space colonization algorithm" In Proceedings of the Third Eugographics conference on Natural Phenomena. Prague, Czech Republic. pp 63 - 70.
+Red Blob Games. (2014) Introduction to A*. [Online] June 2016. Available online: http://www.redblobgames.com/pathfinding/a-star/introduction.html [Date of access: 29 September 2017].
 
 [18]
-Samet, H. (1995). Spatial Data Structures. Addison-Wesley.
+Runions, A. Lane, B and Prusinkiewicz, P. (2007) "Modeling trees with a space colonization algorithm" In Proceedings of the Third Eugographics conference on Natural Phenomena. Prague, Czech Republic. pp 63 - 70.
 
 [19]
-Sun, J. Yu, X. Baciu, G. Green, M. (2002). "Template-based generation of road networks for virtual city modeling". In Proceedings of the ACM symposium on Virtual reality software and technology (VRST '02). Acm, New Work, NY, USA, 33 - 40.
+Samet, H. (1995). Spatial Data Structures. Addison-Wesley.
 
 [20]
+Sun, J. Yu, X. Baciu, G. Green, M. (2002). "Template-based generation of road networks for virtual city modeling". In Proceedings of the ACM symposium on Virtual reality software and technology (VRST '02). Acm, New Work, NY, USA, 33 - 40.
+
+[21]
 Tmwhere. (Date Unknown) Procedural City Generation. [Online] Date unnown. Available online: http://www.tmwhere.com/city_generation.html [Date of access: 27 October 2017].
