@@ -8,6 +8,11 @@
 #include <SFML\Graphics.hpp>
 
 #include "QuadTree.h"
+#include "MinimumSpanningTree.h"
+#include "Node.h"
+#include "MstNode.h"
+#include "Edge.h"
+#include "V2.h"
 
 void makeAllValuesPositive(std::vector<std::vector<float>> &popMap, float &highestVal)
 {
@@ -69,13 +74,10 @@ int main()
 	FastNoise fn;
 	fn.SetNoiseType(FastNoise::ValueFractal);
 	std::vector<std::vector<float>> popMap;
-	// seedNoise(fn);
-
-
+	seedNoise(fn);
 	fn.SetFrequency(0.01); // Default 0.01
 	fn.SetFractalOctaves(6); // Default 3
 	fn.SetInterp(FastNoise::Interp::Quintic); // Default Quintic
-
 	fillNoise(fn, popMap, size);
 
 	/* Make the values positive */
@@ -85,6 +87,18 @@ int main()
 
 	/* Quad tree */
 	QuadTree* qt = new QuadTree(0, 0, size, size, nullptr, popMap, size, highestVal);
+
+	/* MST */
+	MinimumSpanningTree* mst = new MinimumSpanningTree();
+	for (QuadTree* quad : qt->GetTreeChildren())
+	{
+		mst->SpawnPoint(quad->xOrigin, quad->yOrigin, quad->xOrigin + quad->width, quad->yOrigin + quad->height);
+	}
+	float maxDist = size / 4;
+	mst->AssignNighbours(maxDist);
+	mst->CreateAllEdges();
+	mst->Sort();
+
 
 	sf::RenderWindow window(sf::VideoMode(size, size), "Noise population map");
 	while (window.isOpen())
@@ -157,7 +171,17 @@ int main()
 
 				window.draw(vertices, 5, sf::LineStrip);
 			}
+		}
 
+		/* Draw MST */
+		for (Edge edge : mst->GetTreeEdges())
+		{
+			sf::Vertex edgeVertices[2] =
+			{
+				sf::Vertex(sf::Vector2f(edge.start->position->x, edge.start->position->y), sf::Color::Blue),
+				sf::Vertex(sf::Vector2f(edge.end->position->x, edge.end->position->y), sf::Color::Blue)
+			};
+			window.draw(edgeVertices, 2, sf::Lines);
 		}
 		
 
