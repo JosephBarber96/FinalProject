@@ -72,9 +72,9 @@ int main()
 
 	/* Generate noise */
 	FastNoise fn;
-	fn.SetNoiseType(FastNoise::ValueFractal);
 	std::vector<std::vector<float>> popMap;
 	seedNoise(fn);
+	fn.SetNoiseType(FastNoise::ValueFractal);
 	fn.SetFrequency(0.01); // Default 0.01
 	fn.SetFractalOctaves(6); // Default 3
 	fn.SetInterp(FastNoise::Interp::Quintic); // Default Quintic
@@ -83,7 +83,7 @@ int main()
 	/* Make the values positive */
 	float highestVal;
 	makeAllValuesPositive(popMap, highestVal);
-	std::cout << "Highest value: " << highestVal << std::endl;
+	// std::cout << "Highest value: " << highestVal << std::endl;
 
 	/* Quad tree */
 	QuadTree* qt = new QuadTree(0, 0, size, size, nullptr, popMap, size, highestVal);
