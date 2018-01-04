@@ -117,6 +117,7 @@
   <ItemGroup>
     <ClCompile Include="DiamondSquare.cpp" />
     <ClCompile Include="Edge.cpp" />
+    <ClCompile Include="FastNoise.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MinimumSpanningTree.cpp" />
     <ClCompile Include="MstNode.cpp" />
@@ -131,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="DiamondSquare.h" />
     <ClInclude Include="Edge.h" />
+    <ClInclude Include="FastNoise.h" />
     <ClInclude Include="MinimumSpanningTree.h" />
     <ClInclude Include="MstNode.h" />
     <ClInclude Include="Node.h" />

@@ -122,21 +122,28 @@ void CreateRoadNodesFromDiaSqu(std::vector<std::vector<RoadNode>> roadNodes, Dia
 
 		/*if (y % 100 == 0)*/ { std::cout << "Creating on y = " << y << std::endl; }
 
-		RoadNode::grid.push_back(std::vector<RoadNode*>());
+		// RoadNode::grid.push_back(std::vector<RoadNode*>());
+		// roadNodes.push_back(std::vector<RoadNode>());
 		for (int x = 0; x < imageWidth; x++)
 		{
 			if (x % 5 != 0) { continue; }
 
 			// Grab the cost of this node
-			auto cost = (ds.Points()[y][x]->z + abs(ds.Lowest())) * 2;
+			// auto cost = (ds.Points()[y][x]->z + abs(ds.Lowest())) * 2;
 
-			RoadNode* node = new RoadNode(x, y);
-			node->yIndex = yIndex;
-			node->xIndex = xIndex;
+			//RoadNode objnode = RoadNode(x, y);
+			//objnode.xIndex = xIndex;
+			//objnode.yIndex = yIndex;
+			//objnode.SetCost(cost);
+			// xIndex++;
 
-			node->SetCost(cost);
+			//RoadNode* node = new RoadNode(x, y);
+			//node->yIndex = yIndex;
+			//node->xIndex = xIndex;
 
-			RoadNode::grid[yIndex].push_back(node);
+			//node->SetCost(cost);
+
+			//RoadNode::grid[yIndex].push_back(node);
 
 			xIndex++;
 		}
@@ -223,28 +230,16 @@ int main()
 	populationSprite.setTexture(populationTexture);
 	populationSprite.setPosition(0, 0);
 
-#if DEBUG_MODE == true
-	SearchImageForPixelData(populationMap);
-#endif
 
 	// Create a quad tree
-#if DEBUG_MODE == true
-	std::cout << "Creating Quad tree" << std::endl;
-#endif
 	QuadTree* qt = new QuadTree(0, 0, winX, winY, populationMap);
 
 	// Minimum Spanning tree
-#if DEBUG_MODE == true
-	std::cout << "Creating MST" << std::endl;
-#endif
 	mst = new MinimumSpanningTree();
 
 	// Plot points
 	for (QuadTree* qt : QuadTree::Children)
 	{
-#if DEBUG_MODE == true
-		std::cout << "minX: " << qt->xOrigin << ", minY: " << qt->yOrigin << ", maxX: " << (qt->xOrigin + qt->width) << ", maxY: " << (qt->yOrigin + qt->height) << std::endl;
-#endif
 		mst->SpawnPoint(qt->xOrigin, qt->yOrigin, (qt->xOrigin + qt->width), (qt->yOrigin + qt->height));
 	}
 
