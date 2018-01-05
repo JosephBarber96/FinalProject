@@ -8,6 +8,8 @@
 #include "MstNode.h"
 #include "Edge.h"
 #include "V2.h"
+#include "WaterData.h"
+#include "UtilRandom.h"
 
 MinimumSpanningTree::MinimumSpanningTree() {}
 
@@ -25,18 +27,52 @@ void MinimumSpanningTree::SpawnPoints(int numberOfPoints, int minX, int minY, in
 	}
 }
 
-void MinimumSpanningTree::SpawnPoint(int minX, int minY, int maxX, int maxY)
+void MinimumSpanningTree::SpawnPoint(WaterData &wd, int offset, int minX, int minY, int maxX, int maxY)
 {
-	int nodeX = rand() % (maxX - minX + 1) + minX;
-	int nodeY = rand() % (maxY - minY + 1) + minY;
+	// Find all valid land positions in this quad
+	std::vector<V2> landPositions;
+	for (int y = minY; y < maxY; y++)
+	{
+		for (int x = minX; x < maxX; x++)
+		{
+			if (!wd.IsWater(x, y))
+			{
+				landPositions.push_back(V2(x, y));
+			}
+		}
+	}
 
-	int nodeXDifference = (nodeX % 5);
-	int nodeXToFive = nodeX - nodeXDifference;
+	// If none exist, return without placing a point
+	if (landPositions.size() == 0) { return; }
 
-	int nodeYDifference = (nodeY % 5);
-	int nodeYToFive = (nodeY - nodeYDifference);
+	int index = UtilRandom::Instance()->Random(0, landPositions.size()-1);
 
-	MstNode* node = new MstNode(nodeXToFive, nodeYToFive);
+	int x = landPositions[index].x;
+	int y = landPositions[index].y;
+
+	int xdifference = (x % offset);
+	x = x - xdifference;
+
+	int ydifference = (y % offset);
+	y = y - ydifference;
+
+	//do
+	//{
+	//	int nodeX = rand() % (maxX - minX + 1) + minX;
+	//	int nodeY = rand() % (maxY - minY + 1) + minY;
+
+	//	int nodeXDifference = (nodeX % 7);
+	//	int nodeXToFive = nodeX - nodeXDifference;
+
+	//	int nodeYDifference = (nodeY % 7);
+	//	int nodeYToFive = (nodeY - nodeYDifference);
+
+	//	nx = nodeXToFive;
+	//	ny = nodeYToFive;
+
+	//} while (/*wd.IsWater(x, y)*/ 1 == 2);
+
+	MstNode* node = new MstNode(x, y);
 	node->id = nodeCount++;
 	AddNode(node);
 }

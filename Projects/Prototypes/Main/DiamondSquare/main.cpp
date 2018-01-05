@@ -15,11 +15,12 @@
 #include "Edge.h"
 #include "Road.h"
 #include "Pathfinding.h"
+#include "WaterData.h"
 
 const int winSize = 512;
 int offsetForRoadNodes = 2;
 
-void makeAllValuesPositive(std::vector<std::vector<float>> &popMap, float &highestVal)
+void makeAllFastNoiseValuesPositive(std::vector<std::vector<float>> &popMap, float &highestVal)
 {
 	// Find the lowest and highest values
 	float highest = INT_MIN;
@@ -68,11 +69,30 @@ void fillNoise(FastNoise &fn, std::vector<std::vector<float>> &popMap, int size)
 	}
 }
 
+void LoadWaterData(WaterData &wd)
+{
+	sf::Image waterMap;
+	waterMap.loadFromFile("watermap.bmp");
+
+	int wid = waterMap.getSize().x;
+	int hei = waterMap.getSize().y;
+
+	for (int y = 0; y < hei; y++)
+	{
+		for (int x = 0; x < wid; x++)
+		{
+			waterMap.getPixel(x, y) == sf::Color::White ? wd.SetPixelWater(x, y, true) : wd.SetPixelWater(x, y, false);
+		}
+	}
+}
+
 int main()
 {
+
 	/*************************
 		Population noise
 	**************************/
+	std::cout << "Generation population noise." << std::endl;
 	FastNoise fn;
 	std::vector<std::vector<float>> popMap;
 	seedNoise(fn);
@@ -84,12 +104,27 @@ int main()
 
 	/* Make the values positive */
 	float highestVal;
-	makeAllValuesPositive(popMap, highestVal);
+	makeAllFastNoiseValuesPositive(popMap, highestVal);
+
+	/************************
+		Water-boundary map
+	*************************/
+	std::cout << "Loading water-boundary map." << std::endl;
+	WaterData waterData = WaterData(winSize);
+	LoadWaterData(waterData);
+
+	// To display
+	sf::Texture waterMapTexture;
+	waterMapTexture.loadFromFile("watermap.bmp");
+	waterMapTexture.setSmooth(true);
+	sf::Sprite waterMapSprite;
+	waterMapSprite.setTexture(waterMapTexture);
 
 	/***************************
 		Quad tree
 	**************************/
-	QuadTree* qt = new QuadTree(0, 0, winSize, winSize, nullptr, popMap, winSize, highestVal);
+	std::cout << "Creating quad-tree." << std::endl;
+	QuadTree* qt = new QuadTree(0, 0, winSize, winSize, nullptr, popMap, waterData, winSize, highestVal);
 
 	/************************
 			MST
@@ -99,7 +134,7 @@ int main()
 	MinimumSpanningTree mst = MinimumSpanningTree();
 	for (auto quad : qt->GetTreeChildren())
 	{
-		mst.SpawnPoint(quad->xOrigin, quad->yOrigin, (quad->xOrigin + quad->width), (quad->yOrigin + quad->height));
+		mst.SpawnPoint(waterData, offsetForRoadNodes, quad->xOrigin, quad->yOrigin, (quad->xOrigin + quad->width), (quad->yOrigin + quad->height));
 	}
 	float maximumDistanceBetweenNeighbours = winSize / 4;
 	mst.AssignNighbours(maximumDistanceBetweenNeighbours); // Assign neighbours
@@ -123,7 +158,7 @@ int main()
 		Creating roadnodes from terrain data
 	*****************************************/
 	std::vector<std::vector<RoadNode*>> roadNodes;
-	roadNodes = ds.CreatePointsAndPassBackRoadNodes(offsetForRoadNodes);
+	roadNodes = ds.CreatePointsAndPassBackRoadNodes(offsetForRoadNodes, waterData);
 
 	/***************************************************
 		Pathfind roads using the mst edges
@@ -136,11 +171,12 @@ int main()
 	int counter = 0;
 	for (Edge edge : mst.GetTreeEdges())
 	{
-		std::cout << "\r" << (float)counter++ * singlePercent << "% complete.";
+		std::cout << counter++ << "/" << mst.GetTreeEdges().size() << " roads complete." << std::endl;
 		if (edge.start->position->x == edge.end->position->x && edge.start->position->y == edge.end->position->y)
 		{ 
 			continue; 
 		}
+
 		Road* road = new Road();
 		road->nodes = Pathfinding::PathFind(roadNodes,
 			edge.start->position->x / offsetForRoadNodes,
@@ -257,6 +293,12 @@ int main()
 				}
 			}
 			window.draw(vertPoints);
+		}
+
+		/* Water boundary map */
+		if (drawWaterBoundaryMap)
+		{
+			window.draw(waterMapSprite);
 		}
 
 		/* Quad tree */

@@ -85,9 +85,10 @@ namespace Pathfinding
 		int counter = 0;
 		do
 		{
+			// std::cout << "Rebuilding path counter: " << counter++ << std::endl;
 			road.push_back(goal);
 			goal = goal->parent;
-		} while (goal->parent != nullptr);
+		} while (goal->parent != nullptr && goal != goal->parent->parent);
 		road.push_back(goal);
 
 		return road;

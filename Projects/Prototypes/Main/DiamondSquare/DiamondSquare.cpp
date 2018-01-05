@@ -5,6 +5,7 @@
 #include "DiamondSquare.h"
 #include "UtilRandom.h"
 #include "RoadNode.h"
+#include "WaterData.h"
 
 DiamondSquare::DiamondSquare(int div, float siz, float hei)
 	:
@@ -161,7 +162,7 @@ void DiamondSquare::CreatePoints()
 	points.erase(points.end() - 1);
 }
 
-std::vector<std::vector<RoadNode*>> DiamondSquare::CreatePointsAndPassBackRoadNodes(int offsetForRoadNodes)
+std::vector<std::vector<RoadNode*>> DiamondSquare::CreatePointsAndPassBackRoadNodes(int offsetForRoadNodes, WaterData &wd)
 {
 	std::vector<std::vector<RoadNode*>> roadNodes;
 	roadNodes.push_back(std::vector<RoadNode*>());
@@ -181,7 +182,16 @@ std::vector<std::vector<RoadNode*>> DiamondSquare::CreatePointsAndPassBackRoadNo
 		// Only insert RoadNode on every Nth loop
 		if (x % offsetForRoadNodes == 0 && y % offsetForRoadNodes == 0)
 		{
-			roadNodes[roadNodes.size() - 1].push_back(new RoadNode(xIndex, yIndex, x, y, ((tri.y + abs(lowest)))));
+			// High cost
+			if (wd.IsWater(x, y))
+			{
+				roadNodes[roadNodes.size() - 1].push_back(new RoadNode(xIndex, yIndex, x, y, highest*2));
+			}
+			// Average cost
+			else
+			{
+				roadNodes[roadNodes.size() - 1].push_back(new RoadNode(xIndex, yIndex, x, y, (tri.y + abs(lowest))));
+			}
 			xIndex++;
 		}
 

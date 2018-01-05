@@ -128,6 +128,7 @@
     <ClCompile Include="RoadNode.cpp" />
     <ClCompile Include="UtilRandom.cpp" />
     <ClCompile Include="V2.cpp" />
+    <ClCompile Include="WaterData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DiamondSquare.h" />
@@ -142,6 +143,7 @@
     <ClInclude Include="RoadNode.h" />
     <ClInclude Include="UtilRandom.h" />
     <ClInclude Include="V2.h" />
+    <ClInclude Include="WaterData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

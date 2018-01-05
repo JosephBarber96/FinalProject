@@ -1,6 +1,7 @@
 #include "QuadTree.h"
+#include "WaterData.h"
 
-QuadTree::QuadTree(int _x, int _y, int _wid, int _hei, QuadTree* _par, std::vector<std::vector<float>> popMap, int popMapSize, float highest)
+QuadTree::QuadTree(int _x, int _y, int _wid, int _hei, QuadTree* _par, std::vector<std::vector<float>> popMap, WaterData &waterData, int popMapSize, float highest)
 	:
 	xOrigin(_x),
 	yOrigin(_y),
@@ -8,9 +9,9 @@ QuadTree::QuadTree(int _x, int _y, int _wid, int _hei, QuadTree* _par, std::vect
 	height(_hei),
 	parent(_par)
 {
-	if (CheckSplit(popMap, popMapSize, highest))
+	if (CheckSplit(popMap, waterData, popMapSize, highest))
 	{
-		Split(popMap, popMapSize, highest);
+		Split(popMap, waterData, popMapSize, highest);
 	}
 	else
 	{
@@ -31,8 +32,11 @@ QuadTree* QuadTree::GetHead()
 
 /* Private */
 
-bool QuadTree::CheckSplit(std::vector<std::vector<float>> popMap, int size, float highest)
+bool QuadTree::CheckSplit(std::vector<std::vector<float>> popMap, WaterData &waterData, int size, float highest)
 {
+	// First, check that there is land
+	if (!waterData.SectionContainsLand(xOrigin, width, yOrigin, height)) return false;
+
 	float tenPercent = highest / 10;
 
 	int sizes[6] =
@@ -83,7 +87,7 @@ bool QuadTree::CheckSplit(std::vector<std::vector<float>> popMap, int size, floa
 	return false;
 }
 
-void QuadTree::Split(std::vector<std::vector<float>> popMap, int size, float highest)
+void QuadTree::Split(std::vector<std::vector<float>> popMap, WaterData &waterData, int size, float highest)
 {
 	// Width and Height halves for all children
 	int newWidth = width / 2;
@@ -92,20 +96,20 @@ void QuadTree::Split(std::vector<std::vector<float>> popMap, int size, float hig
 	// Top left
 	// Xorigin remains the same
 	// Yorigin increases
-	topLeft = new QuadTree(xOrigin, yOrigin + newHeight, newWidth, newHeight, this, popMap, size, highest);
+	topLeft = new QuadTree(xOrigin, yOrigin + newHeight, newWidth, newHeight, this, popMap, waterData, size, highest);
 
 	// Top Right
 	// Xorigin increases
 	// Yorigin increases
-	topRight = new QuadTree(xOrigin + newWidth, yOrigin + newHeight, newWidth, newHeight, this, popMap, size, highest);
+	topRight = new QuadTree(xOrigin + newWidth, yOrigin + newHeight, newWidth, newHeight, this, popMap, waterData, size, highest);
 
 	// Bottom Left
 	// Xorigin remains the same
 	// Yorigin remains the same
-	bottomLeft = new QuadTree(xOrigin, yOrigin, newWidth, newHeight, this, popMap, size, highest);
+	bottomLeft = new QuadTree(xOrigin, yOrigin, newWidth, newHeight, this, popMap, waterData, size, highest);
 
 	// Bottom Right
 	// Xorigin increasesd
 	// Yorigin remains the same
-	bottomRight = new QuadTree(xOrigin + newWidth, yOrigin, newWidth, newHeight, this, popMap, size, highest);
+	bottomRight = new QuadTree(xOrigin + newWidth, yOrigin, newWidth, newHeight, this, popMap, waterData, size, highest);
 }

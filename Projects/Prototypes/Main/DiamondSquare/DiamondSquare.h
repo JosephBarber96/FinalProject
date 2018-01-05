@@ -16,6 +16,7 @@ public:
 	float x, y, z;
 };
 
+class WaterData;
 class RoadNode;
 class DiamondSquare
 {
@@ -27,7 +28,7 @@ public:
 	void Print();
 	void CalcuateBoundaryPoints();
 	void CreatePoints();
-	std::vector<std::vector<RoadNode*>> CreatePointsAndPassBackRoadNodes(int offsetForRoadNodes);
+	std::vector<std::vector<RoadNode*>> CreatePointsAndPassBackRoadNodes(int offsetForRoadNodes, WaterData &wd);
 
 	int Lowest() { return lowest; }
 	int Highest() { return highest; }

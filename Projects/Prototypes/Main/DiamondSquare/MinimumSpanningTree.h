@@ -4,6 +4,7 @@
 
 class MstNode;
 class Edge;
+class WaterData;
 class MinimumSpanningTree
 {
 public:
@@ -13,7 +14,7 @@ public:
 	std::vector<Edge*> GetEdgesForNode(MstNode node);
 
 	void SpawnPoints(int numberOfPoints, int minX, int minY, int maxX, int maxY);
-	void SpawnPoint(int minX, int minY, int maxX, int maxY);
+	void SpawnPoint(WaterData &wd, int offset, int minX, int minY, int maxX, int maxY);
 	void AssignNighbours(float maxDist);
 	void CreateAllEdges();
 

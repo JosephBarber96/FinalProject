@@ -10,6 +10,8 @@ public:
 	RoadNode(int _xIndex, int _yIndex, int x, int y, float cost);
 	~RoadNode();
 
+	float f, g, h;
+
 	bool checked;
 	float distance;
 	RoadNode* parent;
@@ -18,7 +20,7 @@ public:
 
 	void FillNeighbours(std::vector<std::vector<RoadNode*>> grid, int gridHeight, int gridWidth);
 	void SetCost(int newCost);
-
+	
 	int getXIndex() const { return xIndex; }
 	int getYIndex() const { return yIndex; }
 	float GetCost() { return cost; }
