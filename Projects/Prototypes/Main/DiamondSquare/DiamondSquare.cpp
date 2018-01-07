@@ -185,7 +185,7 @@ std::vector<std::vector<RoadNode*>> DiamondSquare::CreatePointsAndPassBackRoadNo
 			// High cost
 			if (wd.IsWater(x, y))
 			{
-				roadNodes[roadNodes.size() - 1].push_back(new RoadNode(xIndex, yIndex, x, y, highest*2));
+				roadNodes[roadNodes.size() - 1].push_back(new RoadNode(xIndex, yIndex, x, y, highest * 1.5f));
 			}
 			// Average cost
 			else

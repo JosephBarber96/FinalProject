@@ -18,7 +18,7 @@
 #include "WaterData.h"
 
 const int winSize = 512;
-int offsetForRoadNodes = 2;
+int offsetForRoadNodes = 5;
 
 void makeAllFastNoiseValuesPositive(std::vector<std::vector<float>> &popMap, float &highestVal)
 {
@@ -195,7 +195,8 @@ int main()
 		drawWaterBoundaryMap = false,
 		drawQuadTree = true,
 		drawMstNodes = true,
-		drawRoads = true;
+		drawRoads = true,
+		drawMST = false;
 
 	std::cout << std::endl << "Instructions: " << std::endl;
 	std::cout << "\t1: Toggle population map" << std::endl;
@@ -204,6 +205,7 @@ int main()
 	std::cout << "\t4: Toggle quad-tree" << std::endl;
 	std::cout << "\t5: Toggle mst nodes" << std::endl;
 	std::cout << "\t6: Toggle roads" << std::endl;
+	std::cout << "\t7: Toggle MST" << std::endl;
 
 	while (window.isOpen())
 	{
@@ -220,6 +222,7 @@ int main()
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num4)) { drawQuadTree = !drawQuadTree; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num5)) { drawMstNodes = !drawMstNodes; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num6)) { drawRoads = !drawRoads; }
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num7)) { drawMST = !drawMST; }
 			}
 		}
 
@@ -333,6 +336,21 @@ int main()
 					nodeCounter++;
 				}
 				window.draw(roadVertices);
+			}
+		}
+
+		/* MST */
+		if (drawMST)
+		{
+			for (Edge edge : mst.GetTreeEdges())
+			{
+				sf::Vertex roadVerts[2] =
+				{
+					sf::Vertex(sf::Vector2f(edge.start->position->x, edge.start->position->y), sf::Color::Blue),
+					sf::Vertex(sf::Vector2f(edge.end->position->x, edge.end->position->y), sf::Color::Blue)
+				};
+
+				window.draw(roadVerts, 2, sf::Lines);
 			}
 		}
 
