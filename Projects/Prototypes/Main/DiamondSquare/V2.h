@@ -3,11 +3,12 @@ class V2
 {
 public:
 	V2();
-	V2(int newX, int newY);
+	V2(float newX, float newY);
 	~V2();
 
-	int x, y;
+	float x, y;
 	float Length();
+	V2* Normalized();
 	static float Length(V2 vec);
 
 	// Operators
@@ -16,5 +17,8 @@ public:
 
 	// Static
 	static float DistanceBetween(V2 left, V2 right);
+	static float DegreeToRadians(float degree);
+	static V2* AngleToVector(float degree);
+	static float VectorToAngle(V2* vec);
 };
 

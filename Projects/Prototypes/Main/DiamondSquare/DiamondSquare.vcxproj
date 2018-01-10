@@ -115,9 +115,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BuildingLot.cpp" />
     <ClCompile Include="DiamondSquare.cpp" />
     <ClCompile Include="Edge.cpp" />
     <ClCompile Include="FastNoise.cpp" />
+    <ClCompile Include="Line.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MinimumSpanningTree.cpp" />
     <ClCompile Include="MstNode.cpp" />
@@ -126,14 +128,17 @@
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Road.cpp" />
     <ClCompile Include="RoadNode.cpp" />
+    <ClCompile Include="Utility.cpp" />
     <ClCompile Include="UtilRandom.cpp" />
     <ClCompile Include="V2.cpp" />
     <ClCompile Include="WaterData.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BuildingLot.h" />
     <ClInclude Include="DiamondSquare.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="FastNoise.h" />
+    <ClInclude Include="Line.h" />
     <ClInclude Include="MinimumSpanningTree.h" />
     <ClInclude Include="MstNode.h" />
     <ClInclude Include="Node.h" />
@@ -141,6 +146,7 @@
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Road.h" />
     <ClInclude Include="RoadNode.h" />
+    <ClInclude Include="Utility.h" />
     <ClInclude Include="UtilRandom.h" />
     <ClInclude Include="V2.h" />
     <ClInclude Include="WaterData.h" />

@@ -16,6 +16,7 @@
 #include "Road.h"
 #include "Pathfinding.h"
 #include "WaterData.h"
+#include "BuildingLot.h"
 
 const int winSize = 512;
 int offsetForRoadNodes = 5;
@@ -88,7 +89,6 @@ void LoadWaterData(WaterData &wd)
 
 int main()
 {
-
 	/*************************
 		Population noise
 	**************************/
@@ -167,11 +167,9 @@ int main()
 	****************************************************/
 	std::vector<Road*> roads;
 	std::cout << "Pathfinding " << mst.GetTreeEdges().size() << " roads..." << std::endl;
-	float singlePercent = ((float)1 / mst.GetTreeEdges().size()) * 100;
 	int counter = 0;
 	for (Edge edge : mst.GetTreeEdges())
 	{
-		std::cout << counter++ << "/" << mst.GetTreeEdges().size() << " roads complete." << std::endl;
 		if (edge.start->position->x == edge.end->position->x && edge.start->position->y == edge.end->position->y)
 		{ 
 			continue; 
@@ -185,18 +183,83 @@ int main()
 			edge.end->position->y / offsetForRoadNodes,
 			offsetForRoadNodes);
 
+		road->GenerateBuildingLots();
+
 		roads.push_back(road);
+
+		std::cout << counter++ << "/" << mst.GetTreeEdges().size() << " roads complete." << std::endl;
 	}
 
+	/*******************************************************
+		Check for and remove any building lot collisions
+	********************************************************/
+
+	std::cout << "Checking for lot interceptions" << std::endl;
+
+	int roadCounter = 0;
+	// For every lot
+	for (auto &road : roads) { 
+		std::cout << "Checking road " << roadCounter++ << std::endl;
+		for (auto &lot : road->lots) {
+
+			// For every other lot
+			for (auto &otherRoad : roads) {
+				for (auto &otherLot : road->lots) {
+
+					// Don't check a lot against itself
+					if (*lot == *otherLot) { continue; }
+
+					// We don't need to check lots that have already been checked
+					if (otherLot->markForDeletion) { continue; }
+
+					if (lot->IsLotWithin(otherLot))
+					{
+						otherLot->markForDeletion = true;
+					}
+					else
+					{
+						otherLot->markForDeletion = false;
+					}
+				}
+			}
+		}
+	}
+
+	int deletionCounter = 0;
+	int lotCounter = 0;
+
+	for (auto &road : roads)
+	{
+		std::vector<BuildingLot*> lots = road->lots;
+
+		for (std::vector<BuildingLot*>::iterator it = lots.begin();  it != lots.end(); /**/)
+		{
+			lotCounter++;
+			if ((*it)->markForDeletion)
+			{
+				it = lots.erase(it);
+				deletionCounter++;
+			}	
+			else
+				++it;
+		}
+		road->lots = lots;
+	}
+
+	std::cout << lotCounter << " building lots." << std::endl;
+	std::cout << deletionCounter << " deleted." << std::endl;
+
+	/* Create window */
 	sf::RenderWindow window(sf::VideoMode(winSize, winSize), "Window");
 
 	bool drawPopMap = false,
 		drawHeightMap = false,
 		drawWaterBoundaryMap = false,
-		drawQuadTree = true,
-		drawMstNodes = true,
+		drawQuadTree = false,
+		drawMstNodes = false,
 		drawRoads = true,
-		drawMST = false;
+		drawMST = false,
+		drawBuildingLots = false;
 
 	std::cout << std::endl << "Instructions: " << std::endl;
 	std::cout << "\t1: Toggle population map" << std::endl;
@@ -206,6 +269,7 @@ int main()
 	std::cout << "\t5: Toggle mst nodes" << std::endl;
 	std::cout << "\t6: Toggle roads" << std::endl;
 	std::cout << "\t7: Toggle MST" << std::endl;
+	std::cout << "\t8: Toggle building lots" << std::endl;
 
 	while (window.isOpen())
 	{
@@ -223,6 +287,7 @@ int main()
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num5)) { drawMstNodes = !drawMstNodes; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num6)) { drawRoads = !drawRoads; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num7)) { drawMST = !drawMST; }
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num8)) { drawBuildingLots = !drawBuildingLots; }
 			}
 		}
 
@@ -327,6 +392,7 @@ int main()
 		{
 			for (Road* road : roads)
 			{
+				// Draw the road
 				sf::VertexArray roadVertices(sf::LineStrip, road->nodes.size());
 				int nodeCounter = 0;
 				for (RoadNode* node : road->nodes)
@@ -336,6 +402,27 @@ int main()
 					nodeCounter++;
 				}
 				window.draw(roadVertices);
+
+				// Draw building lots
+				if (road->lots.size() > 0)
+				{
+					if (drawBuildingLots)
+					{
+						for (BuildingLot* lot : road->lots)
+						{
+							sf::Vertex vertices[5] =
+							{
+								sf::Vertex(sf::Vector2f(lot->bottomLeft->x, lot->bottomLeft->y), sf::Color::White),
+								sf::Vertex(sf::Vector2f(lot->topLeft->x, lot->topLeft->y), sf::Color::White),
+								sf::Vertex(sf::Vector2f(lot->topRight->x, lot->topRight->y), sf::Color::White),
+								sf::Vertex(sf::Vector2f(lot->bottomRight->x, lot->bottomRight->y), sf::Color::White),
+								sf::Vertex(sf::Vector2f(lot->bottomLeft->x, lot->bottomLeft->y), sf::Color::White)
+							};
+
+							window.draw(vertices, 5, sf::LineStrip);
+						}
+					}
+				}
 			}
 		}
 

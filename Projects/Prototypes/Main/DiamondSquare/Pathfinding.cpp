@@ -14,9 +14,20 @@ namespace Pathfinding
 		RoadNode* start = grid[startY][startX];
 		RoadNode* end = grid[endY][endX];
 
+		// Null checks
 		if (start == nullptr || end == nullptr)
 		{
 			return std::vector<RoadNode*>();
+		}
+
+		// We need not pathfind if the road doesn't meet a threshold length
+		if (V2::DistanceBetween(*start->position, *end->position) < 500)
+		{
+			std::vector<RoadNode*>  path;
+			path.push_back(start);
+			path.push_back(end);
+
+			return path;
 		}
 
 		// Q : the set of all nodes
