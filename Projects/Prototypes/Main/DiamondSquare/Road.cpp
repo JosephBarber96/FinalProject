@@ -31,6 +31,13 @@ void Road::GenerateBuildingLots()
 
 	bool quit = false;
 	V2* lotPos = new V2(start->x, start->y);
+
+	// Before we begin, travel down the size of the lot and the buffer space
+	lotPos->x += dirNormalized->x * minSize;
+	lotPos->y += dirNormalized->y * minSize;
+	lotPos->x += dirNormalized->x * gap;
+	lotPos->y += dirNormalized->y * gap;
+
 	while (!quit)
 	{
 		// Travel down the road the size of the lot
@@ -42,11 +49,11 @@ void Road::GenerateBuildingLots()
 		// place lot right
 		lots.push_back(new BuildingLot(new V2(lotPos->x, lotPos->y), minSize, this, 1));
 
-		// Travel down the road the size of the gap between lots
+		// Travel down the road buffer space between lots
 		lotPos->x += dirNormalized->x * gap;
 		lotPos->y += dirNormalized->y * gap;
 
-		if (V2::DistanceBetween(*lotPos, *end) < minSize * 1.5f)
+		if (V2::DistanceBetween(*lotPos, *end) < minSize * 2.5f)
 		{
 			quit = true;
 		}

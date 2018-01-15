@@ -89,6 +89,7 @@ void LoadWaterData(WaterData &wd)
 
 int main()
 {
+
 	/*************************
 		Population noise
 	**************************/
@@ -212,13 +213,13 @@ int main()
 					// We don't need to check lots that have already been checked
 					if (otherLot->markForDeletion) { continue; }
 
+					// We don't need to check lots that aren't within the minimum range
+					if (V2::DistanceBetween(*lot->bottomLeft, *otherLot->bottomLeft) > 10) { continue; }
+
 					if (lot->IsLotWithin(otherLot))
 					{
+						std::cout << "Setting a lot to be marked." << std::endl;
 						otherLot->markForDeletion = true;
-					}
-					else
-					{
-						otherLot->markForDeletion = false;
 					}
 				}
 			}

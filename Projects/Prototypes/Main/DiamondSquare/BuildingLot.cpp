@@ -86,61 +86,61 @@ void BuildingLot::Expand(float size, Road* parent, int dir)
 	bottomRight = new V2(currentPosition->x, currentPosition->y);
 }
 
-bool BuildingLot::IsLotWithin(BuildingLot* lot)
+bool BuildingLot::IsLotWithin(BuildingLot* otherLot)
 {
-	//for (auto line : GetLotLines())
+	for (auto line : GetLotLines())
+	{
+		for (auto otherline : otherLot->GetLotLines())
+		{
+			if (Utility::GetIntersectionPointWithFiniteLines(line->start, line->end, otherline->start, otherline->end) != nullptr)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+
+	//float minX, maxX, minY, maxY;
+	//float otherMinX, otherMaxX, otherMinY, otherMaxY;
+
+	//GetOutwardValues(minX, maxX, minY, maxY);
+	//otherLot->GetOutwardValues(otherMinX, otherMaxX, otherMinY, otherMaxY);
+
+	//// Allow for a 5% leeway
+	//// minX *= 0.9f; maxX *= 1.1f; minY *= 0.9f; maxY *= 1.1f;
+
+	//bool minXWithin = false,
+	//	maxXWithin = false,
+	//	minYWithin = false,
+	//	maxYWithin = false;
+
+	//// otherMinX within
+	//if (otherMinX > minX && otherMinX < maxX) minXWithin = true;
+	//// otherMaxX within
+	//if (otherMaxX < maxX && otherMaxX > minX) maxXWithin = true;
+	//// otherMinY within
+	//if (otherMinY > minY && otherMinY < maxY) minYWithin = true;
+	//// otherMaxY within
+	//if (otherMaxY < maxY && otherMaxY > minY) maxYWithin = true;
+
+	///* Checks */
+
+	//// If minimum X value is within bounds
+
+	//if (minXWithin)
 	//{
-	//	for (auto otherline : lot->GetLotLines())
-	//	{
-	//		if (Utility::GetIntersectionPoint(line->start, line->end, otherline->start, otherline->end) != nullptr)
-	//		{
-	//			return true;
-	//		}
-	//	}
+	//	if (minYWithin || maxYWithin) return true;
+	//	return false;
 	//}
-	//return false;
-
-
-	float minX, maxX, minY, maxY;
-	float otherMinX, otherMaxX, otherMinY, otherMaxY;
-
-	GetOutwardValues(minX, maxX, minY, maxY);
-	lot->GetOutwardValues(otherMinX, otherMaxX, otherMinY, otherMaxY);
-
-	// Allow for a 5% leeway
-	minX *= 1.05f; maxX *= 0.95f; minY *= 1.05f; maxY *= 0.95f;
-
-	bool minXWithin = false,
-		maxXWithin = false,
-		minYWithin = false,
-		maxYWithin = false;
-
-	// otherMinX within
-	if (otherMinX > minX && otherMinX < maxX) minXWithin = true;
-	// otherMaxX within
-	if (otherMaxX < maxX && otherMaxX > minX) maxXWithin = true;
-	// otherMinY within
-	if (otherMinY > minY && otherMinY < maxY) minYWithin = true;
-	// otherMaxY within
-	if (otherMaxY < maxY && otherMaxY > minY) maxYWithin = true;
-
-	/* Checks */
-
-	// If minimum X value is within bounds
-	if (minXWithin)
-	{
-		if (minYWithin || maxYWithin) return true;
-		return false;
-	}
-	else if (maxXWithin)
-	{
-		if (minYWithin || maxYWithin) return true;
-		return false;
-	}
-	else
-	{
-		return false;
-	}
+	//else if (maxXWithin)
+	//{
+	//	if (minYWithin || maxYWithin) return true;
+	//	return false;
+	//}
+	//else
+	//{
+	//	return false;
+	//}
 }
 
 void BuildingLot::GetOutwardValues(float &minX, float &maxX, float &minY, float &maxY)
