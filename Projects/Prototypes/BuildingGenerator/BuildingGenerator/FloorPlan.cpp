@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 
 #include "FloorPlan.h"
 #include "V2.h"
@@ -28,45 +29,49 @@ void FloorPlan::SetBoundingBox(int minx, int miny, int maxx, int maxy)
 	bb = new BoundingBox(minx, miny, maxx, maxy);
 }
 
-void FloorPlan::GenerateShapes(int num)
+void FloorPlan::GenerateShapes()
 {
 	std::vector<int> limits =
 	{
-		2, // square
-		2, // rectangle
+		3, // square
+		3, // rectangle
 		1, // pentagon
 		1, // hexagon
 	};
 
-	
+	/*	Old: For creating a random shape.
 
-	for (int i = 0; i < num; i++)
+		// Create a random shape
+		index = UtilRandom::Instance()->Random(0, Shape::SHAPE_MAX);
+		shape = jbShape::CreateShape(Shape(index));
+	*/
+
+	for (int i = 0; i < 3; i++)
 	{
 		jbShape* shape;
 		int index;
 
-		//// The first shape is always a rectangle
-		//if (i == 0)
-		//{
-		//	index = (int)Shape::rectangle;
-		//	shape = jbShape::CreateShape(Shape::rectangle);
-		//}
-		//else
-		//{
-		//	do
-		//	{
-		//		// Create a random shape
-		//		index = UtilRandom::Instance()->Random(0, Shape::SHAPE_MAX);
-		//		shape = jbShape::CreateShape(Shape(index));
-		//	}
-		//	// While this shape hasn't met its limit
-		//	while (shapeCounter[Shape(index)] >= limits[index]);
-		//}
+		// The first shape is always a rectangle
+		if (i == 0 || i == 1)
+		{
+			index = (int)Shape::square;
+			shape = jbShape::CreateShape(Shape::square);
+		}
+		else if (i == 2)
+		{
+			index = (int)Shape::hexagon;
+			shape = jbShape::CreateShape(Shape::hexagon);
+		}
+		else
+		{
+			do
+			{
+				index = UtilRandom::Instance()->Random(0, Shape::SHAPE_MAX);
+				shape = jbShape::CreateShape(Shape(index));
+			}
+			while (shapeCounter[Shape(index)] >= limits[index]);
 
-		index = (int)Shape::square;
-		shape = jbShape::CreateShape(Shape::square);
-
-
+		}
 
 		// We now have one more of this shape
 		shapeCounter[Shape(index)]++;
@@ -113,7 +118,7 @@ void FloorPlan::GeneratePerimeter()
 
 					if (intersec != nullptr)
 					{
-						line->AddIntersection(intersec, otherLine->parent);
+						line->AddIntersection(intersec, otherLine, otherLine->parent);
 						intersecCounter++;
 					}
 				}
@@ -122,6 +127,40 @@ void FloorPlan::GeneratePerimeter()
 	}
 
 	std::cout << "Intersections: " << intersecCounter << std::endl;
+
+	/*******************************************
+		Double-check points of intersection, 
+		pass any on that have been missed.
+	********************************************/
+	for (auto shape : shapes)
+	{
+		for (auto line : shape->lines)
+		{
+			for (auto isec : line->intersections)
+			{
+				// At what point does this intersection occur?
+				V2* isecPoint = isec->point;
+
+				// For the intersected line, does this line also contain the same intersection?
+				bool foundIntersec = false;
+				for (auto otherIntersection : isec->lineIntersected->intersections)
+				{
+					std::cout << "loop" << std::endl;
+					if (*otherIntersection->point == *isecPoint)
+					{
+						foundIntersec = true;
+					}
+				}
+
+				// If not, add it. 
+				if (!foundIntersec)
+				{
+					std::cout << "Adding missed intersection point!" << std::endl;
+					isec->lineIntersected->AddIntersection(isecPoint, isec->parent, isec->parent->parent);
+				}
+			}
+		}
+	}
 
 	/*******************************************
 		Remove point of intersection that sit 
@@ -182,6 +221,23 @@ void FloorPlan::GeneratePerimeter()
 		}
 	}
 
+	/***************************************************************************
+		Organise the intersections by their distance from the start of the line
+	*****************************************************************************/
+	
+	auto sortByDistanceFromStart = [](Intersection* left, Intersection* right) -> bool
+	{
+		return (V2::DistanceBetween(*left->parent->start, *left->point) < V2::DistanceBetween(*right->parent->start, *right->point));
+	};
+	
+	for (auto shape : shapes)
+	{
+		for (auto line : shape->lines)
+		{
+			std::sort(line->intersections.begin(), line->intersections.end(), sortByDistanceFromStart);
+		}
+	}
+
 
 	/*******************************************
 			Split the lines up accordingly
@@ -220,10 +276,14 @@ void FloorPlan::GeneratePerimeter()
 				continue;
 			}
 
-			if (shape->PointWithin(line->start) || shape->PointWithin(line->end))
+			if (shape->PointWithin(line->start))
 			{
-				std::cout << "Marking line for deletion." << std::endl;
-				line->markedForDeletion = true;
+				line->startWithinShape = true;
+			}
+
+			if (shape->PointWithin(line->end))
+			{
+				line->endWithinShape = true;
 			}
 		}
 	}
@@ -231,7 +291,7 @@ void FloorPlan::GeneratePerimeter()
 	int delCounter = 0;
 	for (std::vector<Line*>::iterator it = perimeterLines.begin(); it != perimeterLines.end(); /**/)
 	{
-		if ((*it)->markedForDeletion)
+		if ((*it)->startWithinShape && (*it)->endWithinShape)
 		{
 			delCounter++;
 			it = perimeterLines.erase(it);

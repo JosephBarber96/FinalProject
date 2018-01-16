@@ -67,15 +67,21 @@ void jbShape::DrawSelf(sf::RenderWindow *window)
 		window->draw(lineVertices, 2, sf::LineStrip);
 
 		// Intersections
-		for (auto isec : line->intersections)
+		if (this->points.size() > 9)
 		{
-			sf::CircleShape shape;
-			shape.setPosition(isec->point->x -1 , isec->point->y - 1);
-			shape.setFillColor(sf::Color::Cyan);
-			shape.setRadius(2);
+			for (auto isec : line->intersections)
+			{
+				sf::CircleShape shape;
+				shape.setPosition(isec->point->x - 1, isec->point->y - 1);
+				shape.setFillColor(sf::Color::Cyan);
+				shape.setRadius(2);
 
-			window->draw(shape);
+				window->draw(shape);
+			}
 		}
+
+
+
 	}
 }
 

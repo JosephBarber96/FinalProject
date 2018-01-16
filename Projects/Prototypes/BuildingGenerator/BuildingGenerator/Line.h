@@ -11,10 +11,11 @@ public:
 	Line(float sX, float sY, float eX, float ey, jbShape* _parent);
 	~Line();
 
-	void AddIntersection(V2* point, jbShape* intersectedShape);
-	void AddIntersection(int x, int y, jbShape* intersectedShape);
+	void AddIntersection(V2* point, Line* interceptedLine, jbShape* intersectedShape);
+	void AddIntersection(int x, int y, Line* interceptedLine, jbShape* intersectedShape);
 
-	bool markedForDeletion;
+	bool startWithinShape;
+	bool endWithinShape;
 
 	std::vector<Line*> returnLines();
 

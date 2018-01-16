@@ -16,7 +16,7 @@ int main()
 {
 	FloorPlan fp;
 	fp.SetBoundingBox(100, 100, 300, 300);
-	fp.GenerateShapes(8);
+	fp.GenerateShapes();
 	fp.GeneratePerimeter();
 
 	/* Create the window */

@@ -1,0 +1,62 @@
+intersections.sort(distance from start);
+
+if (intersections.size == 1)
+{
+	if END is inside colliding shape:
+		go from start->intersection
+	
+	else if START is inside collising shape:
+		go from intersection->end
+}
+if (intersections.size == 2)
+{
+	line.add(start->intersection[0])
+	line.add(intersection[1]->end)
+}
+
+else
+{
+	// Even amount
+	if (even)
+	{
+		shapes.lines.add(start, 0);
+		
+		for (int i = 1; i < intersections.size - 2; i += 2)
+		{
+			shapes.lines.add(intersection[i], intersection[i+1])
+		}
+		
+		shapes.lines.add(intersection[intersections.size], end)
+	}
+	
+	// Odd amount
+	else (odd)
+	{
+		
+		// Start within?
+		if (startWithin)
+		{
+			// size = 5
+			for (int i = 0; i < intersection.size - 1; i += 2)
+			{
+				lines.add(intersection[i], intersection[i+1])
+			}
+			
+			lines.add(intersection[size], end);			
+		}
+		
+		else (endWithin)
+		{
+			lines.add(start, intersection[0])
+			
+			// size = 5
+			for (int i = 1; i < intersection.size; i += 2)
+			{
+				lines.add(intersection[i], intersection[i+1])
+			}	
+		}
+		
+	
+	}
+	
+}

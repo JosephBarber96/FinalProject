@@ -10,7 +10,8 @@ Line::Line(V2* _start, V2* _end, jbShape* _parent)
 	start(_start),
 	end(_end),
 	parent(_parent),
-	markedForDeletion(false)
+	startWithinShape(false),
+	endWithinShape(false)
 {}
 
 Line::Line(float sX, float sY, float eX, float eY, jbShape* _parent)
@@ -18,19 +19,20 @@ Line::Line(float sX, float sY, float eX, float eY, jbShape* _parent)
 	start(new V2(sX, sY)),
 	end(new V2(eX, eY)),
 	parent(_parent),
-	markedForDeletion(false)
+	startWithinShape(false),
+	endWithinShape(false)
 {}
 
 Line::~Line() {}
 
-void Line::AddIntersection(V2* point, jbShape* intersectedShape)
+void Line::AddIntersection(V2* point, Line* interceptedLine, jbShape* intersectedShape)
 {
-	intersections.push_back(new Intersection(point->x, point->y, intersectedShape));
+	intersections.push_back(new Intersection(point->x, point->y, this, interceptedLine, intersectedShape));
 }
 
-void Line::AddIntersection(int x, int y, jbShape* intersectedShape)
+void Line::AddIntersection(int x, int y, Line* interceptedLine, jbShape* intersectedShape)
 {
-	intersections.push_back(new Intersection(x, y, intersectedShape));
+	intersections.push_back(new Intersection(x, y, this, interceptedLine, intersectedShape));
 }
 
 std::vector<Line*> Line::returnLines()
