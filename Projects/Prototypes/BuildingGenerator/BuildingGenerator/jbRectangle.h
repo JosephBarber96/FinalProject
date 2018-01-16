@@ -6,5 +6,9 @@ class jbRectangle : public jbShape
 public:
 	jbRectangle();
 	~jbRectangle();
-};
 
+	void ResetShape();
+	bool Equal_To(jbShape* shape);
+private:
+	int direction;
+};

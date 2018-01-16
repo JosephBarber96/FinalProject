@@ -6,4 +6,7 @@ class jbHexagon : public jbShape
 public:
 	jbHexagon();
 	~jbHexagon();
+
+	void ResetShape();
+	bool Equal_To(jbShape* shape);
 };

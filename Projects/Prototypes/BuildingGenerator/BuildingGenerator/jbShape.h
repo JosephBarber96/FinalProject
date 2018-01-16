@@ -29,6 +29,11 @@ public:
 
 	float getWidth();
 	float getHeight();
+	bool PointWithin(int x, int y);
+	bool PointWithin(V2* pos);
+
+	//! In place of our bool operator== as this is an abstract class
+	virtual bool Equal_To(jbShape* shape) = 0;
 
 	static jbShape* CreateShape(Shape shape);
 
@@ -37,5 +42,6 @@ public:
 	std::vector<Line*> lines;
 
 protected:
+	virtual void ResetShape() = 0;
 	void GenerateLines();
 };
