@@ -19,10 +19,6 @@ namespace Utility
 		p3_x = end2->x;
 		p3_y = end2->y;
 
-		// Make sure they arent perfectly vertical
-		if (p0_x == p1_x) p0_x += 1;
-		if (p2_x == p3_x) p2_x += 1;
-
 		// ---
 
 		float s1_x, s1_y, s2_x, s2_y;

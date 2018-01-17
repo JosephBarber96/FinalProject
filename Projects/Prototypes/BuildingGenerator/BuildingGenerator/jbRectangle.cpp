@@ -6,7 +6,8 @@ jbRectangle::jbRectangle()
 	:
 	jbShape()
 {
-	direction = UtilRandom::Instance()->Random(0, 1);
+	orientation = UtilRandom::Instance()->Random(0, 1);
+	type = Shape::rectangle;
 
 	// Generate shape
 	ResetShape();
@@ -21,7 +22,7 @@ void jbRectangle::ResetShape()
 	points.push_back(new V2(0, 0));
 
 	// Tall
-	if (direction == 0)
+	if (orientation == 0)
 	{
 		// Top left
 		points.push_back(new V2(0, 150));

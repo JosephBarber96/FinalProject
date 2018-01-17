@@ -10,5 +10,5 @@ public:
 	void ResetShape();
 	bool Equal_To(jbShape* shape);
 private:
-	int direction;
+	int orientation;
 };

@@ -5,6 +5,8 @@ jbSquare::jbSquare()
 	:
 	jbShape()
 {
+	type = Shape::square;
+
 	// Generate shape
 	ResetShape();
 }

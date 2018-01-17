@@ -15,7 +15,7 @@ public:
 	~FloorPlan();
 
 	void SetBoundingBox(int minx, int miny, int maxx, int maxy);
-	void GenerateShapes();
+	void GenerateShapes(int num);
 	void GeneratePerimeter();
 	void DrawPerimeter(sf::RenderWindow *window);
 

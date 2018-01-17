@@ -11,4 +11,3 @@ public:
 
 	int minX, minY, maxX, maxY;
 };
-

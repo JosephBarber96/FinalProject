@@ -5,6 +5,8 @@ jbHexagon::jbHexagon()
 	:
 	jbShape()
 {
+	type = Shape::hexagon;
+
 	// Create shape
 	ResetShape();
 }

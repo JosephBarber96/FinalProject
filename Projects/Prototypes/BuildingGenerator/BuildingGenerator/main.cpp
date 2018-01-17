@@ -9,14 +9,13 @@
 #include "FloorPlan.h"
 #include "BoundingBox.h"
 
-
 #include "Utility.h"
 
 int main()
 {
 	FloorPlan fp;
 	fp.SetBoundingBox(100, 100, 300, 300);
-	fp.GenerateShapes();
+	fp.GenerateShapes(3);
 	fp.GeneratePerimeter();
 
 	/* Create the window */
@@ -32,7 +31,7 @@ int main()
 
 		window.clear();
 
-		//fp.bb->DrawSelf(&window);
+		fp.bb->DrawSelf(&window);
 		for (auto shape : fp.shapes)
 		{
 			shape->DrawSelf(&window);

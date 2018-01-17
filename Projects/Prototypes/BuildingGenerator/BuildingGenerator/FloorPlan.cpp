@@ -1,5 +1,4 @@
 #include <iostream>
-#include <algorithm>
 
 #include "FloorPlan.h"
 #include "V2.h"
@@ -29,56 +28,83 @@ void FloorPlan::SetBoundingBox(int minx, int miny, int maxx, int maxy)
 	bb = new BoundingBox(minx, miny, maxx, maxy);
 }
 
-void FloorPlan::GenerateShapes()
+void FloorPlan::GenerateShapes(int num)
 {
 	std::vector<int> limits =
 	{
-		3, // square
-		3, // rectangle
+		2, // square
+		2, // rectangle
 		1, // pentagon
 		1, // hexagon
 	};
 
-	/*	Old: For creating a random shape.
+	std::vector<int> xPositions;
+	std::vector<int> yPositions;
 
-		// Create a random shape
-		index = UtilRandom::Instance()->Random(0, Shape::SHAPE_MAX);
-		shape = jbShape::CreateShape(Shape(index));
-	*/
-
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < num; i++)
 	{
 		jbShape* shape;
 		int index;
 
-		// The first shape is always a rectangle
-		if (i == 0 || i == 1)
-		{
-			index = (int)Shape::square;
-			shape = jbShape::CreateShape(Shape::square);
-		}
-		else if (i == 2)
-		{
-			index = (int)Shape::hexagon;
-			shape = jbShape::CreateShape(Shape::hexagon);
-		}
-		else
-		{
-			do
-			{
-				index = UtilRandom::Instance()->Random(0, Shape::SHAPE_MAX);
-				shape = jbShape::CreateShape(Shape(index));
-			}
-			while (shapeCounter[Shape(index)] >= limits[index]);
+		//// The first shape is always a square
+		//if (i == 0)
+		//{
+		//	index = (int)Shape::square;
+		//	shape = jbShape::CreateShape(Shape::square);
+		//}
+		//else
+		//{
+		//	do
+		//	{
+		//		// Create a random shape
+		//		index = UtilRandom::Instance()->Random(0, Shape::SHAPE_MAX);
+		//		shape = jbShape::CreateShape(Shape(index));
+		//	}
+		//	// While this shape hasn't met its limit
+		//	while (shapeCounter[Shape(index)] >= limits[index]);
+		//}
 
-		}
+		index = (int)Shape::square;
+		shape = jbShape::CreateShape(Shape::square);
 
 		// We now have one more of this shape
 		shapeCounter[Shape(index)]++;
 
 		// Place the shape randomly within the bounds of the bounding box
-		float shapeX = UtilRandom::Instance()->Random(bb->minX, bb->maxX - shape->getWidth());
-		float shapeY = UtilRandom::Instance()->Random(bb->minY, bb->maxY - shape->getHeight());
+		// Each x and y pos must be divisible by 10
+		// Shapes cannot share an x/y pos
+
+		int shapeX, shapeY;
+		int divisibleBy = 10;
+
+		bool validPosition = false;
+		while (!validPosition)
+		{
+			shapeX = UtilRandom::Instance()->Random(bb->minX, bb->maxX - shape->getWidth());
+			int xDifference = shapeX % divisibleBy;
+			shapeX -= xDifference;
+
+			shapeY = UtilRandom::Instance()->Random(bb->minY, bb->maxY - shape->getHeight());
+			int yDifference = shapeY % divisibleBy;
+			shapeY -= yDifference;
+
+			// Check if this xPos exists
+			bool xFound = false;
+			for (auto num : xPositions)
+				if (num == shapeX) xFound = true;
+
+			// Check if this yPos exists
+			bool yFound = false;
+			for (auto num : yPositions)
+				if (num == shapeY) yFound = true;
+
+			// Is this valid?
+			if (!xFound && !yFound)
+				validPosition = true;
+		}
+
+		xPositions.push_back(shapeX);
+		yPositions.push_back(shapeY);
 		shape->SetPosition(shapeX, shapeY);
 
 		// Add the shape to our floor plan
@@ -89,7 +115,7 @@ void FloorPlan::GenerateShapes()
 void FloorPlan::GeneratePerimeter()
 {
 	/*******************************************
-		Calculate the points of interseption
+	Calculate the points of interseption
 	********************************************/
 
 	int intersecCounter = 0;
@@ -118,7 +144,7 @@ void FloorPlan::GeneratePerimeter()
 
 					if (intersec != nullptr)
 					{
-						line->AddIntersection(intersec, otherLine, otherLine->parent);
+						line->AddIntersection(intersec, otherLine->parent);
 						intersecCounter++;
 					}
 				}
@@ -129,44 +155,10 @@ void FloorPlan::GeneratePerimeter()
 	std::cout << "Intersections: " << intersecCounter << std::endl;
 
 	/*******************************************
-		Double-check points of intersection, 
-		pass any on that have been missed.
+	Remove point of intersection that sit
+	inside of another shape
 	********************************************/
-	for (auto shape : shapes)
-	{
-		for (auto line : shape->lines)
-		{
-			for (auto isec : line->intersections)
-			{
-				// At what point does this intersection occur?
-				V2* isecPoint = isec->point;
 
-				// For the intersected line, does this line also contain the same intersection?
-				bool foundIntersec = false;
-				for (auto otherIntersection : isec->lineIntersected->intersections)
-				{
-					std::cout << "loop" << std::endl;
-					if (*otherIntersection->point == *isecPoint)
-					{
-						foundIntersec = true;
-					}
-				}
-
-				// If not, add it. 
-				if (!foundIntersec)
-				{
-					std::cout << "Adding missed intersection point!" << std::endl;
-					isec->lineIntersected->AddIntersection(isecPoint, isec->parent, isec->parent->parent);
-				}
-			}
-		}
-	}
-
-	/*******************************************
-		Remove point of intersection that sit 
-		inside of another shape
-	********************************************/
-	
 	// For each shape...
 	for (auto shape : shapes)
 	{
@@ -221,26 +213,9 @@ void FloorPlan::GeneratePerimeter()
 		}
 	}
 
-	/***************************************************************************
-		Organise the intersections by their distance from the start of the line
-	*****************************************************************************/
-	
-	auto sortByDistanceFromStart = [](Intersection* left, Intersection* right) -> bool
-	{
-		return (V2::DistanceBetween(*left->parent->start, *left->point) < V2::DistanceBetween(*right->parent->start, *right->point));
-	};
-	
-	for (auto shape : shapes)
-	{
-		for (auto line : shape->lines)
-		{
-			std::sort(line->intersections.begin(), line->intersections.end(), sortByDistanceFromStart);
-		}
-	}
-
 
 	/*******************************************
-			Split the lines up accordingly
+	Split the lines up accordingly
 	********************************************/
 
 	// For each shape...
@@ -263,7 +238,7 @@ void FloorPlan::GeneratePerimeter()
 	/*******************************************
 	Prune lines that sit inside of another shape
 	********************************************/
-	
+
 	// For every line...
 	for (auto line : perimeterLines)
 	{
@@ -276,14 +251,10 @@ void FloorPlan::GeneratePerimeter()
 				continue;
 			}
 
-			if (shape->PointWithin(line->start))
+			if (shape->PointWithin(line->start) || shape->PointWithin(line->end))
 			{
-				line->startWithinShape = true;
-			}
-
-			if (shape->PointWithin(line->end))
-			{
-				line->endWithinShape = true;
+				std::cout << "Marking line for deletion." << std::endl;
+				line->markedForDeletion = true;
 			}
 		}
 	}
@@ -291,7 +262,7 @@ void FloorPlan::GeneratePerimeter()
 	int delCounter = 0;
 	for (std::vector<Line*>::iterator it = perimeterLines.begin(); it != perimeterLines.end(); /**/)
 	{
-		if ((*it)->startWithinShape && (*it)->endWithinShape)
+		if ((*it)->markedForDeletion)
 		{
 			delCounter++;
 			it = perimeterLines.erase(it);

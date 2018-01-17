@@ -5,6 +5,8 @@ jbPentagon::jbPentagon()
 	:
 	jbShape()
 {
+	type = Shape::pentagon;
+
 	// Create shape
 	ResetShape();
 }

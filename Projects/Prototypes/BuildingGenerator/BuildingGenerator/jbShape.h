@@ -37,6 +37,7 @@ public:
 
 	static jbShape* CreateShape(Shape shape);
 
+	Shape type;
 	V2* position;
 	std::vector<V2*> points;
 	std::vector<Line*> lines;
