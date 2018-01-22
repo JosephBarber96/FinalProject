@@ -45,7 +45,7 @@ void MinimumSpanningTree::SpawnPoint(WaterData &wd, int offset, int minX, int mi
 	// If none exist, return without placing a point
 	if (landPositions.size() == 0) { return; }
 
-	int index = UtilRandom::Instance()->Random(0, landPositions.size()-1);
+	int index = UtilRandom::Instance()->RandomInt(0, landPositions.size()-1);
 
 	int x = landPositions[index].x;
 	int y = landPositions[index].y;

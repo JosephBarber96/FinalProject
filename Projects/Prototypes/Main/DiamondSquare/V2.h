@@ -13,6 +13,7 @@ public:
 
 	// Operators
 	bool operator== (V2 arg);
+	bool operator!=(V2 arg);
 	V2 operator- (V2 arg);
 
 	// Static

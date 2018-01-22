@@ -18,6 +18,10 @@
 #include "WaterData.h"
 #include "BuildingLot.h"
 
+#include "FloorPlan.h"
+#include "BoundingBox.h"
+#include "jbShape.h"
+
 const int winSize = 512;
 int offsetForRoadNodes = 5;
 
@@ -188,8 +192,9 @@ int main()
 
 		roads.push_back(road);
 
-		std::cout << counter++ << "/" << mst.GetTreeEdges().size() << " roads complete." << std::endl;
+		std::cout << "\r" << mst.GetTreeEdges().size() << " roads complete.\t\t";
 	}
+	std::cout << std::endl;
 
 	/*******************************************************
 		Check for and remove any building lot collisions
@@ -200,7 +205,7 @@ int main()
 	int roadCounter = 0;
 	// For every lot
 	for (auto &road : roads) { 
-		std::cout << "Checking road " << roadCounter++ << std::endl;
+		std::cout << "\rChecking road " << roadCounter++ << "/" << roads.size() << "\t\t";
 		for (auto &lot : road->lots) {
 
 			// For every other lot
@@ -218,13 +223,14 @@ int main()
 
 					if (lot->IsLotWithin(otherLot))
 					{
-						std::cout << "Setting a lot to be marked." << std::endl;
+						std::cout << "\nSetting a lot to be marked." << std::endl;
 						otherLot->markForDeletion = true;
 					}
 				}
 			}
 		}
 	}
+	std::cout << std::endl;
 
 	int deletionCounter = 0;
 	int lotCounter = 0;
@@ -250,8 +256,36 @@ int main()
 	std::cout << lotCounter << " building lots." << std::endl;
 	std::cout << deletionCounter << " deleted." << std::endl;
 
+	/*******************************************************
+		Generate buildings inside of each building lot
+	********************************************************/
+
+	for (auto road : roads)
+	{
+		for (auto lot : road->lots)
+		{
+			// Get the boundaries of the lot
+			float minX, minY, maxX, maxY;
+			lot->GetOutwardValues(minX, maxX, minY, maxY);
+
+			// Give the lot a new FloorPlan object
+			lot->fp = new FloorPlan();
+
+			// Create the lots bounding box for building generation
+			lot->fp->SetBoundingBox(minX, minY, maxX - minX, maxY - minY);
+
+			// Generate shapes
+			lot->fp->GenerateShapes(2);
+
+			// Calculate building perimeter
+			lot->fp->GeneratePerimeter();
+		}
+	}
+
 	/* Create window */
 	sf::RenderWindow window(sf::VideoMode(winSize, winSize), "Window");
+	sf::View view(sf::FloatRect(0, 0, winSize, winSize));
+	window.setView(view);
 
 	bool drawPopMap = false,
 		drawHeightMap = false,
@@ -274,6 +308,7 @@ int main()
 
 	while (window.isOpen())
 	{
+		window.setView(view);
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -289,6 +324,26 @@ int main()
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num6)) { drawRoads = !drawRoads; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num7)) { drawMST = !drawMST; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num8)) { drawBuildingLots = !drawBuildingLots; }
+
+				// Camera movement
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+					view.move(0, -10);
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+					view.move(-10, 0);
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+					view.move(0, 10);
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+					view.move(10, 0);
+
+				// Camera zooming
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q))
+				{
+					view.zoom(1.1f);
+				}
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::E))
+				{
+					view.zoom(0.9);
+				}
 			}
 		}
 
@@ -454,6 +509,16 @@ int main()
 				shape.setRadius(1);
 
 				window.draw(shape);
+			}
+		}
+
+		/* Floor plans, buildings */
+		for (Road* road : roads)
+		{
+			for (BuildingLot* lot : road->lots)
+			{
+				lot->fp->bb->DrawSelf(&window);
+				lot->fp->DrawPerimeter(&window);
 			}
 		}
 

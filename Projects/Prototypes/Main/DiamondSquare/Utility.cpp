@@ -22,6 +22,15 @@ namespace Utility
 		p3_x = end2->x;
 		p3_y = end2->y;
 
+		p0_x *= 10;
+		p0_y *= 10;
+		p1_x *= 10;
+		p1_y *= 10;
+		p2_x *= 10;
+		p2_y *= 10;
+		p3_x *= 10;
+		p3_y *= 10;
+
 		// ---
 
 		float s1_x, s1_y, s2_x, s2_y;
@@ -40,6 +49,9 @@ namespace Utility
 
 			i_x = p0_x + (t * s1_x);
 			i_y = p0_y + (t * s1_y);
+
+			i_x /= 10;
+			i_y /= 10;
 
 			return new V2(i_x, i_y);
 		}

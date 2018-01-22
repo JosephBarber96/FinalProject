@@ -9,11 +9,18 @@ UtilRandom::UtilRandom()
 
 UtilRandom::~UtilRandom() {}
 
-int UtilRandom::Random(int min, int max)
+int UtilRandom::RandomInt(int min, int max)
 {
 	std::uniform_int_distribution<int> distribution(min, max);
 
 	return (distribution(mt));
+}
+
+float UtilRandom::RandomFloat(float min, float max)
+{
+	std::uniform_real_distribution<float> distribution(min, max);
+
+	return (float)(distribution(mt));
 }
 
 UtilRandom* UtilRandom::Instance()

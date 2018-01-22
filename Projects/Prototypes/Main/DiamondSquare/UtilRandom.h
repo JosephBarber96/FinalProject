@@ -8,7 +8,8 @@ public:
 
 	std::mt19937 mt;
 
-	int Random(int min, int max);
+	int RandomInt(int min, int max);
+	float RandomFloat(float min, float max);
 	static UtilRandom* Instance();	
 
 private:

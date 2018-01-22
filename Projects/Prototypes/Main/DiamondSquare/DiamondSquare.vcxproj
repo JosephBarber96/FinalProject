@@ -115,10 +115,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BoundingBox.cpp" />
     <ClCompile Include="BuildingLot.cpp" />
     <ClCompile Include="DiamondSquare.cpp" />
     <ClCompile Include="Edge.cpp" />
     <ClCompile Include="FastNoise.cpp" />
+    <ClCompile Include="FloorPlan.cpp" />
+    <ClCompile Include="Intersection.cpp" />
+    <ClCompile Include="jbShape.cpp" />
+    <ClCompile Include="jbSquare.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MinimumSpanningTree.cpp" />
@@ -128,16 +133,22 @@
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Road.cpp" />
     <ClCompile Include="RoadNode.cpp" />
+    <ClCompile Include="shapeLine.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="UtilRandom.cpp" />
     <ClCompile Include="V2.cpp" />
     <ClCompile Include="WaterData.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="BuildingLot.h" />
     <ClInclude Include="DiamondSquare.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="FastNoise.h" />
+    <ClInclude Include="FloorPlan.h" />
+    <ClInclude Include="Intersection.h" />
+    <ClInclude Include="jbShape.h" />
+    <ClInclude Include="jbSquare.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="MinimumSpanningTree.h" />
     <ClInclude Include="MstNode.h" />
@@ -146,6 +157,7 @@
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Road.h" />
     <ClInclude Include="RoadNode.h" />
+    <ClInclude Include="shapeLine.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="UtilRandom.h" />
     <ClInclude Include="V2.h" />

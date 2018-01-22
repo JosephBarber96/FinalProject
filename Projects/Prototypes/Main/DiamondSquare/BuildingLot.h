@@ -4,6 +4,7 @@
 class V2;
 class Road;
 class Line;
+class FloorPlan;
 class BuildingLot
 {
 public:
@@ -15,12 +16,16 @@ public:
 	bool IsLotWithin(BuildingLot* lot);
 	void GetOutwardValues(float &minX, float &maxX, float &minY, float &maxY);
 	std::vector<Line*> GetLotLines();
+	float GetWidth();
+	float GetHeight();
 
 	bool markForDeletion = false;
 	V2* bottomLeft;
 	V2* topLeft;
 	V2* topRight;
 	V2* bottomRight;
+
+	FloorPlan* fp;
 
 	bool operator== (BuildingLot rhs);
 };

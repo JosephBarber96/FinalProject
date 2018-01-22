@@ -185,6 +185,16 @@ std::vector<Line*> BuildingLot::GetLotLines()
 	return lines;
 }
 
+float BuildingLot::GetWidth()
+{
+	return V2::DistanceBetween(*bottomLeft, *bottomRight);
+}
+
+float BuildingLot::GetHeight()
+{
+	return V2::DistanceBetween(*bottomLeft, *topLeft);
+}
+
 bool BuildingLot::operator==(BuildingLot rhs)
 {
 	return (*bottomLeft == *rhs.bottomLeft

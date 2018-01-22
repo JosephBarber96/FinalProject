@@ -46,6 +46,13 @@ bool V2::operator==(V2 arg)
 	return (x == arg.x && y == arg.y);
 }
 
+bool V2::operator!=(V2 arg)
+{
+	if (x == arg.x && y == arg.y)
+		return false;
+	return true;
+}
+
 V2 V2::operator- (V2 arg)
 {
 	return V2(x - arg.x, y - arg.y);

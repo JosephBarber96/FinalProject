@@ -66,10 +66,10 @@ void DiamondSquare::Generate()
 	// Diamond Square...
 
 	// First, we have to offset the four corners of the square
-	terrainVertices[0].y = UtilRandom::Instance()->Random(-height, height);			// top left
-	terrainVertices[divisions].y = UtilRandom::Instance()->Random(-height, height);	// top right
-	terrainVertices[terrainVertices.size() - 1].y = UtilRandom::Instance()->Random(-height, height);	// bottom right
-	terrainVertices[(terrainVertices.size() - 1) - divisions].y = UtilRandom::Instance()->Random(-height, height);	// bottom left
+	terrainVertices[0].y = UtilRandom::Instance()->RandomInt(-height, height);			// top left
+	terrainVertices[divisions].y = UtilRandom::Instance()->RandomInt(-height, height);	// top right
+	terrainVertices[terrainVertices.size() - 1].y = UtilRandom::Instance()->RandomInt(-height, height);	// bottom right
+	terrainVertices[(terrainVertices.size() - 1) - divisions].y = UtilRandom::Instance()->RandomInt(-height, height);	// bottom left
 
 	// Next, diamond square algorithm
 	float iterations = (int)log2(divisions);
@@ -230,19 +230,19 @@ void DiamondSquare::DiaSqu(int row, int col, int size, float heightOffset)
 	// Diamond
 
 	terrainVertices[middlePoint].y = (terrainVertices[topLeft].y + terrainVertices[topLeft + size].y + terrainVertices[bottomLeft].y + terrainVertices[bottomLeft + size].y) * 0.25f;
-	terrainVertices[middlePoint].y += UtilRandom::Instance()->Random(-heightOffset, heightOffset);
+	terrainVertices[middlePoint].y += UtilRandom::Instance()->RandomInt(-heightOffset, heightOffset);
 
 	// Square
 
 	terrainVertices[topLeft + halfSize].y = (terrainVertices[topLeft].y + terrainVertices[topLeft + size].y + terrainVertices[middlePoint].y) / 3;
-	terrainVertices[topLeft + halfSize].y += UtilRandom::Instance()->Random(-heightOffset, heightOffset);
+	terrainVertices[topLeft + halfSize].y += UtilRandom::Instance()->RandomInt(-heightOffset, heightOffset);
 
 	terrainVertices[middlePoint - halfSize].y = (terrainVertices[topLeft].y + terrainVertices[bottomLeft].y + terrainVertices[middlePoint].y) / 3;
-	terrainVertices[middlePoint - halfSize].y += UtilRandom::Instance()->Random(-heightOffset, heightOffset);
+	terrainVertices[middlePoint - halfSize].y += UtilRandom::Instance()->RandomInt(-heightOffset, heightOffset);
 
 	terrainVertices[middlePoint + halfSize].y = (terrainVertices[topLeft + size].y + terrainVertices[bottomLeft + size].y + terrainVertices[middlePoint].y) / 3;
-	terrainVertices[middlePoint + halfSize].y += UtilRandom::Instance()->Random(-heightOffset, heightOffset);
+	terrainVertices[middlePoint + halfSize].y += UtilRandom::Instance()->RandomInt(-heightOffset, heightOffset);
 
 	terrainVertices[bottomLeft + halfSize].y += (terrainVertices[bottomLeft].y + terrainVertices[bottomLeft + size].y + terrainVertices[middlePoint].y) / 3;
-	terrainVertices[bottomLeft + halfSize].y += UtilRandom::Instance()->Random(-heightOffset, heightOffset);
+	terrainVertices[bottomLeft + halfSize].y += UtilRandom::Instance()->RandomInt(-heightOffset, heightOffset);
 }

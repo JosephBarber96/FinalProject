@@ -1,37 +1,19 @@
 #include "jbShape.h"
 #include "V2.h"
-#include "Line.h"
+#include "shapeLine.h"
 #include "Intersection.h"
 
-#include "jbTriangle.h"
 #include "jbSquare.h"
-#include "jbRectangle.h"
-#include "jbPentagon.h"
-#include "jbHexagon.h"
 
-jbShape::jbShape()
-	:
-	position(new V2(0, 0))
-{}
-
-jbShape::jbShape(V2* pos)
-	:
-	position(pos)
-{}
-
-jbShape::jbShape(V2* pos, std::vector<V2*> shapePoints)
-	:
-	position(pos),
-	points(shapePoints)
-{
-
-}
+jbShape::jbShape() {}
 
 jbShape::~jbShape() {}
 
-void jbShape::SetPosition(int _x, int _y)
+void jbShape::SetPosition(float _x, float _y)
 {
-	ResetShape();
+	ResetShape(shapeSize);
+
+	position = new V2(_x, _y);
 
 	for (auto point : points)
 	{
@@ -42,7 +24,9 @@ void jbShape::SetPosition(int _x, int _y)
 
 void jbShape::SetPosition(V2 pos)
 {
-	ResetShape();
+	ResetShape(shapeSize);
+
+	position = new V2(pos.x, pos.y);
 
 	for (auto point : points)
 	{
@@ -70,16 +54,16 @@ void jbShape::DrawSelf(sf::RenderWindow *window)
 		for (auto isec : line->intersections)
 		{
 			sf::CircleShape shape;
-			shape.setPosition(isec->point->x - 1, isec->point->y - 1);
+			shape.setPosition(isec->point->x, isec->point->y);
 			shape.setFillColor(sf::Color::Cyan);
-			shape.setRadius(2);
+			shape.setRadius(0.3f);
 
 			window->draw(shape);
 		}
 	}
 }
 
-float jbShape::getWidth()
+float jbShape::GetWidth()
 {
 	float minX = INT_MAX;
 	float maxX = -INT_MAX;
@@ -93,7 +77,7 @@ float jbShape::getWidth()
 	return fabsf(maxX - minX);
 }
 
-float jbShape::getHeight()
+float jbShape::GetHeight()
 {
 	float minY = INT_MAX;
 	float maxY = -INT_MAX;
@@ -119,7 +103,7 @@ bool jbShape::PointWithin(float x, float y)
 	}
 
 	// Greter than minX, Less than minX+Width, Greater than minY, Less than minY+Height
-	return (x > minX && x < minX + getWidth() && y > minY && y < minY + getHeight());
+	return (x > minX && x < minX + GetWidth() && y > minY && y < minY + GetHeight());
 }
 
 bool jbShape::PointWithin(V2* pos)
@@ -128,21 +112,25 @@ bool jbShape::PointWithin(V2* pos)
 }
 
 //! Factory
-jbShape* jbShape::CreateShape(Shape shape)
+jbShape* jbShape::CreateShape(float shapeSize)
 {
-	switch (shape)
-	{
-		// case Shape::triangle:
-		// return new jbTriangle();
-	case Shape::square:
-		return new jbSquare();
-	case Shape::rectangle:
-		return new jbRectangle();
-	case Shape::pentagon:
-		return new jbPentagon();
-	case Shape::hexagon:
-		return new jbHexagon();
-	}
+	return new jbSquare(shapeSize);
+
+
+
+	//switch (shape)
+	//{
+	//	// case Shape::triangle:
+	//	// return new jbTriangle();
+	//case Shape::square:
+	//	return new jbSquare();
+	//case Shape::rectangle:
+	//	return new jbRectangle();
+	//case Shape::pentagon:
+	//	return new jbPentagon();
+	//case Shape::hexagon:
+	//	return new jbHexagon();
+	//}
 }
 
 //! Private
@@ -152,8 +140,8 @@ void jbShape::GenerateLines()
 
 	for (int i = 0; i < points.size() - 1; i++)
 	{
-		lines.push_back(new Line(points[i], points[i + 1], this));
+		lines.push_back(new shapeLine(points[i], points[i + 1], this));
 
 	}
-	lines.push_back(new Line(points[points.size() - 1], points[0], this));
+	lines.push_back(new shapeLine(points[points.size() - 1], points[0], this));
 }

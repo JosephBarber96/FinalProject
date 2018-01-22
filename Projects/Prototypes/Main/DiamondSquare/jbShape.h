@@ -3,46 +3,35 @@
 
 #include <SFML\Graphics.hpp>
 
-enum Shape
-{
-	// triangle,
-	square,
-	rectangle,
-	pentagon,
-	hexagon,
-	SHAPE_MAX = hexagon
-};
-
-class Line;
+class shapeLine;
 class V2;
 class jbShape
 {
 public:
 	jbShape();
-	jbShape(V2* pos);
-	jbShape(V2* pos, std::vector<V2*> shapePoints);
 	~jbShape();
 
-	void SetPosition(int _x, int _y);
+	void SetPosition(float _x, float _y);
 	void SetPosition(V2 pos);
 	void DrawSelf(sf::RenderWindow *window);
 
-	float getWidth();
-	float getHeight();
+	float GetWidth();
+	float GetHeight();
 	bool PointWithin(float x, float y);
 	bool PointWithin(V2* pos);
 
 	//! In place of our bool operator== as this is an abstract class
 	virtual bool Equal_To(jbShape* shape) = 0;
 
-	static jbShape* CreateShape(Shape shape);
+	//! Factory
+	static jbShape* CreateShape(float size);
 
-	Shape type;
+	float shapeSize;
 	V2* position;
 	std::vector<V2*> points;
-	std::vector<Line*> lines;
+	std::vector<shapeLine*> lines;
 
 protected:
-	virtual void ResetShape() = 0;
+	virtual void ResetShape(float size) = 0;
 	void GenerateLines();
 };
