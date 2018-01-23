@@ -9,17 +9,18 @@
 
 BuildingLot::BuildingLot() {}
 
-BuildingLot::BuildingLot(V2* botLeft, float size, Road* parent, int dir)
+BuildingLot::BuildingLot(V2* botLeft, float size, Road* par, int _dir)
 	:
-	bottomLeft(botLeft)
+	bottomLeft(botLeft),
+	parent(par)
 {
 	markForDeletion = false;
-	Expand(size, parent, dir);
+	Expand(size, par, _dir);
 }
 
 BuildingLot::~BuildingLot() {}
 
-void BuildingLot::Expand(float size, Road* parent, int dir)
+void BuildingLot::Expand(float size, Road* parent, int _dir)
 {
 	// Get parent start and end
 	V2* parentStart = parent->nodes[0]->position;
@@ -30,10 +31,11 @@ void BuildingLot::Expand(float size, Road* parent, int dir)
 	float parentAngle = V2::VectorToAngle(parentDir);
 
 	// Find our facing angle (relatively outwards from bottomLeft)
-	int rotateAmount = (dir == 0) ? -90 : 90;
+	int rotateAmount = (_dir == 0) ? -90 : 90;
 
 	float myAngle = parentAngle + rotateAmount;
-
+	angle = myAngle;
+	dir = _dir;
 
 	// Find our direction
 	V2* myDir = V2::AngleToVector(myAngle);

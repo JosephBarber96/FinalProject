@@ -17,10 +17,13 @@
 #include "Pathfinding.h"
 #include "WaterData.h"
 #include "BuildingLot.h"
+#include "UtilRandom.h"
+#include "Utility.h"
 
 #include "FloorPlan.h"
 #include "BoundingBox.h"
 #include "jbShape.h"
+#include "shapeLine.h"
 
 const int winSize = 512;
 int offsetForRoadNodes = 5;
@@ -93,7 +96,6 @@ void LoadWaterData(WaterData &wd)
 
 int main()
 {
-
 	/*************************
 		Population noise
 	**************************/
@@ -260,25 +262,108 @@ int main()
 		Generate buildings inside of each building lot
 	********************************************************/
 
+	std::vector<V2*> lotCenter;
+	std::vector<V2*> buildingCenter;
+
 	for (auto road : roads)
 	{
 		for (auto lot : road->lots)
 		{
 			// Get the boundaries of the lot
-			float minX, minY, maxX, maxY;
-			lot->GetOutwardValues(minX, maxX, minY, maxY);
+			float lotMinX, lotMinY, lotMaxX, lotMaxY;
+			lot->GetOutwardValues(lotMinX, lotMaxX, lotMinY, lotMaxY);
 
 			// Give the lot a new FloorPlan object
 			lot->fp = new FloorPlan();
 
 			// Create the lots bounding box for building generation
-			lot->fp->SetBoundingBox(minX, minY, maxX - minX, maxY - minY);
+			lot->fp->SetBoundingBox(lotMinX, lotMinY, lotMaxX - lotMinX, lotMaxY - lotMinY);
 
 			// Generate shapes
-			lot->fp->GenerateShapes(2);
+			int numberOfShapes = UtilRandom::Instance()->RandomInt(2, 4);
+			lot->fp->GenerateShapes(numberOfShapes);
 
 			// Calculate building perimeter
 			lot->fp->GeneratePerimeter();
+
+			// Find the center point of the generated building
+
+			// First we need to find the minimum and maximum boundaries
+			float buildingMinX = FLT_MAX, buildingMaxX = -FLT_MAX, buildingMinY = FLT_MAX, buildingMaxY = -FLT_MAX;
+			for (shapeLine* line : lot->fp->perimeterLines)
+			{
+				if (line->start->x < buildingMinX) buildingMinX = line->start->x;
+				if (line->start->x > buildingMaxX) buildingMaxX = line->start->x;
+
+				if (line->start->y < buildingMinY) buildingMinY = line->start->y;
+				if (line->start->y > buildingMaxY) buildingMaxY = line->start->y;
+
+				if (line->end->x < buildingMinX) buildingMinX = line->start->x;
+				if (line->end->x > buildingMaxX) buildingMaxX = line->start->x;
+
+				if (line->end->y < buildingMinY) buildingMinY = line->start->y;
+				if (line->end->y > buildingMaxY) buildingMaxY = line->start->y;
+			}
+
+			// Then we find the center
+			float buildingDiffX = buildingMaxX - buildingMinX;
+			float buildingDiffY = buildingMaxY - buildingMinY;
+
+			float buildingMidX = buildingMaxX - (buildingDiffX / 2);
+			float buildingMidY = buildingMaxY - (buildingDiffY / 2);
+
+
+			/*
+			Find the angle to rotate by
+			*/
+
+			// Get the road the lot belongs to
+			Road* lotParent = lot->parent;
+
+			// Get parent start and end
+			V2* parentStart = lotParent->nodes[0]->position;
+			V2* parentEnd = lotParent->nodes[1]->position;
+
+			// Find the parents facing angle
+			V2* parentDir = new V2(parentEnd->x - parentStart->x, parentEnd->y - parentStart->y);
+			float parentAngle = V2::VectorToAngle(parentDir);
+
+			float angleToRotate = 90 - parentAngle - 45;
+
+			// Rotate the points around the found center point
+			for (shapeLine* line : lot->fp->perimeterLines)
+			{
+				line->start = Utility::RotateAroundPoint(line->start, new V2(buildingMidX, buildingMidY), angleToRotate);
+				line->end = Utility::RotateAroundPoint(line->end, new V2(buildingMidX, buildingMidY), angleToRotate);
+			}
+
+			/* 
+			Move the building so the center point of the building is the center point of the shape
+			*/
+
+			// Find the center of the lot
+			float lotDiffX = lotMaxX - lotMinX;
+			float lotDiffY = lotMaxY - lotMinY;
+
+			float lotMidX = lotMaxX - (lotDiffX / 2);
+			float lotMidY = lotMaxY - (lotDiffY / 2);
+
+			// Find out the offset
+			float offsetX = lotMidX - buildingMidX;
+			float offsetY = lotMidY - buildingMidY;
+
+			buildingCenter.push_back(new V2(buildingMidX, buildingMidY));
+			lotCenter.push_back(new V2(lotMidX, lotMidY));
+
+			// Move the lines by this much
+			for (shapeLine* line : lot->fp->perimeterLines)
+			{
+				line->start->x += offsetX;
+				line->start->y += offsetY;
+
+				line->end->x += offsetX;
+				line->end->y += offsetY;
+			}
 		}
 	}
 
@@ -294,7 +379,8 @@ int main()
 		drawMstNodes = false,
 		drawRoads = true,
 		drawMST = false,
-		drawBuildingLots = false;
+		drawBuildingLots = false,
+		drawBuildings = false;
 
 	std::cout << std::endl << "Instructions: " << std::endl;
 	std::cout << "\t1: Toggle population map" << std::endl;
@@ -305,6 +391,7 @@ int main()
 	std::cout << "\t6: Toggle roads" << std::endl;
 	std::cout << "\t7: Toggle MST" << std::endl;
 	std::cout << "\t8: Toggle building lots" << std::endl;
+	std::cout << "\t9: Toggle buildings" << std::endl;
 
 	while (window.isOpen())
 	{
@@ -324,6 +411,7 @@ int main()
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num6)) { drawRoads = !drawRoads; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num7)) { drawMST = !drawMST; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num8)) { drawBuildingLots = !drawBuildingLots; }
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num9)) { drawBuildings = !drawBuildings; }
 
 				// Camera movement
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
@@ -497,7 +585,6 @@ int main()
 			}
 		}
 
-
 		/* Points */
 		if (drawMstNodes)
 		{
@@ -513,12 +600,15 @@ int main()
 		}
 
 		/* Floor plans, buildings */
-		for (Road* road : roads)
+		if (drawBuildings)
 		{
-			for (BuildingLot* lot : road->lots)
+			for (Road* road : roads)
 			{
-				lot->fp->bb->DrawSelf(&window);
-				lot->fp->DrawPerimeter(&window);
+				for (BuildingLot* lot : road->lots)
+				{
+					// lot->fp->bb->DrawSelf(&window);
+					lot->fp->DrawPerimeter(&window);
+				}
 			}
 		}
 

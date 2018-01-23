@@ -105,4 +105,28 @@ namespace Utility
 			return new V2(intersectionX, intersectionY);
 		}
 	}
+
+	//! https://stackoverflow.com/questions/2259476/rotating-a-point-about-another-point-2d
+	V2* RotateAroundPoint(V2* toRotate, V2* pivotPoint, float angle)
+	{
+		float s = sin(angle);
+		float c = cos(angle);
+
+		// Create a local copy of the vector we are rotating
+		V2* vector = new V2(toRotate->x, toRotate->y);
+
+		// Tranlate vector to the pivot point
+		vector->x -= pivotPoint->x;
+		vector->y -= pivotPoint->y;
+
+		// Rotate the point
+		float rotX = vector->x * c - vector->y * s;
+		float rotY = vector->x * s + vector->y * c;
+
+		// Translate the point back
+		vector->x = rotX + pivotPoint->x;
+		vector->y = rotY + pivotPoint->y;
+
+		return vector;
+	}
 }

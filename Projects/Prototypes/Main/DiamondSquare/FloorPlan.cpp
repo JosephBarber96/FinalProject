@@ -22,7 +22,7 @@ void FloorPlan::GenerateShapes(int num)
 	float width, height;
 	width = bb->width;
 
-	float shapeSize = width * 0.75f;
+	float shapeSize = width * 0.51f;
 
 	for (int i = 0; i < num; i++)
 	{
