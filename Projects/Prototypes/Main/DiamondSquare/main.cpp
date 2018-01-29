@@ -1,7 +1,16 @@
 #include <vector>
+#include <array>
 #include <iostream>
 #include <math.h>
 
+/*
+	Requires C++ Boost Library for 1.65s for windows
+	https://dl.bintray.com/boostorg/release/1.65.1/binaries/
+	(boost_1_65_1-msvc-10.0-32.exe)
+
+	include directory: C:\local\boost_1_65_1
+*/
+#include <boost\polygon\voronoi.hpp>
 #include "FastNoise.h"
 #include <SFML\Graphics.hpp>
 
@@ -24,6 +33,13 @@
 #include "BoundingBox.h"
 #include "jbShape.h"
 #include "shapeLine.h"
+
+//! Voronoi
+using namespace std;
+using namespace boost::polygon;
+typedef int coordinate_type;
+typedef point_data<coordinate_type> point_type;
+typedef voronoi_diagram<double> VD;
 
 const int winSize = 512;
 int offsetForRoadNodes = 5;
@@ -141,12 +157,70 @@ int main()
 	MinimumSpanningTree mst = MinimumSpanningTree();
 	for (auto quad : qt->GetTreeChildren())
 	{
-		mst.SpawnPoint(waterData, offsetForRoadNodes, quad->xOrigin, quad->yOrigin, (quad->xOrigin + quad->width), (quad->yOrigin + quad->height));
+		// Only spawn quads in the big-enough quads
+		if (quad->indexer > 2)
+		{
+			mst.SpawnPoint(waterData, offsetForRoadNodes, quad->xOrigin, quad->yOrigin, (quad->xOrigin + quad->width), (quad->yOrigin + quad->height));
+		}
 	}
 	float maximumDistanceBetweenNeighbours = winSize / 4;
 	mst.AssignNighbours(maximumDistanceBetweenNeighbours); // Assign neighbours
 	mst.CreateAllEdges(); // Create edges
 	mst.Sort(); // Sort the MST
+
+	/************************
+			Voronoi
+	*************************/
+
+	// Points
+	vector<point_type> points;
+	int bufferSpace = 5;
+	for (auto quad : qt->GetTreeChildren())
+	{
+		int minX = quad->xOrigin;
+		int maxX = quad->xOrigin + quad->width;
+		int minY = quad->yOrigin;
+		int maxY = quad->yOrigin + quad->height;
+
+		double px = UtilRandom::Instance()->RandomFloat(minX + bufferSpace, maxX - bufferSpace);
+		double py = UtilRandom::Instance()->RandomFloat(minY + bufferSpace, maxY - bufferSpace);
+
+		points.push_back(point_type(px, py));
+	}
+
+	// Construct the voronoi diagram
+	VD vd;
+	construct_voronoi(points.begin(), points.end(), &vd);
+
+	// Create major roads from voronoi edges
+	std::vector<Road> minorRoads;
+	for (auto const &edge : vd.edges())
+	{
+		if (edge.vertex0() != NULL && edge.vertex1() != NULL)
+		{
+			int sX = edge.vertex0()->x();
+			int sY = edge.vertex0()->y();
+
+			int eX = edge.vertex1()->x();
+			int eY = edge.vertex1()->y();
+
+			Road road = Road(sX, sY, eX, eY);
+
+			bool exists = false;
+			for (auto r : minorRoads)
+			{
+				if (*road.start == *r.end && *road.end == *r.start)
+				{
+					exists = true;
+					break;
+				}
+			}
+			if (!exists)
+			{
+				minorRoads.push_back(road);
+			}
+		}
+	}
 
 	/************************
 		Height/terrain data
@@ -392,6 +466,9 @@ int main()
 	std::cout << "\t7: Toggle MST" << std::endl;
 	std::cout << "\t8: Toggle building lots" << std::endl;
 	std::cout << "\t9: Toggle buildings" << std::endl;
+	std::cout << std::endl;
+	std::cout << "\t WASD - Move camera" << std::endl;
+	std::cout << "\t Q/E - (Un)zoom camera" << std::endl;
 
 	while (window.isOpen())
 	{
@@ -518,20 +595,34 @@ int main()
 		{
 			for (auto quad : qt->GetHead()->GetTreeChildren())
 			{
+				sf::Color colour;
+				switch (quad->population)
+				{
+				case QuadPopulation::high:
+					colour = sf::Color::Blue;
+					break;
+				case QuadPopulation::med:
+					colour = sf::Color::Red;
+					break;
+				case QuadPopulation::low:
+					colour = sf::Color::Yellow;
+					break;
+				}
+
 				sf::Vertex vertices[5] =
 				{
-					sf::Vertex(sf::Vector2f(quad->xOrigin, quad->yOrigin), sf::Color::Red),
-					sf::Vertex(sf::Vector2f(quad->xOrigin, quad->yOrigin + quad->height), sf::Color::Red),
-					sf::Vertex(sf::Vector2f(quad->xOrigin + quad->width, quad->yOrigin + quad->height), sf::Color::Red),
-					sf::Vertex(sf::Vector2f(quad->xOrigin + quad->width, quad->yOrigin), sf::Color::Red),
-					sf::Vertex(sf::Vector2f(quad->xOrigin, quad->yOrigin), sf::Color::Red)
+					sf::Vertex(sf::Vector2f(quad->xOrigin, quad->yOrigin), colour),
+					sf::Vertex(sf::Vector2f(quad->xOrigin, quad->yOrigin + quad->height), colour),
+					sf::Vertex(sf::Vector2f(quad->xOrigin + quad->width, quad->yOrigin + quad->height), colour),
+					sf::Vertex(sf::Vector2f(quad->xOrigin + quad->width, quad->yOrigin), colour),
+					sf::Vertex(sf::Vector2f(quad->xOrigin, quad->yOrigin), colour)
 				};
 
 				window.draw(vertices, 5, sf::LineStrip);
 			}
 		}
 
-		/* Roads */
+		/* Major roads */
 		if (drawRoads)
 		{
 			for (Road* road : roads)
@@ -569,6 +660,22 @@ int main()
 				}
 			}
 		}
+
+		/* Minor roads */
+		for (Road road : minorRoads)
+		{
+			// Draw the road
+			sf::VertexArray roadVertices(sf::LineStrip, 2);
+
+			roadVertices[0].position = sf::Vector2f(road.start->x, road.start->y);
+			roadVertices[0].color = sf::Color(255, 0, 255);
+
+			roadVertices[1].position = sf::Vector2f(road.end->x, road.end->y);
+			roadVertices[1].color = sf::Color(255, 0, 255);
+
+			window.draw(roadVertices);
+		}
+
 
 		/* MST */
 		if (drawMST)

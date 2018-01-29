@@ -5,6 +5,19 @@
 
 Road::Road() {}
 
+Road::Road(int _sx, int _sy, int _ex, int _ey)
+	:
+	start(new V2(_sx, _sy)),
+	end(new V2(_ex, _ey))
+{}
+
+
+Road::Road(V2* s, V2* e)
+	:
+	start(s),
+	end(e)
+{}
+
 Road::~Road() {}
 
 void Road::GenerateBuildingLots()

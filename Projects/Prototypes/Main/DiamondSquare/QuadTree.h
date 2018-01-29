@@ -1,6 +1,13 @@
 #pragma once
 #include <vector>
 
+enum QuadPopulation
+{
+	low,
+	med,
+	high
+};
+
 class WaterData;
 class QuadTree
 {
@@ -13,6 +20,18 @@ public:
 	int width;
 	int height;
 
+	int indexer;
+
+	int sizes[6] =
+	{
+		512,
+		256,
+		128,
+		64,
+		32,
+		16
+	};
+
 	// Parent
 	QuadTree* parent;
 
@@ -21,6 +40,9 @@ public:
 	QuadTree* topRight;
 	QuadTree* bottomLeft;
 	QuadTree* bottomRight;
+
+	// Population
+	QuadPopulation population;
 
 	//! Returns the head of the quad tree
 	QuadTree* GetHead();

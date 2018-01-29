@@ -9,6 +9,21 @@ QuadTree::QuadTree(int _x, int _y, int _wid, int _hei, QuadTree* _par, std::vect
 	height(_hei),
 	parent(_par)
 {
+
+	// Check population
+	if (width > 128) //256, 512
+	{
+		population = QuadPopulation::low;
+	}
+	else if (width >= 64) // 64, 128
+	{
+		population = QuadPopulation::med;
+	}
+	else // 16, 32, 64
+	{
+		population = QuadPopulation::high;
+	}
+
 	if (CheckSplit(popMap, waterData, popMapSize, highest))
 	{
 		Split(popMap, waterData, popMapSize, highest);
@@ -39,16 +54,6 @@ bool QuadTree::CheckSplit(std::vector<std::vector<float>> popMap, WaterData &wat
 
 	float tenPercent = highest / 10;
 
-	int sizes[6] =
-	{
-		512,
-		256,
-		128,
-		64,
-		32,
-		16
-	};
-
 	float thresholds[6] =
 	{
 		tenPercent,			//10%
@@ -59,7 +64,7 @@ bool QuadTree::CheckSplit(std::vector<std::vector<float>> popMap, WaterData &wat
 		tenPercent * 9.5f	//95%
 	};
 
-	int indexer = 0;
+	indexer = 0;
 	int counter = 0;
 	for (auto val : sizes)
 	{
@@ -71,6 +76,7 @@ bool QuadTree::CheckSplit(std::vector<std::vector<float>> popMap, WaterData &wat
 	// If minimum width already reached
 	if (indexer == 5) return false;
 
+	// See if there is a high enough population point within the quad
 	for (int y = yOrigin; y < (yOrigin + height); y++)
 	{
 		for (int x = xOrigin; x < (xOrigin + width); x++)
