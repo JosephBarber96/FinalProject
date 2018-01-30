@@ -20,15 +20,15 @@ namespace Pathfinding
 			return std::vector<RoadNode*>();
 		}
 
-		// We need not pathfind if the road doesn't meet a threshold length
-		if (V2::DistanceBetween(*start->position, *end->position) < 500)
-		{
-			std::vector<RoadNode*>  path;
-			path.push_back(start);
-			path.push_back(end);
+		//// We need not pathfind if the road doesn't meet a threshold length
+		//if (V2::DistanceBetween(*start->position, *end->position) < 500)
+		//{
+		//	std::vector<RoadNode*>  path;
+		//	path.push_back(start);
+		//	path.push_back(end);
 
-			return path;
-		}
+		//	return path;
+		//}
 
 		// Q : the set of all nodes
 		std::vector<RoadNode*> Q;

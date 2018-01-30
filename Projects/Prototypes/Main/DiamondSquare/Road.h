@@ -17,5 +17,6 @@ public:
 	V2* start;
 	V2* end;
 	std::vector<RoadNode*> nodes;
+	std::vector<Road*> segments;
 	std::vector<BuildingLot*> lots;
 };

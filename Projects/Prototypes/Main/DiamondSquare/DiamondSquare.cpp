@@ -121,7 +121,6 @@ void DiamondSquare::Print()
 void DiamondSquare::CalcuateBoundaryPoints()
 {
 	// Find the highest and lowest points
-
 	lowest = INT_MAX;
 	highest = INT_MIN;
 	for (auto vec : points)
@@ -135,7 +134,7 @@ void DiamondSquare::CalcuateBoundaryPoints()
 	// Convert it into positive space
 	highest += abs(lowest);
 
-	std::cout << "Highest: " << highest << std::endl;
+	// std::cout << "Highest: " << highest << std::endl;
 }
 
 void DiamondSquare::CreatePoints()

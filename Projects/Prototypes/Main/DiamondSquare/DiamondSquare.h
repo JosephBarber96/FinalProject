@@ -39,17 +39,24 @@ public:
 	std::vector<std::vector<Vec3*>> Points() { return points; }
 
 private:
-	int divisions;	// The number of divisions along the terrain (5 vertices = 4 faces)
-					// this number must be a power of 2: 2, 4, 8, 16, 32, 64, etc...
+	// The number of divisions along the terrain (5 vertices = 4 faces)
+	// this number must be a power of 2: 2, 4, 8, 16, 32, 64, etc...
+	int divisions;	
+					
 	int vertCount;
 
-	int lowest, highest;	// These hold the lowest and highest values of the 
-							// Generated terrain after calculating boundary points
+	// These hold the lowest and highest values of the 
+	// Generated terrain after calculating boundary points
+	int lowest, highest;	
+							
+	// The size of the terrain (e.g. 10x10)
+	float size;	
 
-	float size;		// The size of the terrain (e.g. 10x10)
-	float height;	// The maximum height for our terrain
+	// The maximum height for our terrain
+	float height;	
 	std::vector<Vec3> terrainVertices;
 
+	// The 2d array of points
 	std::vector<std::vector<Vec3*>> points;
 
 	void DiaSqu(int row, int col, int size, float heightOffset);

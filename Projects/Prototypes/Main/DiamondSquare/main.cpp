@@ -44,6 +44,12 @@ typedef voronoi_diagram<double> VD;
 const int winSize = 512;
 int offsetForRoadNodes = 5;
 
+template <typename Iter>
+Iter ReturnNextIter(Iter iter)
+{
+	return ++iter;
+}
+
 void makeAllFastNoiseValuesPositive(std::vector<std::vector<float>> &popMap, float &highestVal)
 {
 	// Find the lowest and highest values
@@ -93,7 +99,7 @@ void fillNoise(FastNoise &fn, std::vector<std::vector<float>> &popMap, int size)
 	}
 }
 
-void LoadWaterData(WaterData &wd)
+void LoadWaterDataFromMap(WaterData &wd)
 {
 	sf::Image waterMap;
 	waterMap.loadFromFile("watermap.bmp");
@@ -106,6 +112,49 @@ void LoadWaterData(WaterData &wd)
 		for (int x = 0; x < wid; x++)
 		{
 			waterMap.getPixel(x, y) == sf::Color::White ? wd.SetPixelWater(x, y, true) : wd.SetPixelWater(x, y, false);
+		}
+	}
+}
+
+void LoadWaterDataFromTerrain(WaterData &wd, DiamondSquare terrain, float percentage)
+{
+	// First, make all of the values positive
+	float lowest = terrain.Lowest();
+	float highest = terrain.Highest();
+	float toAdd = fabsf(lowest);
+	for (auto &row : terrain.Points())
+	{
+		for (auto &point : row)
+		{
+			point->z += toAdd;
+		}
+	}
+
+	// Find the new highest and lowest values
+	float newLowest = lowest + toAdd;
+	float newHighest = highest + toAdd;
+
+	// Find the difference
+	float difference = newHighest - newLowest;
+
+	// The bottom 20% shal be considered water
+	float cutoffPoint = difference * (percentage / 100);
+	std::cout << "Highest terrain point: " << newHighest << std::endl;
+	std::cout << "Cut off point: " << cutoffPoint << std::endl;
+
+	// Get the size
+	int wid, hei;
+	wid = terrain.getDivisions();
+	hei = terrain.getDivisions();
+
+	// Loop through, assign water or terrain
+	auto points = terrain.Points();
+	for (int y = 0; y < hei; y++)
+	{
+		for (int x = 0; x < wid; x++)
+		{
+			// If the Z point is lower than or equal to the cut off point, set it as water. Otherwise, don't
+			points[y][x]->z <= cutoffPoint ? wd.SetPixelWater(x, y, true) : wd.SetPixelWater(x, y, false);
 		}
 	}
 }
@@ -130,11 +179,25 @@ int main()
 	makeAllFastNoiseValuesPositive(popMap, highestVal);
 
 	/************************
+		Height/terrain data
+	*************************/
+	std::cout << "Generating DiamondSquare terrain..." << std::endl;
+	int divisions = winSize;
+	int size = 5;
+	int height = 64;
+	DiamondSquare terrain = DiamondSquare(divisions, size, height);
+	terrain.Generate();
+	terrain.CreatePoints();
+	terrain.CalcuateBoundaryPoints();
+	// ds.Print();
+
+	/************************
 		Water-boundary map
 	*************************/
 	std::cout << "Loading water-boundary map." << std::endl;
 	WaterData waterData = WaterData(winSize);
-	LoadWaterData(waterData);
+	// LoadWaterDataFromMap(waterData);
+	LoadWaterDataFromTerrain(waterData, terrain, 10);
 
 	// To display
 	sf::Texture waterMapTexture;
@@ -144,29 +207,10 @@ int main()
 	waterMapSprite.setTexture(waterMapTexture);
 
 	/***************************
-		Quad tree
+			Quad tree
 	**************************/
 	std::cout << "Creating quad-tree." << std::endl;
 	QuadTree* qt = new QuadTree(0, 0, winSize, winSize, nullptr, popMap, waterData, winSize, highestVal);
-
-	/************************
-			MST
-	*************************/
-	std::cout << "Creating MST..." << std::endl;
-
-	MinimumSpanningTree mst = MinimumSpanningTree();
-	for (auto quad : qt->GetTreeChildren())
-	{
-		// Only spawn quads in the big-enough quads
-		if (quad->indexer > 2)
-		{
-			mst.SpawnPoint(waterData, offsetForRoadNodes, quad->xOrigin, quad->yOrigin, (quad->xOrigin + quad->width), (quad->yOrigin + quad->height));
-		}
-	}
-	float maximumDistanceBetweenNeighbours = winSize / 4;
-	mst.AssignNighbours(maximumDistanceBetweenNeighbours); // Assign neighbours
-	mst.CreateAllEdges(); // Create edges
-	mst.Sort(); // Sort the MST
 
 	/************************
 			Voronoi
@@ -223,29 +267,36 @@ int main()
 	}
 
 	/************************
-		Height/terrain data
+				MST
 	*************************/
-	std::cout << "Generating DiamondSquare terrain..." << std::endl;
-	int divisions = winSize;
-	int size = 5;
-	int height = 64;
-	DiamondSquare ds = DiamondSquare(divisions, size, height);
-	ds.Generate();
-	ds.CreatePoints();
-	ds.CalcuateBoundaryPoints();
-	// ds.Print();
+	std::cout << "Creating MST..." << std::endl;
+
+	MinimumSpanningTree mst = MinimumSpanningTree();
+	for (auto quad : qt->GetTreeChildren())
+	{
+		// Only spawn quads in the big-enough quads
+		if (quad->indexer > 2)
+		{
+			mst.SpawnPoint(waterData, offsetForRoadNodes, quad->xOrigin, quad->yOrigin, (quad->xOrigin + quad->width), (quad->yOrigin + quad->height));
+		}
+	}
+	float maximumDistanceBetweenNeighbours = winSize / 4;
+	mst.AssignNighbours(maximumDistanceBetweenNeighbours); // Assign neighbours
+	mst.CreateAllEdges(); // Create edges
+	mst.Sort(); // Sort the MST
 
 	/****************************************
 		Creating roadnodes from terrain data
 	*****************************************/
 	std::vector<std::vector<RoadNode*>> roadNodes;
-	roadNodes = ds.CreatePointsAndPassBackRoadNodes(offsetForRoadNodes, waterData);
+	roadNodes = terrain.CreatePointsAndPassBackRoadNodes(offsetForRoadNodes, waterData);
 
 	/***************************************************
 		Pathfind roads using the mst edges
 		and roadnodes generated from the diamondsquare
 		terrain
 	****************************************************/
+
 	std::vector<Road*> roads;
 	std::cout << "Pathfinding " << mst.GetTreeEdges().size() << " roads..." << std::endl;
 	int counter = 0;
@@ -256,13 +307,26 @@ int main()
 			continue; 
 		}
 
+		// Create the road
 		Road* road = new Road();
+
+		// Pathfind to get the nodes
 		road->nodes = Pathfinding::PathFind(roadNodes,
 			edge.start->position->x / offsetForRoadNodes,
 			edge.start->position->y / offsetForRoadNodes,
 			edge.end->position->x / offsetForRoadNodes,
 			edge.end->position->y / offsetForRoadNodes,
 			offsetForRoadNodes);
+
+		// Split the road into segments
+		for (std::vector<RoadNode*>::iterator iter = road->nodes.begin(); iter != road->nodes.end(); iter++)
+		{
+			if (ReturnNextIter(iter) != road->nodes.end())
+			{
+				road->segments.push_back(
+					new Road((*iter)->position, (*ReturnNextIter(iter))->position));
+			}
+		}
 
 		road->GenerateBuildingLots();
 
@@ -454,7 +518,8 @@ int main()
 		drawRoads = true,
 		drawMST = false,
 		drawBuildingLots = false,
-		drawBuildings = false;
+		drawBuildings = false,
+		drawMinorRoads = false;
 
 	std::cout << std::endl << "Instructions: " << std::endl;
 	std::cout << "\t1: Toggle population map" << std::endl;
@@ -466,6 +531,7 @@ int main()
 	std::cout << "\t7: Toggle MST" << std::endl;
 	std::cout << "\t8: Toggle building lots" << std::endl;
 	std::cout << "\t9: Toggle buildings" << std::endl;
+	std::cout << "\t0: Toggle minor roads" << std::endl;
 	std::cout << std::endl;
 	std::cout << "\t WASD - Move camera" << std::endl;
 	std::cout << "\t Q/E - (Un)zoom camera" << std::endl;
@@ -489,6 +555,7 @@ int main()
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num7)) { drawMST = !drawMST; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num8)) { drawBuildingLots = !drawBuildingLots; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num9)) { drawBuildings = !drawBuildings; }
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num0)) { drawMinorRoads = !drawMinorRoads; }
 
 				// Camera movement
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
@@ -557,10 +624,10 @@ int main()
 		/* Terrain (Heightmap) */
 		if (drawHeightMap)
 		{
-			int numOfVerts = ds.Points().size() * ds.Points()[0].size();
+			int numOfVerts = terrain.Points().size() * terrain.Points()[0].size();
 			sf::VertexArray vertPoints(sf::Points, numOfVerts);
 			int counter = 0;
-			for (auto vec : ds.Points())
+			for (auto vec : terrain.Points())
 			{
 				for (auto v : vec)
 				{
@@ -569,9 +636,9 @@ int main()
 
 					// Color
 					sf::Color shapeColor = sf::Color::White;
-					int total = ds.Highest();
+					int total = terrain.Highest();
 					float current = v->z;
-					current += (abs(ds.Lowest()));
+					current += (abs(terrain.Lowest()));
 					float percentage = (current * 100) / total;
 					float singlePercent = 255 / 100;
 					float fillAmount = singlePercent * percentage;
@@ -587,7 +654,39 @@ int main()
 		/* Water boundary map */
 		if (drawWaterBoundaryMap)
 		{
-			window.draw(waterMapSprite);
+			int numOfPoints = winSize*winSize;
+			sf::VertexArray waterPoints(sf::Points, numOfPoints);
+			int counter = 0;
+			for (int y = 0; y < winSize; y++)
+			{
+				for (int x = 0; x < winSize; x++)
+				{
+					waterPoints[counter].position = sf::Vector2f(x, y);
+					waterPoints[counter].color = (waterData.IsWater(x, y)) ? sf::Color::White : sf::Color(0, 0, 0, 0);
+					counter++;
+				}
+			}
+
+			window.draw(waterPoints);
+
+			//sf::VertexArray verts;
+			//for (int y = 0; y < winSize; y++)
+			//{
+			//	for (int x = 0; x < winSize; x++)
+			//	{
+			//		if (waterData.IsWater(x, y))
+			//		{
+			//			verts.append(sf::Vertex(sf::Vector2f(x, y), sf::Color::White));
+			//		}
+			//		else
+			//		{
+			//			verts.append(sf::Vertex(sf::Vector2f(x, y), sf::Color::Black));
+			//		}
+			//	}
+			//}
+			//window.draw(verts);
+
+			// window.draw(waterMapSprite);
 		}
 
 		/* Quad tree */
@@ -627,16 +726,28 @@ int main()
 		{
 			for (Road* road : roads)
 			{
-				// Draw the road
-				sf::VertexArray roadVertices(sf::LineStrip, road->nodes.size());
-				int nodeCounter = 0;
-				for (RoadNode* node : road->nodes)
+				// Draw each segment
+				for (Road* segment : road->segments)
 				{
-					roadVertices[nodeCounter].position = sf::Vector2f(node->position->x, node->position->y);
-					roadVertices[nodeCounter].color = sf::Color(255, 0, 255);
-					nodeCounter++;
+					sf::Vertex vertices[2] =
+					{
+						sf::Vertex(sf::Vector2f(segment->start->x, segment->start->y), sf::Color(255, 0, 255)),
+						sf::Vertex(sf::Vector2f(segment->end->x, segment->end->y), sf::Color(255, 0, 255))
+					};
+					window.draw(vertices, 2, sf::LinesStrip);
 				}
-				window.draw(roadVertices);
+
+
+				// Draw the road
+				//sf::VertexArray roadVertices(sf::LineStrip, road->nodes.size());
+				//int nodeCounter = 0;
+				//for (RoadNode* node : road->nodes)
+				//{
+				//	roadVertices[nodeCounter].position = sf::Vector2f(node->position->x, node->position->y);
+				//	roadVertices[nodeCounter].color = sf::Color(255, 0, 255);
+				//	nodeCounter++;
+				//}
+				//window.draw(roadVertices);
 
 				// Draw building lots
 				if (road->lots.size() > 0)
@@ -662,20 +773,22 @@ int main()
 		}
 
 		/* Minor roads */
-		for (Road road : minorRoads)
+		if (drawMinorRoads)
 		{
-			// Draw the road
-			sf::VertexArray roadVertices(sf::LineStrip, 2);
+			for (Road road : minorRoads)
+			{
+				// Draw the road
+				sf::VertexArray roadVertices(sf::LineStrip, 2);
 
-			roadVertices[0].position = sf::Vector2f(road.start->x, road.start->y);
-			roadVertices[0].color = sf::Color(255, 0, 255);
+				roadVertices[0].position = sf::Vector2f(road.start->x, road.start->y);
+				roadVertices[0].color = sf::Color(255, 0, 0, 100);
 
-			roadVertices[1].position = sf::Vector2f(road.end->x, road.end->y);
-			roadVertices[1].color = sf::Color(255, 0, 255);
+				roadVertices[1].position = sf::Vector2f(road.end->x, road.end->y);
+				roadVertices[1].color = sf::Color(255, 0, 0, 100);
 
-			window.draw(roadVertices);
+				window.draw(roadVertices);
+			}
 		}
-
 
 		/* MST */
 		if (drawMST)
