@@ -14,6 +14,7 @@ public:
 	void GenerateBuildingLots();
 	void GenerateBuildingLotsForLongRoad();
 
+	bool markedForDeletion = false;
 	V2* start;
 	V2* end;
 	std::vector<RoadNode*> nodes;

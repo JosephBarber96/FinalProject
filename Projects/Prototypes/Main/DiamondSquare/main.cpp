@@ -297,7 +297,7 @@ int main()
 		terrain
 	****************************************************/
 
-	std::vector<Road*> roads;
+	std::vector<Road*> majorRoads;
 	std::cout << "Pathfinding " << mst.GetTreeEdges().size() << " roads..." << std::endl;
 	int counter = 0;
 	for (Edge edge : mst.GetTreeEdges())
@@ -330,11 +330,51 @@ int main()
 
 		road->GenerateBuildingLots();
 
-		roads.push_back(road);
+		majorRoads.push_back(road);
 
 		std::cout << "\r" << mst.GetTreeEdges().size() << " roads complete.\t\t";
 	}
 	std::cout << std::endl;
+
+	/*******************************************************
+			Remove any voronoi minor roads that
+			overlap main mst roads
+	********************************************************/
+	std::cout << "Checking for minor:major road intersections..." << std::endl;
+	int minorMajorIntersectionCounter = 0;
+	// For each minor road
+	for (auto &minor : minorRoads)
+	{
+		// Check each major road
+		for (auto &major : majorRoads)
+		{
+			// Check each segment
+			for (auto &seg : major->segments)
+			{
+
+				if (Utility::GetIntersectionPointWithFiniteLines(minor.start, minor.end, seg->start, seg->end) != nullptr)
+				{
+					minorMajorIntersectionCounter++;
+					minor.markedForDeletion = true;
+				}
+			}
+		}
+	}
+	std::cout << minorMajorIntersectionCounter << " found. Deleting roads." << std::endl;
+
+	// Remove and minor roads that have been marked for deletion
+	for (std::vector<Road>::iterator iter = minorRoads.begin(); iter != minorRoads.end(); /**/)
+	{
+		if ((*iter).markedForDeletion)
+		{
+			iter = minorRoads.erase(iter);
+		}
+		else
+		{
+			iter++;
+		}
+	}
+
 
 	/*******************************************************
 		Check for and remove any building lot collisions
@@ -344,12 +384,12 @@ int main()
 
 	int roadCounter = 0;
 	// For every lot
-	for (auto &road : roads) { 
-		std::cout << "\rChecking road " << roadCounter++ << "/" << roads.size() << "\t\t";
+	for (auto &road : majorRoads) { 
+		std::cout << "\rChecking road " << roadCounter++ << "/" << majorRoads.size() << "\t\t";
 		for (auto &lot : road->lots) {
 
 			// For every other lot
-			for (auto &otherRoad : roads) {
+			for (auto &otherRoad : majorRoads) {
 				for (auto &otherLot : road->lots) {
 
 					// Don't check a lot against itself
@@ -375,7 +415,7 @@ int main()
 	int deletionCounter = 0;
 	int lotCounter = 0;
 
-	for (auto &road : roads)
+	for (auto &road : majorRoads)
 	{
 		std::vector<BuildingLot*> lots = road->lots;
 
@@ -403,7 +443,7 @@ int main()
 	std::vector<V2*> lotCenter;
 	std::vector<V2*> buildingCenter;
 
-	for (auto road : roads)
+	for (auto road : majorRoads)
 	{
 		for (auto lot : road->lots)
 		{
@@ -724,7 +764,7 @@ int main()
 		/* Major roads */
 		if (drawRoads)
 		{
-			for (Road* road : roads)
+			for (Road* road : majorRoads)
 			{
 				// Draw each segment
 				for (Road* segment : road->segments)
@@ -822,7 +862,7 @@ int main()
 		/* Floor plans, buildings */
 		if (drawBuildings)
 		{
-			for (Road* road : roads)
+			for (Road* road : majorRoads)
 			{
 				for (BuildingLot* lot : road->lots)
 				{
