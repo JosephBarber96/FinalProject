@@ -14,10 +14,16 @@ public:
 	void GenerateBuildingLots();
 	void GenerateBuildingLotsForLongRoad();
 
+	bool operator==(Road rhs);
+
 	bool markedForDeletion = false;
+	bool expandFromEnd = false;
+	bool expandFromStart = false;
 	V2* start;
 	V2* end;
 	std::vector<RoadNode*> nodes;
 	std::vector<Road*> segments;
 	std::vector<BuildingLot*> lots;
+	std::vector<Road*> endChildren;
+	std::vector<Road*> startChildren;
 };

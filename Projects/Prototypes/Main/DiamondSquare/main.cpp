@@ -212,11 +212,14 @@ int main()
 	std::cout << "Creating quad-tree." << std::endl;
 	QuadTree* qt = new QuadTree(0, 0, winSize, winSize, nullptr, popMap, waterData, winSize, highestVal);
 
-	/************************
-			Voronoi
-	*************************/
+	/****************************
+		Voronoi diagram 
+		to create minor roads
+	*****************************/
 
-	// Points
+	std::cout << "Creating voronoi minor roads." << std::endl;
+
+	// Create voronoi points
 	vector<point_type> points;
 	int bufferSpace = 5;
 	for (auto quad : qt->GetTreeChildren())
@@ -237,7 +240,7 @@ int main()
 	construct_voronoi(points.begin(), points.end(), &vd);
 
 	// Create major roads from voronoi edges
-	std::vector<Road> minorRoads;
+	std::vector<Road*> minorRoads;
 	for (auto const &edge : vd.edges())
 	{
 		if (edge.vertex0() != NULL && edge.vertex1() != NULL)
@@ -248,12 +251,12 @@ int main()
 			int eX = edge.vertex1()->x();
 			int eY = edge.vertex1()->y();
 
-			Road road = Road(sX, sY, eX, eY);
+			Road* road = new Road(sX, sY, eX, eY);
 
 			bool exists = false;
 			for (auto r : minorRoads)
 			{
-				if (*road.start == *r.end && *road.end == *r.start)
+				if (*road->start == *r->end && *road->end == *r->start)
 				{
 					exists = true;
 					break;
@@ -264,6 +267,42 @@ int main()
 				minorRoads.push_back(road);
 			}
 		}
+	}
+
+	// Neighbour the roads
+
+	// Check every road
+	for (Road* minorRoad : minorRoads)
+	{
+		// Against every other road
+		for (Road* otherRoad : minorRoads)
+		{
+			// Skip itself
+			if (*minorRoad == *otherRoad) { continue; }
+
+			// Check for neighbours
+
+			// If otherRoad has minorRoad.Start
+			if (*minorRoad->start == *otherRoad->start
+				||
+				*minorRoad->start == *otherRoad->end)
+			{
+				minorRoad->startChildren.push_back(minorRoad);
+			}
+
+			// If otherRoad has minorRoad.End
+			if (*minorRoad->end == *otherRoad->start
+				||
+				*minorRoad->end == *otherRoad->end)
+			{
+				minorRoad->endChildren.push_back(minorRoad);
+			}
+		}
+	}
+
+	for (Road* minorRoad : minorRoads)
+	{
+		// std::cout << minorRoad->startChildren.size() << " starting children | " << minorRoad->endChildren.size() << " end children" << std::endl;
 	}
 
 	/************************
@@ -332,7 +371,7 @@ int main()
 
 		majorRoads.push_back(road);
 
-		std::cout << "\r" << mst.GetTreeEdges().size() << " roads complete.\t\t";
+		std::cout << "\r" << counter++ << " roads complete.\t\t";
 	}
 	std::cout << std::endl;
 
@@ -340,10 +379,12 @@ int main()
 			Remove any voronoi minor roads that
 			overlap main mst roads
 	********************************************************/
+	std::vector<V2*> expandPoints;
+
 	std::cout << "Checking for minor:major road intersections..." << std::endl;
 	int minorMajorIntersectionCounter = 0;
 	// For each minor road
-	for (auto &minor : minorRoads)
+	for (auto minor : minorRoads)
 	{
 		// Check each major road
 		for (auto &major : majorRoads)
@@ -351,22 +392,38 @@ int main()
 			// Check each segment
 			for (auto &seg : major->segments)
 			{
-
-				if (Utility::GetIntersectionPointWithFiniteLines(minor.start, minor.end, seg->start, seg->end) != nullptr)
+				if (Utility::GetIntersectionPointWithFiniteLines(minor->start, minor->end, seg->start, seg->end) != nullptr)
 				{
 					minorMajorIntersectionCounter++;
-					minor.markedForDeletion = true;
+
+					// Mark this road for deletion
+					minor->markedForDeletion = true;
+
+					// Tell its neighbours to expand and find a major road to connect to
+					expandPoints.push_back(new V2(minor->start->x, minor->start->y));
+					expandPoints.push_back(new V2(minor->end->x, minor->end->y));
 				}
 			}
 		}
 	}
 	std::cout << minorMajorIntersectionCounter << " found. Deleting roads." << std::endl;
 
-	// Remove and minor roads that have been marked for deletion
-	for (std::vector<Road>::iterator iter = minorRoads.begin(); iter != minorRoads.end(); /**/)
+	int expandStart = 0, expandEnd = 0;
+	for (auto road : minorRoads)
 	{
-		if ((*iter).markedForDeletion)
+		if (road->expandFromEnd) expandEnd++;
+		if (road->expandFromStart) expandStart++;
+	}
+
+	std::cout << expandEnd << " end expansions." << std::endl;
+	std::cout << expandStart << " start expansions." << std::endl;
+
+	// Remove and minor roads that have been marked for deletion
+	for (std::vector<Road*>::iterator iter = minorRoads.begin(); iter != minorRoads.end(); /**/)
+	{
+		if ((*iter)->markedForDeletion)
 		{
+			// Tell its neighbours to expand and find a major road to connect to
 			iter = minorRoads.erase(iter);
 		}
 		else
@@ -374,7 +431,17 @@ int main()
 			iter++;
 		}
 	}
+	std::cout << "After deletion" << std::endl;
 
+	expandStart = 0; expandEnd = 0;
+	for (auto road : minorRoads)
+	{
+		if (road->expandFromEnd) expandEnd++;
+		if (road->expandFromStart) expandStart++;
+	}
+
+	std::cout << expandEnd << " end expansions." << std::endl;
+	std::cout << expandStart << " start expansions." << std::endl;
 
 	/*******************************************************
 		Check for and remove any building lot collisions
@@ -815,18 +882,27 @@ int main()
 		/* Minor roads */
 		if (drawMinorRoads)
 		{
-			for (Road road : minorRoads)
+			for (Road* road : minorRoads)
 			{
 				// Draw the road
 				sf::VertexArray roadVertices(sf::LineStrip, 2);
 
-				roadVertices[0].position = sf::Vector2f(road.start->x, road.start->y);
+				roadVertices[0].position = sf::Vector2f(road->start->x, road->start->y);
 				roadVertices[0].color = sf::Color(255, 0, 0, 100);
 
-				roadVertices[1].position = sf::Vector2f(road.end->x, road.end->y);
+				roadVertices[1].position = sf::Vector2f(road->end->x, road->end->y);
 				roadVertices[1].color = sf::Color(255, 0, 0, 100);
 
 				window.draw(roadVertices);
+			}
+
+			for (V2* point : expandPoints)
+			{
+				sf::CircleShape shape;
+				shape.setPosition(point->x, point->y);
+				shape.setFillColor(sf::Color::Blue);
+				shape.setRadius(1);
+				window.draw(shape);
 			}
 		}
 

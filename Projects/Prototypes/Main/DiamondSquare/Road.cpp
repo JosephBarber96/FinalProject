@@ -93,3 +93,8 @@ void Road::GenerateBuildingLotsForLongRoad()
 		lots.push_back(new BuildingLot(nodes[size]->position, minSize, this, 0));
 	}
 }
+
+bool Road::operator==(Road rhs)
+{
+	return (*start == *rhs.start && *end == *rhs.end);
+}
