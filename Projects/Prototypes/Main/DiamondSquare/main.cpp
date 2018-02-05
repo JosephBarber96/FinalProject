@@ -220,24 +220,46 @@ int main()
 	std::cout << "Creating voronoi minor roads." << std::endl;
 
 	// Create voronoi points
-	vector<point_type> points;
+	vector<point_type> voronoiPoints;
 	int bufferSpace = 5;
+
+	// For each quad in the quadtree
 	for (auto quad : qt->GetTreeChildren())
 	{
+		// Get the boundaries of this quad
 		int minX = quad->xOrigin;
 		int maxX = quad->xOrigin + quad->width;
 		int minY = quad->yOrigin;
 		int maxY = quad->yOrigin + quad->height;
 
+		// Do not place a point in a quad that contains water..
+
+		// Find all valid land positions in this quad
+		std::vector<V2> waterPositions;
+		for (int y = minY; y < maxY; y++)
+		{
+			for (int x = minX; x < maxX; x++)
+			{
+				if (waterData.IsWater(x, y))
+				{
+					waterPositions.push_back(V2(x, y));
+				}
+			}
+		}
+
+		// If none exist, continue without placing a point
+		if (waterPositions.size() > 0) { continue; }
+
+		// Otherwise, place a point
 		double px = UtilRandom::Instance()->RandomFloat(minX + bufferSpace, maxX - bufferSpace);
 		double py = UtilRandom::Instance()->RandomFloat(minY + bufferSpace, maxY - bufferSpace);
 
-		points.push_back(point_type(px, py));
+		voronoiPoints.push_back(point_type(px, py));
 	}
 
 	// Construct the voronoi diagram
 	VD vd;
-	construct_voronoi(points.begin(), points.end(), &vd);
+	construct_voronoi(voronoiPoints.begin(), voronoiPoints.end(), &vd);
 
 	// Create major roads from voronoi edges
 	std::vector<Road*> minorRoads;
@@ -377,7 +399,8 @@ int main()
 
 	/*******************************************************
 			Remove any voronoi minor roads that
-			overlap main mst roads
+			overlap main mst roads and reconnect the 
+			voronoi to the main roads
 	********************************************************/
 	std::vector<V2*> expandPoints;
 
@@ -408,16 +431,6 @@ int main()
 	}
 	std::cout << minorMajorIntersectionCounter << " found. Deleting roads." << std::endl;
 
-	int expandStart = 0, expandEnd = 0;
-	for (auto road : minorRoads)
-	{
-		if (road->expandFromEnd) expandEnd++;
-		if (road->expandFromStart) expandStart++;
-	}
-
-	std::cout << expandEnd << " end expansions." << std::endl;
-	std::cout << expandStart << " start expansions." << std::endl;
-
 	// Remove and minor roads that have been marked for deletion
 	for (std::vector<Road*>::iterator iter = minorRoads.begin(); iter != minorRoads.end(); /**/)
 	{
@@ -431,17 +444,101 @@ int main()
 			iter++;
 		}
 	}
-	std::cout << "After deletion" << std::endl;
 
-	expandStart = 0; expandEnd = 0;
-	for (auto road : minorRoads)
+	// Time to reconnect the voronoi to the main roads
+
+	// For each point
+	for (V2* point : expandPoints)
 	{
-		if (road->expandFromEnd) expandEnd++;
-		if (road->expandFromStart) expandStart++;
+		// Find the closest roadNode to it
+		RoadNode* closest = nullptr;
+
+		// Check each node
+		for (Road* road : majorRoads)
+		{
+			for (RoadNode* node : road->nodes)
+			{
+				// The first will be closest by default
+				if (closest == nullptr) { closest = node; }
+
+				// If node is closer than closest, closest becomes node
+				if (V2::DistanceBetween(*node->position, *point) < V2::DistanceBetween(*closest->position, *point))
+				{
+					closest = node;
+				}
+			}
+		}
+
+		// After finding the closest, create this new road
+		minorRoads.push_back(
+			new Road(point->x, 
+				point->y, 
+				closest->position->x, 
+				closest->position->y));
 	}
 
-	std::cout << expandEnd << " end expansions." << std::endl;
-	std::cout << expandStart << " start expansions." << std::endl;
+	// Finally, now that we've built new minor roads, we need to check for collisions between any minor roads
+
+	for (Road* minorRoad : minorRoads)
+	{
+		for (Road* other : minorRoads)
+		{
+			// Skip itself
+			if (*minorRoad == *other) { continue; }
+
+			// if Other is already marked for deletion, skip
+			// We don't want both roads to get deleted which would cause there to be 
+			// 0 connections instead of 2 (we want there to be 1)
+			if (other->markedForDeletion) { continue; }
+
+			// Get the intersection point
+			V2* iPoint = Utility::GetIntersectionPointWithFiniteLines(minorRoad->start, minorRoad->end, other->start, other->end);
+
+			// If it's not null
+			if (iPoint != nullptr)
+			{
+				// Make sure its not where the roads naturally connect
+				if (*iPoint == *minorRoad->start
+					|| *iPoint == *minorRoad->end
+					|| *iPoint == *other->start
+					|| *iPoint == *other->end)
+				{
+					continue;
+				}
+			}
+			else { continue; }
+
+			// If not, continue
+			minorRoad->markedForDeletion = true;
+		}
+	}
+
+	// We can also detect here to delete and roads that have an end which sits inside of a body of water
+	for (Road* minorRoad : minorRoads)
+	{
+		if (waterData.IsWater(minorRoad->start->x, minorRoad->start->y)
+			||
+			waterData.IsWater(minorRoad->end->x, minorRoad->end->y))
+		{
+			minorRoad->markedForDeletion = true;
+		}
+	}
+
+
+	// Remove any new minor roads that have been marked for deletion
+	for (std::vector<Road*>::iterator iter = minorRoads.begin(); iter != minorRoads.end(); /**/)
+	{
+		if ((*iter)->markedForDeletion)
+		{
+			// Tell its neighbours to expand and find a major road to connect to
+			iter = minorRoads.erase(iter);
+		}
+		else
+		{
+			iter++;
+		}
+	}
+
 
 	/*******************************************************
 		Check for and remove any building lot collisions
@@ -626,7 +723,8 @@ int main()
 		drawMST = false,
 		drawBuildingLots = false,
 		drawBuildings = false,
-		drawMinorRoads = false;
+		drawMinorRoads = false,
+		drawExpansionPoints = false;
 
 	std::cout << std::endl << "Instructions: " << std::endl;
 	std::cout << "\t1: Toggle population map" << std::endl;
@@ -639,6 +737,7 @@ int main()
 	std::cout << "\t8: Toggle building lots" << std::endl;
 	std::cout << "\t9: Toggle buildings" << std::endl;
 	std::cout << "\t0: Toggle minor roads" << std::endl;
+	std::cout << "\tz: Toggle minor road expansion points" << std::endl;
 	std::cout << std::endl;
 	std::cout << "\t WASD - Move camera" << std::endl;
 	std::cout << "\t Q/E - (Un)zoom camera" << std::endl;
@@ -663,6 +762,7 @@ int main()
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num8)) { drawBuildingLots = !drawBuildingLots; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num9)) { drawBuildings = !drawBuildings; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num0)) { drawMinorRoads = !drawMinorRoads; }
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Z)) { drawExpansionPoints = !drawExpansionPoints; }
 
 				// Camera movement
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
@@ -844,7 +944,6 @@ int main()
 					window.draw(vertices, 2, sf::LinesStrip);
 				}
 
-
 				// Draw the road
 				//sf::VertexArray roadVertices(sf::LineStrip, road->nodes.size());
 				//int nodeCounter = 0;
@@ -895,15 +994,28 @@ int main()
 
 				window.draw(roadVertices);
 			}
+		}
 
-			for (V2* point : expandPoints)
+		/* Minor road expansion points */
+		if (drawExpansionPoints)
+		{
+			for (auto point : voronoiPoints)
 			{
 				sf::CircleShape shape;
-				shape.setPosition(point->x, point->y);
-				shape.setFillColor(sf::Color::Blue);
+				shape.setPosition(point.x(), point.y());
+				shape.setFillColor(sf::Color::Cyan);
 				shape.setRadius(1);
 				window.draw(shape);
 			}
+
+			//for (V2* point : expandPoints)
+			//{
+			//	sf::CircleShape shape;
+			//	shape.setPosition(point->x, point->y);
+			//	shape.setFillColor(sf::Color::Cyan);
+			//	shape.setRadius(2);
+			//	window.draw(shape);
+			//}
 		}
 
 		/* MST */
