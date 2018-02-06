@@ -43,6 +43,7 @@ typedef voronoi_diagram<double> VD;
 
 const int winSize = 512;
 int offsetForRoadNodes = 5;
+float maxMinorRoadDist = 100;
 
 template <typename Iter>
 Iter ReturnNextIter(Iter iter)
@@ -291,41 +292,6 @@ int main()
 		}
 	}
 
-	// Neighbour the roads
-
-	// Check every road
-	for (Road* minorRoad : minorRoads)
-	{
-		// Against every other road
-		for (Road* otherRoad : minorRoads)
-		{
-			// Skip itself
-			if (*minorRoad == *otherRoad) { continue; }
-
-			// Check for neighbours
-
-			// If otherRoad has minorRoad.Start
-			if (*minorRoad->start == *otherRoad->start
-				||
-				*minorRoad->start == *otherRoad->end)
-			{
-				minorRoad->startChildren.push_back(minorRoad);
-			}
-
-			// If otherRoad has minorRoad.End
-			if (*minorRoad->end == *otherRoad->start
-				||
-				*minorRoad->end == *otherRoad->end)
-			{
-				minorRoad->endChildren.push_back(minorRoad);
-			}
-		}
-	}
-
-	for (Road* minorRoad : minorRoads)
-	{
-		// std::cout << minorRoad->startChildren.size() << " starting children | " << minorRoad->endChildren.size() << " end children" << std::endl;
-	}
 
 	/************************
 				MST
@@ -477,7 +443,7 @@ int main()
 				closest->position->y));
 	}
 
-	// Finally, now that we've built new minor roads, we need to check for collisions between any minor roads
+	// Now that we've built new minor roads, we need to check for collisions between any minor roads
 
 	for (Road* minorRoad : minorRoads)
 	{
@@ -524,13 +490,22 @@ int main()
 		}
 	}
 
+	// Next we delete any minor roads that are above a certain length threshold
+	// this is to remove the long outwards lines left over from the voronoi
+	for (Road* minorRoad : minorRoads)
+	{
+		if (V2::DistanceBetween(*minorRoad->start, *minorRoad->end) > maxMinorRoadDist)
+		{
+			minorRoad->markedForDeletion = true;
+		}
+	}
 
 	// Remove any new minor roads that have been marked for deletion
 	for (std::vector<Road*>::iterator iter = minorRoads.begin(); iter != minorRoads.end(); /**/)
 	{
 		if ((*iter)->markedForDeletion)
 		{
-			// Tell its neighbours to expand and find a major road to connect to
+			// Erase
 			iter = minorRoads.erase(iter);
 		}
 		else
@@ -539,6 +514,48 @@ int main()
 		}
 	}
 
+	// Now that we've deleted all of these roads, neighbour the remaining roads
+	for (Road* minorRoad : minorRoads)
+	{
+		// Against every other road
+		for (Road* otherRoad : minorRoads)
+		{
+			// Skip itself
+			if (*minorRoad == *otherRoad) { continue; }
+
+			// Check for neighbours
+
+			// If otherRoad has minorRoad.Start
+			if (*minorRoad->start == *otherRoad->start
+				||
+				*minorRoad->start == *otherRoad->end)
+			{
+				minorRoad->startChildren.push_back(minorRoad);
+			}
+
+			// If otherRoad has minorRoad.End
+			if (*minorRoad->end == *otherRoad->start
+				||
+				*minorRoad->end == *otherRoad->end)
+			{
+				minorRoad->endChildren.push_back(minorRoad);
+			}
+		}
+	}
+
+	// Remove any minor roads that have 0 neighbours (and thus are sitting along)
+	for (std::vector<Road*>::iterator iter = minorRoads.begin(); iter != minorRoads.end(); /**/)
+	{
+		// no neighbours on BOTH sides, it has to have 0 end AND 0 start
+		if ((*iter)->endChildren.size() == 0 && (*iter)->startChildren.size() == 0)
+		{
+			iter = minorRoads.erase(iter);
+		}
+		else
+		{
+			iter++;
+		}
+	}
 
 	/*******************************************************
 		Check for and remove any building lot collisions
