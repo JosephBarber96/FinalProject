@@ -22,16 +22,17 @@ Road::~Road() {}
 
 void Road::GenerateBuildingLots()
 {
-	// Only plot lots on straight roads (only 2 nodes - start and end)
-	if (nodes.size() > 2) { return; }
+	//// Only plot lots on straight roads (only 2 nodes - start and end)
+	//if (nodes.size() > 2) { return; }
 
-	V2* start = nodes[0]->position;
-	V2* end = nodes[1]->position;
+	//V2* start = nodes[0]->position;
+	//V2* end = nodes[1]->position;
 
 	float roadLength = V2::DistanceBetween(*start, *end);
 
 	V2* direction = new V2(end->x - start->x, end->y - start->y);
 	V2* dirNormalized = direction->Normalized();
+	if (dirNormalized == nullptr) return;
 
 	float minSize = 4.f;
 	float gap = 2.f;
@@ -66,7 +67,7 @@ void Road::GenerateBuildingLots()
 		lotPos->x += dirNormalized->x * gap;
 		lotPos->y += dirNormalized->y * gap;
 
-		if (V2::DistanceBetween(*lotPos, *end) < minSize * 2.5f)
+		if (V2::DistanceBetween(*lotPos, *end) < minSize * 2.5f + 10)
 		{
 			quit = true;
 		}

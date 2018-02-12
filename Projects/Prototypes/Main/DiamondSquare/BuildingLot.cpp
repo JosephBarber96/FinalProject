@@ -23,8 +23,10 @@ BuildingLot::~BuildingLot() {}
 void BuildingLot::Expand(float size, Road* parent, int _dir)
 {
 	// Get parent start and end
-	V2* parentStart = parent->nodes[0]->position;
-	V2* parentEnd = parent->nodes[1]->position;
+	V2* parentStart = parent->start;
+	V2* parentEnd = parent->end;
+	//V2* parentStart = parent->nodes[0]->position;
+	//V2* parentEnd = parent->nodes[1]->position;
 
 	// Find the parents facing angle
 	V2* parentDir = new V2(parentEnd->x - parentStart->x, parentEnd->y - parentStart->y);

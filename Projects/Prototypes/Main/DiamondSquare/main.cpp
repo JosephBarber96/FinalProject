@@ -28,6 +28,7 @@
 #include "BuildingLot.h"
 #include "UtilRandom.h"
 #include "Utility.h"
+#include "Line.h"
 
 #include "FloorPlan.h"
 #include "BoundingBox.h"
@@ -292,7 +293,6 @@ int main()
 		}
 	}
 
-
 	/************************
 				MST
 	*************************/
@@ -326,7 +326,7 @@ int main()
 
 	std::vector<Road*> majorRoads;
 	std::cout << "Pathfinding " << mst.GetTreeEdges().size() << " roads..." << std::endl;
-	int counter = 0;
+	int roadCounter = 0;
 	for (Edge edge : mst.GetTreeEdges())
 	{
 		if (edge.start->position->x == edge.end->position->x && edge.start->position->y == edge.end->position->y)
@@ -355,11 +355,9 @@ int main()
 			}
 		}
 
-		road->GenerateBuildingLots();
-
 		majorRoads.push_back(road);
 
-		std::cout << "\r" << counter++ << " roads complete.\t\t";
+		std::cout << "\r" << roadCounter++ << " roads complete.\t\t";
 	}
 	std::cout << std::endl;
 
@@ -557,56 +555,143 @@ int main()
 		}
 	}
 
+	/***********************************************
+		Now that the minor roads are set up, 
+		generate building lots in each minor 
+		road that is still in the road network
+	************************************************/
+	std::cout << "Generating building lots on minor roads" << std::endl;
+	int lotCounter = 0;
+	for (Road* road : minorRoads)
+	{
+		std::cout << "\rGenerating lot of road: " << lotCounter++ << "\t\t";
+		road->GenerateBuildingLots();
+	}
+	std::cout << std::endl;
+
 	/*******************************************************
 		Check for and remove any building lot collisions
 	********************************************************/
 
-	std::cout << "Checking for lot interceptions" << std::endl;
+	std::cout << "Checking for building lot collisions" << std::endl;
 
-	int roadCounter = 0;
-	// For every lot
-	for (auto &road : majorRoads) { 
-		std::cout << "\rChecking road " << roadCounter++ << "/" << majorRoads.size() << "\t\t";
-		for (auto &lot : road->lots) {
+	/* MINOR ROADS */
 
-			// For every other lot
-			for (auto &otherRoad : majorRoads) {
-				for (auto &otherLot : road->lots) {
+	/* First, we prioritive collisions against minor roads and major roads */
 
-					// Don't check a lot against itself
-					if (*lot == *otherLot) { continue; }
+	V2* ip;
 
-					// We don't need to check lots that have already been checked
-					if (otherLot->markForDeletion) { continue; }
+	// For every building lot
+	for (Road* minorRoad : minorRoads)
+	{
+		for (BuildingLot* lot : minorRoad->lots)
+		{
+			// Check every minor road
+			for (Road* otherRoad : minorRoads)
+			{
+				// Skip itself
+				if (*minorRoad == *otherRoad) { continue; }
 
-					// We don't need to check lots that aren't within the minimum range
-					if (V2::DistanceBetween(*lot->bottomLeft, *otherLot->bottomLeft) > 10) { continue; }
-
-					if (lot->IsLotWithin(otherLot))
+				// Check if each line of the lot intersects with the otherRoad
+				for (Line* line : lot->GetLotLines())
+				{
+					ip = Utility::GetIntersectionPointWithFiniteLines(line->start, line->end, otherRoad->start, otherRoad->end);
+					if (ip != nullptr)
 					{
-						std::cout << "\nSetting a lot to be marked." << std::endl;
-						otherLot->markForDeletion = true;
+						lot->markForDeletion = true;
 					}
 				}
 			}
 		}
 	}
-	std::cout << std::endl;
 
-	int deletionCounter = 0;
-	int lotCounter = 0;
+	//int majorRoadsChecked = 0;
+	//// For every building lot
+	//for (Road* minorRoad : minorRoads)
+	//{
+	//	for (BuildingLot* lot : minorRoad->lots)
+	//	{
+	//		// Check every major road
+	//		for (Road* majorRoad : majorRoads)
+	//		{
+	//			std::cout <<"\r" << majorRoadsChecked++ << " major roads checked for intersections \t";
+	//			// Check each segment of the major road
+	//			for (auto seg : majorRoad->segments)
+	//			{
+	//				// Check if each line of the lot intersects with the segment
+	//				for (Line* line : lot->GetLotLines())
+	//				{
+	//					if (Utility::GetIntersectionPointWithFiniteLines(line->start, line->end, seg->start, seg->end) != nullptr)
+	//					{
+	//						lot->markForDeletion = true;
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 
-	for (auto &road : majorRoads)
+	int minorLotDeletionCounter = 0;
+	for (Road* road : minorRoads)
+	{
+		std::vector<BuildingLot*> lots = road->lots;
+
+		for (std::vector<BuildingLot*>::iterator it = lots.begin(); it != lots.end(); /**/)
+		{
+			if ((*it)->markForDeletion)
+			{
+				it = lots.erase(it);
+				minorLotDeletionCounter++;
+			}
+			else
+				++it;
+		}
+		road->lots = lots;
+	}
+
+
+	/* Next, we check for collisions against other building lots */
+
+	// Check every road against every other road
+	for (Road* minorRoad : minorRoads)
+	{
+		for (Road* otherRoad : minorRoads)
+		{
+			// Do not check the road against itself
+			if (*minorRoad == *otherRoad) { continue; }
+
+			// Check each lot of each road
+			for (BuildingLot* lot : minorRoad->lots)
+			{
+				for (BuildingLot* otherLot : otherRoad->lots)
+				{
+					// If the lots are far away we do not need to check for interceptions
+					if (V2::DistanceBetween(*lot->bottomLeft, *otherLot->bottomLeft) > 15)
+					{
+						continue;
+					}
+
+					if (lot->IsLotWithin(otherLot))
+					{
+						lot->markForDeletion = true;
+						otherLot->markForDeletion = true;
+					}
+				}
+			}
+
+		}
+	}
+
+	for (Road* road : minorRoads)
 	{
 		std::vector<BuildingLot*> lots = road->lots;
 
 		for (std::vector<BuildingLot*>::iterator it = lots.begin();  it != lots.end(); /**/)
 		{
-			lotCounter++;
 			if ((*it)->markForDeletion)
 			{
 				it = lots.erase(it);
-				deletionCounter++;
+				minorLotDeletionCounter++;
 			}	
 			else
 				++it;
@@ -614,8 +699,63 @@ int main()
 		road->lots = lots;
 	}
 
-	std::cout << lotCounter << " building lots." << std::endl;
-	std::cout << deletionCounter << " deleted." << std::endl;
+	/* MAJOR ROADS */
+
+	//std::cout << "Checking for lot interceptions" << std::endl;
+
+	//int lotInterceptionCounter = 0;
+	//// For every lot
+	//for (auto &road : majorRoads) { 
+	//	std::cout << "\rChecking road " << lotInterceptionCounter++ << "/" << majorRoads.size() << "\t\t";
+	//	for (auto &lot : road->lots) {
+
+	//		// For every other lot
+	//		for (auto &otherRoad : majorRoads) {
+	//			for (auto &otherLot : road->lots) {
+
+	//				// Don't check a lot against itself
+	//				if (*lot == *otherLot) { continue; }
+
+	//				// We don't need to check lots that have already been checked
+	//				if (otherLot->markForDeletion) { continue; }
+
+	//				// We don't need to check lots that aren't within the minimum range
+	//				if (V2::DistanceBetween(*lot->bottomLeft, *otherLot->bottomLeft) > 10) { continue; }
+
+	//				if (lot->IsLotWithin(otherLot))
+	//				{
+	//					std::cout << "\nSetting a lot to be marked." << std::endl;
+	//					otherLot->markForDeletion = true;
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+	//std::cout << std::endl;
+
+	//int deletionCounter = 0;
+	//int counter = 0;
+
+	//for (auto &road : majorRoads)
+	//{
+	//	std::vector<BuildingLot*> lots = road->lots;
+
+	//	for (std::vector<BuildingLot*>::iterator it = lots.begin();  it != lots.end(); /**/)
+	//	{
+	//		counter++;
+	//		if ((*it)->markForDeletion)
+	//		{
+	//			it = lots.erase(it);
+	//			deletionCounter++;
+	//		}	
+	//		else
+	//			++it;
+	//	}
+	//	road->lots = lots;
+	//}
+
+	//std::cout << counter << " building lots." << std::endl;
+	//std::cout << deletionCounter << " deleted." << std::endl;
 
 	/*******************************************************
 		Generate buildings inside of each building lot
@@ -741,7 +881,7 @@ int main()
 		drawBuildingLots = false,
 		drawBuildings = false,
 		drawMinorRoads = false,
-		drawExpansionPoints = false;
+		drawVoronoiPointsForMinorRoads = false;
 
 	std::cout << std::endl << "Instructions: " << std::endl;
 	std::cout << "\t1: Toggle population map" << std::endl;
@@ -754,7 +894,7 @@ int main()
 	std::cout << "\t8: Toggle building lots" << std::endl;
 	std::cout << "\t9: Toggle buildings" << std::endl;
 	std::cout << "\t0: Toggle minor roads" << std::endl;
-	std::cout << "\tz: Toggle minor road expansion points" << std::endl;
+	std::cout << "\tz: Toggle minor road voronoi points" << std::endl;
 	std::cout << std::endl;
 	std::cout << "\t WASD - Move camera" << std::endl;
 	std::cout << "\t Q/E - (Un)zoom camera" << std::endl;
@@ -779,7 +919,7 @@ int main()
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num8)) { drawBuildingLots = !drawBuildingLots; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num9)) { drawBuildings = !drawBuildings; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num0)) { drawMinorRoads = !drawMinorRoads; }
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Z)) { drawExpansionPoints = !drawExpansionPoints; }
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Z)) { drawVoronoiPointsForMinorRoads = !drawVoronoiPointsForMinorRoads; }
 
 				// Camera movement
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
@@ -1010,11 +1150,31 @@ int main()
 				roadVertices[1].color = sf::Color(255, 0, 0, 100);
 
 				window.draw(roadVertices);
+
+				if (road->lots.size() > 0)
+				{
+					if (drawBuildingLots)
+					{
+						for (BuildingLot* lot : road->lots)
+						{
+							sf::Vertex vertices[5] =
+							{
+								sf::Vertex(sf::Vector2f(lot->bottomLeft->x, lot->bottomLeft->y), sf::Color::White),
+								sf::Vertex(sf::Vector2f(lot->topLeft->x, lot->topLeft->y), sf::Color::White),
+								sf::Vertex(sf::Vector2f(lot->topRight->x, lot->topRight->y), sf::Color::White),
+								sf::Vertex(sf::Vector2f(lot->bottomRight->x, lot->bottomRight->y), sf::Color::White),
+								sf::Vertex(sf::Vector2f(lot->bottomLeft->x, lot->bottomLeft->y), sf::Color::White)
+							};
+
+							window.draw(vertices, 5, sf::LineStrip);
+						}
+					}
+				}
 			}
 		}
 
 		/* Minor road expansion points */
-		if (drawExpansionPoints)
+		if (drawVoronoiPointsForMinorRoads)
 		{
 			for (auto point : voronoiPoints)
 			{
