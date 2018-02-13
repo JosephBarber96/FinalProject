@@ -573,14 +573,13 @@ int main()
 		Check for and remove any building lot collisions
 	********************************************************/
 
-	std::cout << "Checking for building lot collisions" << std::endl;
+	std::cout << "Checking for building lot collisions..." << std::endl;
 
 	/* MINOR ROADS */
 
 	/* First, we prioritive collisions against minor roads and major roads */
 
-	V2* ip;
-
+	std::cout << "Between minor roads..." << std::endl;
 	// For every building lot
 	for (Road* minorRoad : minorRoads)
 	{
@@ -593,10 +592,9 @@ int main()
 				if (*minorRoad == *otherRoad) { continue; }
 
 				// Check if each line of the lot intersects with the otherRoad
-				for (Line* line : lot->GetLotLines())
+				for (Line* line : lot->lines)
 				{
-					ip = Utility::GetIntersectionPointWithFiniteLines(line->start, line->end, otherRoad->start, otherRoad->end);
-					if (ip != nullptr)
+					if (Utility::GetIntersectionPointWithFiniteLines(line->start, line->end, otherRoad->start, otherRoad->end) != nullptr)
 					{
 						lot->markForDeletion = true;
 					}
@@ -605,31 +603,31 @@ int main()
 		}
 	}
 
-	//int majorRoadsChecked = 0;
-	//// For every building lot
-	//for (Road* minorRoad : minorRoads)
-	//{
-	//	for (BuildingLot* lot : minorRoad->lots)
-	//	{
-	//		// Check every major road
-	//		for (Road* majorRoad : majorRoads)
-	//		{
-	//			std::cout <<"\r" << majorRoadsChecked++ << " major roads checked for intersections \t";
-	//			// Check each segment of the major road
-	//			for (auto seg : majorRoad->segments)
-	//			{
-	//				// Check if each line of the lot intersects with the segment
-	//				for (Line* line : lot->GetLotLines())
-	//				{
-	//					if (Utility::GetIntersectionPointWithFiniteLines(line->start, line->end, seg->start, seg->end) != nullptr)
-	//					{
-	//						lot->markForDeletion = true;
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
+	std::cout << "Between major roads..." << std::endl;
+	int majorRoadsChecked = 0;
+	// For every building lot
+	for (Road* minorRoad : minorRoads)
+	{
+		for (BuildingLot* lot : minorRoad->lots)
+		{
+			// For every major road
+			for (Road* majorRoad : majorRoads)
+			{
+				// Check each segment of the major road
+				for (auto seg : majorRoad->segments)
+				{
+					// For each line of the buildnig lot
+					for (auto line : lot->lines)
+					{
+						if (Utility::GetIntersectionPointWithFiniteLines(line->start, line->end, seg->start, seg->end) != nullptr)
+						{
+							lot->markForDeletion = true;
+						}
+					}
+				}
+			}
+		}
+	}
 
 	int minorLotDeletionCounter = 0;
 	for (Road* road : minorRoads)
@@ -652,6 +650,7 @@ int main()
 
 	/* Next, we check for collisions against other building lots */
 
+	std::cout << "Between other building lots..." << std::endl;
 	// Check every road against every other road
 	for (Road* minorRoad : minorRoads)
 	{

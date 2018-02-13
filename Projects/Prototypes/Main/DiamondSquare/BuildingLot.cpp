@@ -88,13 +88,16 @@ void BuildingLot::Expand(float size, Road* parent, int _dir)
 
 	// Assign
 	bottomRight = new V2(currentPosition->x, currentPosition->y);
+
+	// Generate lines
+	GenerateLotLines();
 }
 
 bool BuildingLot::IsLotWithin(BuildingLot* otherLot)
 {
-	for (auto line : GetLotLines())
+	for (auto line : lines)
 	{
-		for (auto otherline : otherLot->GetLotLines())
+		for (auto otherline : otherLot->lines)
 		{
 			if (Utility::GetIntersectionPointWithFiniteLines(line->start, line->end, otherline->start, otherline->end) != nullptr)
 			{
@@ -147,6 +150,14 @@ bool BuildingLot::IsLotWithin(BuildingLot* otherLot)
 	//}
 }
 
+bool BuildingLot::PointWithin(int x, int y)
+{
+	float minX, maxX, minY, maxY;
+	GetOutwardValues(minX, maxX, minY, maxY);
+
+	return (x >= minX && x <= maxX && y >= minY && y <= maxY);
+}
+
 void BuildingLot::GetOutwardValues(float &minX, float &maxX, float &minY, float &maxY)
 {
 	minX = bottomLeft->x;
@@ -170,9 +181,9 @@ void BuildingLot::GetOutwardValues(float &minX, float &maxX, float &minY, float 
 	if (bottomRight->y > maxY) maxY = bottomRight->y;
 }
 
-std::vector<Line*> BuildingLot::GetLotLines()
+void BuildingLot::GenerateLotLines()
 {
-	std::vector<Line*> lines;
+	lines;
 
 	// botLeft -> topLeft
 	lines.push_back(new Line(bottomLeft, topLeft));
@@ -185,8 +196,6 @@ std::vector<Line*> BuildingLot::GetLotLines()
 
 	// bottomRight -> botLeft
 	lines.push_back(new Line(bottomRight, bottomLeft));
-
-	return lines;
 }
 
 float BuildingLot::GetWidth()
