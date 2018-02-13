@@ -91,74 +91,60 @@ void BuildingLot::Expand(float size, Road* parent, int _dir)
 
 	// Generate lines
 	GenerateLotLines();
+
+	// Get outward values
+	GetOutwardValues();
 }
 
 bool BuildingLot::IsLotWithin(BuildingLot* otherLot)
 {
-	for (auto line : lines)
+	//for (auto line : lines)
+	//{
+	//	for (auto otherline : otherLot->lines)
+	//	{
+	//		if (Utility::GetIntersectionPointWithFiniteLines(line->start, line->end, otherline->start, otherline->end) != nullptr)
+	//		{
+	//			return true;
+	//		}
+	//	}
+	//}
+	//return false;
+
+	bool minXWithin = false,
+		maxXWithin = false,
+		minYWithin = false,
+		maxYWithin = false;
+
+	// otherMinX within
+	if (otherLot->minX > minX && otherLot->minX < maxX) minXWithin = true;
+	// otherMaxX within
+	if (otherLot->maxX < maxX && otherLot->maxX > minX) maxXWithin = true;
+	// otherMinY within
+	if (otherLot->minY > minY && otherLot->minY < maxY) minYWithin = true;
+	// otherMaxY within
+	if (otherLot->maxY < maxY && otherLot->maxY > minY) maxYWithin = true;
+
+	/* Checks */
+
+	// If minimum X value is within bounds
+
+	if (minXWithin)
 	{
-		for (auto otherline : otherLot->lines)
-		{
-			if (Utility::GetIntersectionPointWithFiniteLines(line->start, line->end, otherline->start, otherline->end) != nullptr)
-			{
-				return true;
-			}
-		}
+		return (minYWithin || maxYWithin);
+	}
+	else if (maxXWithin)
+	{
+		return (minYWithin || maxYWithin);
 	}
 	return false;
-
-	//float minX, maxX, minY, maxY;
-	//float otherMinX, otherMaxX, otherMinY, otherMaxY;
-
-	//GetOutwardValues(minX, maxX, minY, maxY);
-	//otherLot->GetOutwardValues(otherMinX, otherMaxX, otherMinY, otherMaxY);
-
-	//// Allow for a 5% leeway
-	//// minX *= 0.9f; maxX *= 1.1f; minY *= 0.9f; maxY *= 1.1f;
-
-	//bool minXWithin = false,
-	//	maxXWithin = false,
-	//	minYWithin = false,
-	//	maxYWithin = false;
-
-	//// otherMinX within
-	//if (otherMinX > minX && otherMinX < maxX) minXWithin = true;
-	//// otherMaxX within
-	//if (otherMaxX < maxX && otherMaxX > minX) maxXWithin = true;
-	//// otherMinY within
-	//if (otherMinY > minY && otherMinY < maxY) minYWithin = true;
-	//// otherMaxY within
-	//if (otherMaxY < maxY && otherMaxY > minY) maxYWithin = true;
-
-	///* Checks */
-
-	//// If minimum X value is within bounds
-
-	//if (minXWithin)
-	//{
-	//	if (minYWithin || maxYWithin) return true;
-	//	return false;
-	//}
-	//else if (maxXWithin)
-	//{
-	//	if (minYWithin || maxYWithin) return true;
-	//	return false;
-	//}
-	//else
-	//{
-	//	return false;
-	//}
 }
 
 bool BuildingLot::PointWithin(int x, int y)
 {
-	float minX, maxX, minY, maxY;
-	GetOutwardValues(minX, maxX, minY, maxY);
-
 	return (x >= minX && x <= maxX && y >= minY && y <= maxY);
 }
 
-void BuildingLot::GetOutwardValues(float &minX, float &maxX, float &minY, float &maxY)
+void BuildingLot::GetOutwardValues()
 {
 	minX = bottomLeft->x;
 	if (topLeft->x < minX) minX = topLeft->x;

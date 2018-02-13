@@ -37,6 +37,7 @@ void Road::GenerateBuildingLots()
 	float minSize = 4.f;
 	float gap = 2.f;
 	float lotLength = roadLength;
+	float minSpaceRequired = minSize + gap + 1;
 
 	while (lotLength > minSize)
 	{
@@ -47,27 +48,33 @@ void Road::GenerateBuildingLots()
 	V2* lotPos = new V2(start->x, start->y);
 
 	// Before we begin, travel down the size of the lot and the buffer space
-	lotPos->x += dirNormalized->x * minSize;
-	lotPos->y += dirNormalized->y * minSize;
 	lotPos->x += dirNormalized->x * gap;
 	lotPos->y += dirNormalized->y * gap;
 
+	// Check there is enough space to post even 1 lot
+	if (V2::DistanceBetween(*lotPos, *end) < minSpaceRequired)
+	{
+		return;
+	}
+	
+	// If there is...
 	while (!quit)
 	{
-		// Travel down the road the size of the lot
-		lotPos->x += dirNormalized->x * minSize;
-		lotPos->y += dirNormalized->y * minSize;
-
 		// Place lot left
 		lots.push_back(new BuildingLot(new V2(lotPos->x, lotPos->y), minSize, this, 0));
 		// place lot right
 		lots.push_back(new BuildingLot(new V2(lotPos->x, lotPos->y), minSize, this, 1));
 
+		// Travel down the road the size of the lot
+		lotPos->x += dirNormalized->x * minSize;
+		lotPos->y += dirNormalized->y * minSize;
+
 		// Travel down the road buffer space between lots
 		lotPos->x += dirNormalized->x * gap;
 		lotPos->y += dirNormalized->y * gap;
 
-		if (V2::DistanceBetween(*lotPos, *end) < minSize * 2.5f + 10)
+		// Check if we have enough space to loop again
+		if (V2::DistanceBetween(*lotPos, *end) < minSpaceRequired)
 		{
 			quit = true;
 		}

@@ -29,60 +29,38 @@ RoadNode::~RoadNode() {}
 
 std::vector<RoadNode*> RoadNode::GetNeighbors(std::vector<std::vector<RoadNode*>> grid)
 {
-	std::vector<RoadNode*> myNeighbours;
-
-	// Up
-	if (yIndex > 0) { myNeighbours.push_back(grid[yIndex - 1][xIndex]); }
-
-	// Up-right
-	if (yIndex > 0 && xIndex < grid[0].size()-1) { myNeighbours.push_back(grid[yIndex-1][xIndex+1]); }
-
-	// Right
-	if (xIndex < grid[0].size()-1) { myNeighbours.push_back(grid[yIndex][xIndex+1]); }
-
-	// Down-right
-	if (yIndex < grid.size()-1 && xIndex < grid[0].size()-1) { myNeighbours.push_back(grid[yIndex+1][xIndex+1]); }
-
-	// Down
-	if (yIndex < grid.size()-1) { myNeighbours.push_back(grid[yIndex+1][xIndex]); }
-
-	// Down-left
-	if (yIndex < grid.size()-1 && xIndex > 0) { myNeighbours.push_back(grid[yIndex+1][xIndex-1]); }
-
-	// Left
-	if (xIndex > 0) { myNeighbours.push_back(grid[yIndex][xIndex-1]); }
-
-	// Up-left
-	if (yIndex > 0 && xIndex > 0) { myNeighbours.push_back(grid[yIndex-1][xIndex-1]); }
-
-	return myNeighbours;
+	if (neighbours.size() == 0)
+	{
+		FillNeighbours(grid, grid[0].size() - 1, grid.size());
+	}
+	return neighbours;
 }
 
-void RoadNode::FillNeighbours(std::vector<std::vector<RoadNode*>> grid, int gridHeight, int gridWidth)
+void RoadNode::FillNeighbours(std::vector<std::vector<RoadNode*>> grid, int gridWidth, int gridHeight)
 {
 	// Up
-	if (position->y > 0) { neighbours.push_back(grid[position->y - 1][position->x]); }
+	if (yIndex > 0) { neighbours.push_back(grid[yIndex - 1][xIndex]); }
 
 	// Up-right
-	if (position->y > 0 && position->x < gridWidth) { neighbours.push_back(grid[position->y - 1][position->x + 1]); }
+	if (yIndex > 0 && xIndex < gridWidth-1) { neighbours.push_back(grid[yIndex - 1][xIndex + 1]); }
 
 	// Right
-	if (position->x < gridWidth) { neighbours.push_back(grid[position->y][position->x + 1]); }
+	if (xIndex < gridWidth) { neighbours.push_back(grid[yIndex][xIndex + 1]); }
 
 	// Down-right
-	if (position->y < gridHeight && position->x < gridWidth) { neighbours.push_back(grid[position->y + 1][position->x + 1]); }
+	if (yIndex < gridHeight-1 && xIndex < gridWidth-1) { neighbours.push_back(grid[yIndex+1][xIndex+1]); }
 
 	// Down
-	if (position->y < gridHeight) { neighbours.push_back(grid[position->y + 1][position->x]); }
+	if (yIndex < gridHeight-1) { neighbours.push_back(grid[yIndex+1][xIndex]); }
 
 	// Down-left
-	if (position->y < gridHeight && position->x > 0) { neighbours.push_back(grid[position->y + 1][position->x - 1]); }
+	if (yIndex < gridHeight-1 && xIndex > 0) { neighbours.push_back(grid[yIndex+1][xIndex-1]); }
 
 	// Left
-	if (position->x > 0) { neighbours.push_back(grid[position->y][position->x - 1]); }
+	if (xIndex > 0) { neighbours.push_back(grid[yIndex][xIndex-1]); }
 
 	// Up-left
-	if (position->y > 0 && position->x > 0) { neighbours.push_back(grid[position->y - 1][position->x - 1]); }
+	if (yIndex > 0 && xIndex > 0) { neighbours.push_back(grid[yIndex-1][xIndex-1]); }
 }
 
 void RoadNode::SetCost(int newCost)

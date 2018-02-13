@@ -62,8 +62,8 @@ V2 V2::operator- (V2 arg)
 
 float V2::DistanceBetween(V2 left, V2 right)
 {
-	V2* vec = new V2(left.x - right.x, left.y - right.y);
-	return fabsf(vec->Length());
+	V2 vec = V2(left.x - right.x, left.y - right.y);
+	return fabsf(vec.Length());
 }
 
 float V2::DegreeToRadians(float degree)
@@ -82,7 +82,6 @@ V2* V2::AngleToVector(float degree)
 
 	float roundedX = roundf(x * 100) / 100;
 	float roundedY = roundf(y * 100) / 100;
-
 
 	return new V2(roundedX, roundedY);
 }

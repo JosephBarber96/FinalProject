@@ -15,7 +15,7 @@ public:
 	void Expand(float size, Road* parent, int dir);
 	bool IsLotWithin(BuildingLot* lot);
 	bool PointWithin(int x, int y);
-	void GetOutwardValues(float &minX, float &maxX, float &minY, float &maxY);
+	
 	void GenerateLotLines();
 	float GetWidth();
 	float GetHeight();
@@ -29,9 +29,14 @@ public:
 	V2* bottomRight;
 	Road* parent;
 
+	int minX, maxX, minY, maxY;
+
 	std::vector<Line*> lines;
 
 	FloorPlan* fp;
 
 	bool operator== (BuildingLot rhs);
+
+private:
+	void GetOutwardValues();
 };

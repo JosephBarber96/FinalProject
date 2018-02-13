@@ -79,7 +79,6 @@ void makeAllFastNoiseValuesPositive(std::vector<std::vector<float>> &popMap, flo
 			val += toAdd;
 		}
 	}
-
 }
 
 void seedNoise(FastNoise &fn)
@@ -368,8 +367,8 @@ int main()
 	********************************************************/
 	std::vector<V2*> expandPoints;
 
-	std::cout << "Checking for minor:major road intersections..." << std::endl;
-	int minorMajorIntersectionCounter = 0;
+	std::cout << "Checking for minor roads to prune..." << std::endl;
+
 	// For each minor road
 	for (auto minor : minorRoads)
 	{
@@ -381,8 +380,6 @@ int main()
 			{
 				if (Utility::GetIntersectionPointWithFiniteLines(minor->start, minor->end, seg->start, seg->end) != nullptr)
 				{
-					minorMajorIntersectionCounter++;
-
 					// Mark this road for deletion
 					minor->markedForDeletion = true;
 
@@ -393,7 +390,8 @@ int main()
 			}
 		}
 	}
-	std::cout << minorMajorIntersectionCounter << " found. Deleting roads." << std::endl;
+
+	std::cout << "Deleting roads." << std::endl;
 
 	// Remove and minor roads that have been marked for deletion
 	for (std::vector<Road*>::iterator iter = minorRoads.begin(); iter != minorRoads.end(); /**/)
@@ -410,6 +408,8 @@ int main()
 	}
 
 	// Time to reconnect the voronoi to the main roads
+
+	std::cout << "Reconnecting minor roads to highways" << std::endl;
 
 	// For each point
 	for (V2* point : expandPoints)
@@ -442,6 +442,8 @@ int main()
 	}
 
 	// Now that we've built new minor roads, we need to check for collisions between any minor roads
+
+	std::cout << "Checking for new collisions." << std::endl;
 
 	for (Road* minorRoad : minorRoads)
 	{
@@ -512,6 +514,8 @@ int main()
 		}
 	}
 
+	std::cout << "Neighbouring minor roads " << std::endl;
+
 	// Now that we've deleted all of these roads, neighbour the remaining roads
 	for (Road* minorRoad : minorRoads)
 	{
@@ -540,6 +544,8 @@ int main()
 			}
 		}
 	}
+
+	std::cout << "Removing minor roads with zero neighbours" << std::endl;
 
 	// Remove any minor roads that have 0 neighbours (and thus are sitting along)
 	for (std::vector<Road*>::iterator iter = minorRoads.begin(); iter != minorRoads.end(); /**/)
@@ -677,7 +683,6 @@ int main()
 					}
 				}
 			}
-
 		}
 	}
 
@@ -697,6 +702,8 @@ int main()
 		}
 		road->lots = lots;
 	}
+
+	std::cout << minorLotDeletionCounter << " lots pruned." << std::endl;
 
 	/* MAJOR ROADS */
 
@@ -767,15 +774,11 @@ int main()
 	{
 		for (auto lot : road->lots)
 		{
-			// Get the boundaries of the lot
-			float lotMinX, lotMinY, lotMaxX, lotMaxY;
-			lot->GetOutwardValues(lotMinX, lotMaxX, lotMinY, lotMaxY);
-
 			// Give the lot a new FloorPlan object
 			lot->fp = new FloorPlan();
 
 			// Create the lots bounding box for building generation
-			lot->fp->SetBoundingBox(lotMinX, lotMinY, lotMaxX - lotMinX, lotMaxY - lotMinY);
+			lot->fp->SetBoundingBox(lot->minX, lot->minY, lot->maxX - lot->minY, lot->maxY - lot->minY);
 
 			// Generate shapes
 			int numberOfShapes = UtilRandom::Instance()->RandomInt(2, 4);
@@ -840,11 +843,11 @@ int main()
 			*/
 
 			// Find the center of the lot
-			float lotDiffX = lotMaxX - lotMinX;
-			float lotDiffY = lotMaxY - lotMinY;
+			float lotDiffX = lot->maxX - lot->minX;
+			float lotDiffY = lot->maxY - lot->minY;
 
-			float lotMidX = lotMaxX - (lotDiffX / 2);
-			float lotMidY = lotMaxY - (lotDiffY / 2);
+			float lotMidX = lot->maxX - (lotDiffX / 2);
+			float lotMidY = lot->maxY - (lotDiffY / 2);
 
 			// Find out the offset
 			float offsetX = lotMidX - buildingMidX;

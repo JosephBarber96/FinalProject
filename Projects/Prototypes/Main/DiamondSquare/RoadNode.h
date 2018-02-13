@@ -15,10 +15,8 @@ public:
 	bool checked;
 	float distance;
 	RoadNode* parent;
-	std::vector<RoadNode*> GetNeighbors(std::vector<std::vector<RoadNode*>> grid);
-	std::vector<RoadNode*> neighbours;
-
-	void FillNeighbours(std::vector<std::vector<RoadNode*>> grid, int gridHeight, int gridWidth);
+	std::vector<RoadNode*> GetNeighbors(std::vector<std::vector<RoadNode*>> grid);	
+	
 	void SetCost(int newCost);
 	
 	int getXIndex() const { return xIndex; }
@@ -26,6 +24,8 @@ public:
 	float GetCost() { return cost; }
 
 private:
+	void FillNeighbours(std::vector<std::vector<RoadNode*>> grid, int gridWidth, int gridHeight);
 	int xIndex, yIndex;
 	float cost;
+	std::vector<RoadNode*> neighbours;
 };
