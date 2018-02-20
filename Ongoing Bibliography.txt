@@ -47,28 +47,31 @@ Muller, P and Parish, Y, I, H.  (2001). "Procedural modeling of cities". In Proc
 Muller, P. Wonka, P. Haegler, S. Ulmer, A. Goo, L, V. (2006). "Procedural modeling of buildings" In Proceedings of SIGGRAPH 06' ACM SIGGRAPH 2006. Acm, New York, NY, USA. 614 - 623.
 
 [16]
-Prusinkiewicx, P. and Janan, J. (1992). "Lindenmayer systems, fractals, and plants." New York, N.Y.: Springer-Verlag.
+Omar, A. (2017). Unity Tutorials: Diamond-Square Procedural Terrain. [Online] 26th January 2017. Available online: https://www.youtube.com/watch?v=1HV8GbFnCik [Date of access: 14 December 2017].
 
 [17]
-Rose, T and Bakaoukas, A. (2016). "Algorithms and Approaches for Procedural Terrain Generation - A Brief Review of Current Techniques". 2016 8th International Conference on Games and Virtual Worlds for Serious Applications (VS-GAMES). 1-2.
+Prusinkiewicx, P. and Janan, J. (1992). "Lindenmayer systems, fractals, and plants." New York, N.Y.: Springer-Verlag.
 
 [18]
-Red Blob Games. (2014) Introduction to A*. [Online] June 2016. Available online: http://www.redblobgames.com/pathfinding/a-star/introduction.html [Date of access: 29 September 2017].
+Rose, T and Bakaoukas, A. (2016). "Algorithms and Approaches for Procedural Terrain Generation - A Brief Review of Current Techniques". 2016 8th International Conference on Games and Virtual Worlds for Serious Applications (VS-GAMES). 1-2.
 
 [19]
-Runions, A. Lane, B and Prusinkiewicz, P. (2007) "Modeling trees with a space colonization algorithm" In Proceedings of the Third Eugographics conference on Natural Phenomena. Prague, Czech Republic. pp 63 - 70.
+Red Blob Games. (2014) Introduction to A*. [Online] June 2016. Available online: http://www.redblobgames.com/pathfinding/a-star/introduction.html [Date of access: 29 September 2017].
 
 [20]
-Samet, H. (1995). Spatial Data Structures. Addison-Wesley.
+Runions, A. Lane, B and Prusinkiewicz, P. (2007) "Modeling trees with a space colonization algorithm" In Proceedings of the Third Eugographics conference on Natural Phenomena. Prague, Czech Republic. pp 63 - 70.
 
 [21]
-Smelik, R., Tutenel, T., de Kraker, K. and Bidarra, R. (2011). A declarative approach to procedural modeling of virtual worlds. *Computers & Graphics*, 35(2), pp.352-363.
+Samet, H. (1995). Spatial Data Structures. Addison-Wesley.
 
 [22]
-Smelik, R., Tutenel, T., Bidarra, R. and Benes, B. (2014). A survey on Procedural Modelling for Virtual Worlds. *Computer Graphics Forum*, 33(6), pp.31-50.
+Smelik, R., Tutenel, T., de Kraker, K. and Bidarra, R. (2011). A declarative approach to procedural modeling of virtual worlds. *Computers & Graphics*, 35(2), pp.352-363.
 
 [23]
-Sun, J. Yu, X. Baciu, G. Green, M. (2002). "Template-based generation of road networks for virtual city modeling". In Proceedings of the ACM symposium on Virtual reality software and technology (VRST '02). Acm, New Work, NY, USA, 33 - 40.
+Smelik, R., Tutenel, T., Bidarra, R. and Benes, B. (2014). A survey on Procedural Modelling for Virtual Worlds. *Computer Graphics Forum*, 33(6), pp.31-50.
 
 [24]
+Sun, J. Yu, X. Baciu, G. Green, M. (2002). "Template-based generation of road networks for virtual city modeling". In Proceedings of the ACM symposium on Virtual reality software and technology (VRST '02). Acm, New Work, NY, USA, 33 - 40.
+
+[25]
 Tmwhere. (Date Unknown) Procedural City Generation. [Online] Date unnown. Available online: http://www.tmwhere.com/city_generation.html [Date of access: 27 October 2017].
