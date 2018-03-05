@@ -10,7 +10,7 @@
 
 int main()
 {
-	City city = City();
+	City city;
 	city.Generate();
 	city.Draw();
 	return 0;

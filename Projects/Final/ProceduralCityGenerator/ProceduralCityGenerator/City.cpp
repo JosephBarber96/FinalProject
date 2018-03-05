@@ -7,6 +7,8 @@
 #include "DiamondSquare.h"
 #include "WaterData.h"
 #include "PopulationQuadTree.h"
+#include "MinorRoad.h"
+#include "MinimumSpanningTree.h"
 
 
 City::City() {}
@@ -32,6 +34,9 @@ void City::Generate()
 
 	/* Minor roads */
 	GenerateMinorRoads();
+
+	/* Mst */
+	GenerateMST();
 }
 
 void City::Draw()
@@ -115,5 +120,57 @@ void City::GenerateVoronoi()
 
 void City::GenerateMinorRoads()
 {
+	//minorRoads
 
+	for (auto const &edge : voronoi.edges())
+	{
+		if (edge.vertex0() != NULL && edge.vertex1() != NULL)
+		{
+			int sX = edge.vertex0()->x();
+			int sY = edge.vertex0()->y();
+
+			int eX = edge.vertex1()->x();
+			int eY = edge.vertex1()->y();
+
+
+			// See if this exists already
+			bool exists = false;
+			for (auto r : minorRoads)
+			{
+				if (r->Equals(sX, sY, eX, eY))
+				{
+					exists = true;
+					break;
+				}
+			}
+			if (exists) continue;
+
+			// If not, create
+			MinorRoad* road = new MinorRoad(sX, eY, eX, eY);
+			minorRoads.push_back(road);
+		}
+	}
+}
+
+void City::GenerateMST()
+{
+	mst = new MinimumSpanningTree();
+
+	// Spawn a point in each quad
+	for (auto quad : quadTree->AllChildren())
+	{
+		if (static_cast<PopulationQuadTree*>(quad)->Indexer() > 2)
+		{
+			mst->SpawnPoint(waterData, 
+				offsetForRoadNodes, 
+				quad->XOrigin(), 
+				quad->YOrigin(), 
+				(quad->XOrigin() + quad->Width()), 
+				(quad->YOrigin() + quad->Height()));
+		}
+	}
+
+	mst->AssignNeighbours(winSize / 4);
+	mst->CreateEdges();
+	mst->Sort();
 }

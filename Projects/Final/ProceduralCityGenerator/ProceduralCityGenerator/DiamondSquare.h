@@ -1,9 +1,9 @@
 #pragma once
-
 #include <vector>
 
+#include "Vec3.h"
+
 class WaterData;
-class Vec3;
 class RoadNode;
 class DiamondSquare
 {

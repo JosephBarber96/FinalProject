@@ -48,6 +48,30 @@
     <ClCompile Include="Vec2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Road.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MajorRoad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MinorRoad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MinimumSpanningTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MstEdge.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MstNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RoadNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FastNoise.h">
@@ -78,6 +102,30 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Vec2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Road.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MajorRoad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MinorRoad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MinimumSpanningTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MstEdge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MstNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RoadNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

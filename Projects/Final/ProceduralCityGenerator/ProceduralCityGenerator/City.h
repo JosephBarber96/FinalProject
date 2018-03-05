@@ -13,7 +13,8 @@ class PopulationMap;
 class DiamondSquare;
 class WaterData;
 class PopulationQuadTree;
-class Road;
+class MinorRoad;
+class MinimumSpanningTree;
 class City
 {
 public:
@@ -35,7 +36,8 @@ private:
 	WaterData* waterData;
 	PopulationQuadTree* quadTree;
 	VD voronoi;
-	std::vector<Road*> minorRoads;
+	std::vector<MinorRoad*> minorRoads;
+	MinimumSpanningTree* mst;
 
 
 private:
@@ -45,4 +47,5 @@ private:
 	void GenerateQuadTree();
 	void GenerateVoronoi();
 	void GenerateMinorRoads();
+	void GenerateMST();
 };

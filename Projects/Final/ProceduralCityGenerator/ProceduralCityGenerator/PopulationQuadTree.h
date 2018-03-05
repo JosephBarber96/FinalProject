@@ -23,6 +23,8 @@ public:
 
 	~PopulationQuadTree();
 
+	int Indexer() const { return indexer; }
+
 private:
 	bool CheckSplit(PopulationMap* popMap, WaterData* waterData, int size);
 	void Split(PopulationMap* popMap, WaterData* waterData, int size);

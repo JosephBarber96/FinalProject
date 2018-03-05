@@ -36,6 +36,7 @@
 #include "shapeLine.h"
 
 //! Voronoi
+using namespace std;
 using namespace boost::polygon;
 typedef int coordinate_type;
 typedef point_data<coordinate_type> point_type;
