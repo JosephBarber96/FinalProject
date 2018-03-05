@@ -10,8 +10,6 @@ public:
 	RoadNode(int _xIndex, int _yIndex, int x, int y, float cost);
 	~RoadNode();
 
-	float f, g, h;
-
 	bool checked;
 	float distance;
 	RoadNode* parent;

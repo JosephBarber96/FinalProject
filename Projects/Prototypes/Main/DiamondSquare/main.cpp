@@ -36,7 +36,6 @@
 #include "shapeLine.h"
 
 //! Voronoi
-using namespace std;
 using namespace boost::polygon;
 typedef int coordinate_type;
 typedef point_data<coordinate_type> point_type;
@@ -201,11 +200,11 @@ int main()
 	LoadWaterDataFromTerrain(waterData, terrain, 10);
 
 	// To display
-	sf::Texture waterMapTexture;
-	waterMapTexture.loadFromFile("watermap.bmp");
-	waterMapTexture.setSmooth(true);
-	sf::Sprite waterMapSprite;
-	waterMapSprite.setTexture(waterMapTexture);
+	//sf::Texture waterMapTexture;
+	//waterMapTexture.loadFromFile("watermap.bmp");
+	//waterMapTexture.setSmooth(true);
+	//sf::Sprite waterMapSprite;
+	//waterMapSprite.setTexture(waterMapTexture);
 
 	/***************************
 			Quad tree

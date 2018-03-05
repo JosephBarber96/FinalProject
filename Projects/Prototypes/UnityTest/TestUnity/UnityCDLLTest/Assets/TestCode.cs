@@ -22,8 +22,6 @@ public class TestCode : MonoBehaviour
         int[] ia = { 10, 7, 8, 4, 6, 7, 2, 1, 5, 7, 2};
 
 
-            
-
         Debug.Log("Before sorting: ");
         PrintArray(ia);
 
