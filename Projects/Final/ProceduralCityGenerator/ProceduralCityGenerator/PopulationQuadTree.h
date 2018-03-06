@@ -24,6 +24,7 @@ public:
 	~PopulationQuadTree();
 
 	int Indexer() const { return indexer; }
+	QuadPopulation PopulationDensity() const { return population; }
 
 private:
 	bool CheckSplit(PopulationMap* popMap, WaterData* waterData, int size);

@@ -14,6 +14,8 @@ public:
 	float GetValueAtPoint(int x, int y);
 	float GetHighestValue() const { return highestValue; }
 
+	std::vector<std::vector<float>> GetPopulationMap() const { return popMap; }
+
 private:
 	void SeedNoise(FastNoise& fn);
 	void FillNoise(FastNoise& fn, int size);

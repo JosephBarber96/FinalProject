@@ -7,7 +7,7 @@ class QuadTree
 public:
 	QuadTree();
 	QuadTree(int newX, int newY, int newWid, int newHei, QuadTree* _parent);
-	~QuadTree();
+	virtual ~QuadTree();
 
 	//! Add an object as a child to the head of the tree
 	void AddChildToHeadOfTree(QuadTree* child);

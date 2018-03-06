@@ -1,4 +1,5 @@
 #include <ctime>
+#include <math.h>
 #include <random>
 
 #include "FastNoise.h"
@@ -26,6 +27,8 @@ void PopulationMap::Generate(int size)
 	// Fill noise
 	FillNoise(fn, size);
 
+	// Positive the values
+	ShiftAllValuesPositive();
 }
 
 float PopulationMap::GetValueAtPoint(int x, int y)

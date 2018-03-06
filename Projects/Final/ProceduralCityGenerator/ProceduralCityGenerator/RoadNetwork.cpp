@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <boost\polygon\voronoi.hpp>
+
 #include "Utility.h"
 #include "UtilRandom.h"
 #include "Pathfinding.h"
@@ -16,6 +18,11 @@
 #include "BuildingLot.h"
 #include "Line.h"
 
+using namespace boost::polygon;
+typedef int coordinate_type;
+typedef point_data<coordinate_type> point_type;
+typedef voronoi_diagram<double> VD;
+
 RoadNetwork::RoadNetwork()
 {
 	minorRoads = std::vector<MinorRoad*>();
@@ -24,6 +31,39 @@ RoadNetwork::RoadNetwork()
 }
 
 RoadNetwork::~RoadNetwork() {}
+
+void RoadNetwork::GenerateMinorRoads(VD* voronoi)
+{
+	for (auto const &edge : voronoi->edges())
+	{
+		if (edge.vertex0() != NULL && edge.vertex1() != NULL)
+		{
+			int sX = edge.vertex0()->x();
+			int sY = edge.vertex0()->y();
+
+			int eX = edge.vertex1()->x();
+			int eY = edge.vertex1()->y();
+
+			// See if this exists already
+			bool exists = false;
+			for (auto r : minorRoads)
+			{
+				// If this is the same road but reversed (start->end vs end->start)
+				if (r->End()->x == sX && r->End()->y == sY
+					&& r->Start()->x == eX && r->Start()->y == eY)
+				{
+					exists = true;
+					break;
+				}
+			}
+			if (exists) continue;
+
+			// If not, create
+			MinorRoad* road = new MinorRoad(sX, sY, eX, eY);
+			minorRoads.push_back(road);
+		}
+	}
+}
 
 void RoadNetwork::GenerateMajorRoads(MinimumSpanningTree* mst, int offsetForRoadNodes)
 {
@@ -289,7 +329,6 @@ void RoadNetwork::ValidateBuildingLots()
 	/* MINOR ROADS */
 
 	/* First, we prioritive collisions against minor roads and major roads */
-
 	std::cout << "Between minor roads..." << std::endl;
 	// For every building lot
 	for (MinorRoad* minorRoad : minorRoads)
