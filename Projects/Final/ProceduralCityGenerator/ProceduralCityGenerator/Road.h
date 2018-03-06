@@ -11,7 +11,10 @@ public:
 
 	bool Equals(int sx, int sy, int ex, int ey);
 
-private:
+	Vec2* Start() const { return startPos; }
+	Vec2* End() const { return endPos; }
+
+protected:
 	Vec2* startPos;
 	Vec2* endPos;
 };

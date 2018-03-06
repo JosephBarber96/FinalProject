@@ -1,14 +1,20 @@
+#include <iostream>
+
 #include "City.h"
 
 #include "UtilRandom.h"
+#include "Utility.h"
 #include "Vec2.h"
+#include "Pathfinding.h"
 
 #include "PopulationMap.h"
 #include "DiamondSquare.h"
 #include "WaterData.h"
 #include "PopulationQuadTree.h"
+#include "RoadNetwork.h"
 #include "MinorRoad.h"
 #include "MinimumSpanningTree.h"
+#include "RoadNode.h"
 
 
 City::City() {}
@@ -37,6 +43,18 @@ void City::Generate()
 
 	/* Mst */
 	GenerateMST();
+
+	/* Road nodes */
+	GenerateRoadNodes();
+
+	/* Major roads */
+	GenerateMajorRoads();
+
+	/* Validate roads */
+	ValidateRoads();
+
+	/* Building lots */
+	GenerateBuildingLots();
 }
 
 void City::Draw()
@@ -48,12 +66,14 @@ void City::Draw()
 
 void City::GeneratePopulationMap()
 {
+	std::cout << "Generating population map." << std::endl;
 	populationMap = new PopulationMap();
 	populationMap->Generate(winSize);
 }
 
 void City::GenerateTerrain()
 {
+	std::cout << "Generating terrain." << std::endl;
 	int divisions = winSize;
 	int size = 5;
 	int height = 65;
@@ -65,17 +85,20 @@ void City::GenerateTerrain()
 
 void City::GenerateWaterBoundary()
 {
+	std::cout << "Generating water." << std::endl;
 	waterData = new WaterData(winSize);
 	waterData->LoadFromTerrain(terrain, 10);
 }
 
 void City::GenerateQuadTree()
 {
+	std::cout << "Creating QuadTree." << std::endl;
 	quadTree = new PopulationQuadTree(0, 0, winSize, winSize, nullptr, populationMap, waterData, winSize);
 }
 
 void City::GenerateVoronoi()
 {
+	std::cout << "Generating voronoi." << std::endl;
 	// To hold voronoiPoints
 	std::vector<point_type> voronoiPoints;
 	int bufferSpace = 5;
@@ -120,8 +143,10 @@ void City::GenerateVoronoi()
 
 void City::GenerateMinorRoads()
 {
-	//minorRoads
+	std::cout << "Creating minor roads." << std::endl;
+	roadNetwork = new RoadNetwork();
 
+	//minorRoads
 	for (auto const &edge : voronoi.edges())
 	{
 		if (edge.vertex0() != NULL && edge.vertex1() != NULL)
@@ -135,7 +160,7 @@ void City::GenerateMinorRoads()
 
 			// See if this exists already
 			bool exists = false;
-			for (auto r : minorRoads)
+			for (auto r : roadNetwork->minorRoads)
 			{
 				if (r->Equals(sX, sY, eX, eY))
 				{
@@ -147,13 +172,14 @@ void City::GenerateMinorRoads()
 
 			// If not, create
 			MinorRoad* road = new MinorRoad(sX, eY, eX, eY);
-			minorRoads.push_back(road);
+			roadNetwork->minorRoads.push_back(road);
 		}
 	}
 }
 
 void City::GenerateMST()
 {
+	std::cout << "Generating Minimum spanning tree." << std::endl;
 	mst = new MinimumSpanningTree();
 
 	// Spawn a point in each quad
@@ -173,4 +199,29 @@ void City::GenerateMST()
 	mst->AssignNeighbours(winSize / 4);
 	mst->CreateEdges();
 	mst->Sort();
+}
+
+void City::GenerateRoadNodes()
+{
+	std::cout << "Generating road nodes." << std::endl;
+	roadNetwork->roadNodes = terrain->CreatePointsAndPassBackRoadNodes(offsetForRoadNodes, waterData);
+}
+
+void City::GenerateMajorRoads()
+{
+	std::cout << "Generating major roads." << std::endl;
+	roadNetwork->GenerateMajorRoads(mst, offsetForRoadNodes);
+}
+
+void City::ValidateRoads()
+{
+	std::cout << "Validating roads." << std::endl;
+	roadNetwork->ValidateRoads(waterData);
+}
+
+void City::GenerateBuildingLots()
+{
+	std::cout << "Generating building lots." << std::endl;
+	roadNetwork->GenerateBuildingLots();
+	roadNetwork->ValidateBuildingLots();
 }

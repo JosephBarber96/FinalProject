@@ -162,7 +162,7 @@ void DiamondSquare::CreatePoints()
 	points.erase(points.end() - 1);
 }
 
-std::vector<std::vector<RoadNode*>> DiamondSquare::CreatePointsAndPassBackRoadNodes(int offsetForRoadNodes, WaterData &wd)
+std::vector<std::vector<RoadNode*>> DiamondSquare::CreatePointsAndPassBackRoadNodes(int offsetForRoadNodes, WaterData* wd)
 {
 	std::vector<std::vector<RoadNode*>> roadNodes;
 	roadNodes.push_back(std::vector<RoadNode*>());
@@ -183,7 +183,7 @@ std::vector<std::vector<RoadNode*>> DiamondSquare::CreatePointsAndPassBackRoadNo
 		if (x % offsetForRoadNodes == 0 && y % offsetForRoadNodes == 0)
 		{
 			// High cost
-			if (wd.IsWater(x, y))
+			if (wd->IsWater(x, y))
 			{
 				roadNodes[roadNodes.size() - 1].push_back(new RoadNode(xIndex, yIndex, x, y, highest * 1.5f));
 			}

@@ -1,4 +1,5 @@
 #include "MajorRoad.h"
+#include "Vec2.h"
 
 MajorRoad::MajorRoad() {}
 

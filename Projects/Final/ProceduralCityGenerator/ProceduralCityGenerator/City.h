@@ -15,6 +15,7 @@ class WaterData;
 class PopulationQuadTree;
 class MinorRoad;
 class MinimumSpanningTree;
+class RoadNetwork;
 class City
 {
 public:
@@ -28,7 +29,6 @@ private:
 	// Vars
 	const int winSize = 512;
 	int offsetForRoadNodes = 5;
-	float maxMinorRoadDist = 100;
 
 	// City components
 	PopulationMap* populationMap;
@@ -36,9 +36,8 @@ private:
 	WaterData* waterData;
 	PopulationQuadTree* quadTree;
 	VD voronoi;
-	std::vector<MinorRoad*> minorRoads;
+	RoadNetwork* roadNetwork;
 	MinimumSpanningTree* mst;
-
 
 private:
 	void GeneratePopulationMap();
@@ -48,4 +47,8 @@ private:
 	void GenerateVoronoi();
 	void GenerateMinorRoads();
 	void GenerateMST();
+	void GenerateRoadNodes();
+	void GenerateMajorRoads();
+	void ValidateRoads();
+	void GenerateBuildingLots();
 };

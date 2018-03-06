@@ -17,6 +17,9 @@ public:
 	void Sort();
 
 	bool TreeEdgeContainsNode(MstNode* node);
+	std::vector<MstNode*> GetNodes() const { return nodes; }
+	std::vector<MstEdge*> GetAllEdges() const { return allEdges; }
+	std::vector<MstEdge*> GetTreeEdges() const { return treeEdges; }
 
 private:
 	void AddNode(MstNode* newNode);
