@@ -1,0 +1,81 @@
+#include "UnityLib.h"
+
+#include "Vec2.h"
+#include "City.h"
+#include "RoadNetwork.h"
+#include "MajorRoad.h"
+#include "MinorRoad.h"
+#include "BuildingLot.h"
+#include "WaterData.h"
+
+/* City */
+
+CITYLIB City* GenerateCity()
+{
+	City* city = new City();
+	city->Generate();
+	return city;
+}
+
+/* Major roads */
+
+CITYLIB int GetMajorRoadCount(City* city)
+{
+	return city->GetRoadNetwork()->MajorRoadCount();
+}
+
+CITYLIB int GetMajorRoadSegmentCount(City* city, int index)
+{
+	return city->GetRoadNetwork()->GetMajorRoad(index)->segments.size();
+}
+
+CITYLIB void MajorRoadSegmentPos(City* city, int roadIndex, int segmentIndex, float &sx, float &sy, float &ex, float &ey)
+{
+	MajorRoad* mr = city->GetRoadNetwork()->GetMajorRoad(roadIndex);
+
+	sx = mr->segments[segmentIndex]->Start()->x;
+	sy = mr->segments[segmentIndex]->Start()->y;
+
+	ex = mr->segments[segmentIndex]->End()->x;
+	ey = mr->segments[segmentIndex]->End()->y;
+}
+
+/* Minor roads */
+
+CITYLIB int GetMinorRoadCount(City* city)
+{
+	return city->GetRoadNetwork()->MinorRoadCount();
+}
+
+CITYLIB void MinorRoadPos(City* city, int index, float &sx, float &sy, float &ex, float &ey)
+{
+	MinorRoad mr = *city->GetRoadNetwork()->GetMinorRoad(index);
+
+	sx = mr.Start()->x;
+	sy = mr.Start()->y;
+
+	ex = mr.End()->x;
+	ey = mr.End()->y;
+}
+
+/* Buildings */
+
+CITYLIB int MinorRoadBuildingCount(City* city, int index)
+{
+	return city->GetRoadNetwork()->GetMinorRoad(index)->lots.size() - 1;
+}
+
+CITYLIB void MinorRoadBuildingPos(City* city, int roadIndex, int buildingIndex, float &x, float &y)
+{
+	BuildingLot lot = *city->GetRoadNetwork()->GetMinorRoad(roadIndex)->lots[buildingIndex];
+
+	x = lot.minX + (lot.GetWidth() / 2);
+	y = lot.minY + (lot.GetHeight() / 2);
+}
+
+/* Terrain */
+
+CITYLIB bool IsWater(City* city, int x, int y)
+{
+	return (city->GetWaterData()->IsWater(x, y));
+}

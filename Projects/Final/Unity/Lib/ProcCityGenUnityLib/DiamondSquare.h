@@ -1,0 +1,50 @@
+#pragma once
+#include <vector>
+
+#include "Vec3.h"
+
+class WaterData;
+class RoadNode;
+class DiamondSquare
+{
+public:
+	DiamondSquare(int div, float siz, float hei);
+	~DiamondSquare();
+
+	void Generate();
+	void Print();
+	void CalcuateBoundaryPoints();
+	void CreatePoints();
+	std::vector<std::vector<RoadNode*>> CreatePointsAndPassBackRoadNodes(int offsetForRoadNodes, WaterData* wd);
+
+	int Lowest() { return lowest; }
+	int Highest() { return highest; }
+	int getDivisions() { return divisions; }
+	float getSize() const { return size; }
+	float getHeight() { return height; }
+	std::vector<Vec3> Verts() { return terrainVertices; }
+	std::vector<std::vector<Vec3*>> Points() { return points; }
+
+private:
+	// The number of divisions along the terrain (5 vertices = 4 faces)
+	// this number must be a power of 2: 2, 4, 8, 16, 32, 64, etc...
+	int divisions;
+
+	int vertCount;
+
+	// These hold the lowest and highest values of the 
+	// Generated terrain after calculating boundary points
+	int lowest, highest;
+
+	// The size of the terrain (e.g. 10x10)
+	float size;
+
+	// The maximum height for our terrain
+	float height;
+	std::vector<Vec3> terrainVertices;
+
+	// The 2d array of points
+	std::vector<std::vector<Vec3*>> points;
+
+	void DiaSqu(int row, int col, int size, float heightOffset);
+};
