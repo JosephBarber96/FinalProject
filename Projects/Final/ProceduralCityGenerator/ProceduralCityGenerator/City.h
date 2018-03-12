@@ -51,4 +51,5 @@ private:
 	void GenerateMajorRoads();
 	void ValidateRoads();
 	void GenerateBuildingLots();
+	void GenerateBuildings();
 };

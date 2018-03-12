@@ -20,7 +20,8 @@ void FloorPlan::SetBoundingBox(int xOri, int yOri, int wid, int hei)
 void FloorPlan::GenerateShapes(int num)
 {
 	float width, height;
-	width = bb->width;
+	width = fabsf(bb->width);
+	height = fabsf(bb->height);
 
 	float shapeSize = width * 0.51f;
 
@@ -29,8 +30,8 @@ void FloorPlan::GenerateShapes(int num)
 		jbShape* shape = jbShape::CreateShape(shapeSize);
 
 		float shapeX, shapeY;
-		shapeX = UtilRandom::Instance()->RandomFloat(bb->xOrigin, (bb->xOrigin + bb->width) - shapeSize);
-		shapeY = UtilRandom::Instance()->RandomFloat(bb->yOrigin, (bb->yOrigin + bb->height) - shapeSize);
+		shapeX = UtilRandom::Instance()->RandomFloat(bb->xOrigin, (bb->xOrigin + width) - shapeSize);
+		shapeY = UtilRandom::Instance()->RandomFloat(bb->yOrigin + 1, (bb->yOrigin + height) - shapeSize);
 
 		shape->SetPosition(shapeX, shapeY);
 
@@ -79,8 +80,8 @@ void FloorPlan::GeneratePerimeter()
 	}
 
 	/*******************************************
-	Remove point of intersection that sit
-	inside of another shape
+		Remove point of intersection that sit
+		inside of another shape
 	********************************************/
 
 	// For each shape...

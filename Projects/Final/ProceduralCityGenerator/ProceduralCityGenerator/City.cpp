@@ -23,6 +23,7 @@
 #include "MstEdge.h"
 #include "MstNode.h"
 #include "FloorPlan.h"
+#include "shapeLine.h"
 
 
 City::City() {}
@@ -63,6 +64,9 @@ void City::Generate()
 
 	/* Building lots */
 	GenerateBuildingLots();
+
+	/* Buildings */
+	GenerateBuildings();
 }
 
 void City::Draw()
@@ -516,4 +520,103 @@ void City::GenerateBuildingLots()
 	std::cout << "Generating building lots." << std::endl;
 	roadNetwork->GenerateBuildingLots();
 	roadNetwork->ValidateBuildingLots();
+}
+
+void City::GenerateBuildings()
+{
+	std::vector<Vec2*> lotCenter;
+	std::vector<Vec2*> buildingCenter;
+
+	for (auto road : roadNetwork->minorRoads)
+	{
+		for (auto lot : road->lots)
+		{
+			// Give the lot a new FloorPlan object
+			lot->fp = new FloorPlan();
+
+			// Create the lots bounding box for building generation
+			lot->fp->SetBoundingBox(lot->minX, lot->minY, lot->maxX - lot->minX, lot->maxY - lot->minY);
+
+			// Generate shapes
+			int numberOfShapes = UtilRandom::Instance()->RandomInt(2, 5);
+			lot->fp->GenerateShapes(numberOfShapes);
+
+			// Calculate building perimeter
+			lot->fp->GeneratePerimeter();
+
+			// Find the center point of the generated building
+
+			// First we need to find the minimum and maximum boundaries
+			float buildingMinX = FLT_MAX, buildingMaxX = -FLT_MAX, buildingMinY = FLT_MAX, buildingMaxY = -FLT_MAX;
+			for (shapeLine* line : lot->fp->perimeterLines)
+			{
+				if (line->start->x < buildingMinX) buildingMinX = line->start->x;
+				if (line->start->x > buildingMaxX) buildingMaxX = line->start->x;
+
+				if (line->start->y < buildingMinY) buildingMinY = line->start->y;
+				if (line->start->y > buildingMaxY) buildingMaxY = line->start->y;
+
+				if (line->end->x < buildingMinX) buildingMinX = line->start->x;
+				if (line->end->x > buildingMaxX) buildingMaxX = line->start->x;
+
+				if (line->end->y < buildingMinY) buildingMinY = line->start->y;
+				if (line->end->y > buildingMaxY) buildingMaxY = line->start->y;
+			}
+
+			// Then we find the center
+			float buildingDiffX = buildingMaxX - buildingMinX;
+			float buildingDiffY = buildingMaxY - buildingMinY;
+
+			float buildingMidX = buildingMaxX - (buildingDiffX / 2);
+			float buildingMidY = buildingMaxY - (buildingDiffY / 2);
+
+
+			/*
+			Find the angle to rotate by
+			*/
+
+			// Find the roads facing angle
+			Vec2 parentDir = Vec2(
+				road->End()->x - road->Start()->x,
+				road->End()->y - road->Start()->y);
+			float parentAngle = Vec2::VectorToAngle(parentDir);
+
+			float angleToRotate = 90 - parentAngle - 45;
+
+			// Rotate the points around the found center point
+			for (shapeLine* line : lot->fp->perimeterLines)
+			{
+				line->start = Utility::RotateAroundPoint(line->start, new Vec2(buildingMidX, buildingMidY), angleToRotate);
+				line->end = Utility::RotateAroundPoint(line->end, new Vec2(buildingMidX, buildingMidY), angleToRotate);
+			}
+
+			/*
+			Move the building so the center point of the building is the center point of the shape
+			*/
+
+			// Find the center of the lot
+			float lotDiffX = lot->maxX - lot->minX;
+			float lotDiffY = lot->maxY - lot->minY;
+
+			float lotMidX = lot->maxX - (lotDiffX / 2);
+			float lotMidY = lot->maxY - (lotDiffY / 2);
+
+			// Find out the offset
+			float offsetX = lotMidX - buildingMidX;
+			float offsetY = lotMidY - buildingMidY;
+
+			buildingCenter.push_back(new Vec2(buildingMidX, buildingMidY));
+			lotCenter.push_back(new Vec2(lotMidX, lotMidY));
+
+			// Move the lines by this much
+			for (shapeLine* line : lot->fp->perimeterLines)
+			{
+				line->start->x += offsetX;
+				line->start->y += offsetY;
+
+				line->end->x += offsetX;
+				line->end->y += offsetY;
+			}
+		}
+	}
 }

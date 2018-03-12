@@ -20,5 +20,6 @@ public:
 	static float DistanceBetween(Vec2 left, Vec2 right);
 	static float DegreeToRadians(float degree);
 	static Vec2* AngleToVector(float degree);
+	static float VectorToAngle(Vec2 vec);
 	static float VectorToAngle(Vec2* vec);
 };

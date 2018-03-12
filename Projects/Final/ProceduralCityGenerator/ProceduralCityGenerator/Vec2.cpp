@@ -91,3 +91,10 @@ float Vec2::VectorToAngle(Vec2* vec)
 	float deg = rads * 180 / M_PI;
 	return deg;
 }
+
+float Vec2::VectorToAngle(Vec2 vec)
+{
+	float rads = atan2f(vec.y, vec.x);
+	float deg = rads * 180 / M_PI;
+	return deg;
+}

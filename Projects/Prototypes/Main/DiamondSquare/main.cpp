@@ -770,7 +770,7 @@ int main()
 	std::vector<V2*> lotCenter;
 	std::vector<V2*> buildingCenter;
 
-	for (auto road : majorRoads)
+	for (auto road : minorRoads)
 	{
 		for (auto lot : road->lots)
 		{
@@ -778,7 +778,7 @@ int main()
 			lot->fp = new FloorPlan();
 
 			// Create the lots bounding box for building generation
-			lot->fp->SetBoundingBox(lot->minX, lot->minY, lot->maxX - lot->minY, lot->maxY - lot->minY);
+			lot->fp->SetBoundingBox(lot->minX, lot->minY, lot->maxX - lot->minX, lot->maxY - lot->minY);
 
 			// Generate shapes
 			int numberOfShapes = UtilRandom::Instance()->RandomInt(2, 4);
