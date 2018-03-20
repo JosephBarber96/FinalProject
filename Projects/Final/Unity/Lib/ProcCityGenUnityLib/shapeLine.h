@@ -25,5 +25,6 @@ public:
 	std::vector<Intersection*> intersections;
 
 private:
+	std::vector<shapeLine*> lines;
 	bool markedForDeletion;
 };

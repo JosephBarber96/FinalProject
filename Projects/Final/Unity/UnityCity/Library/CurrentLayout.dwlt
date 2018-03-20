@@ -66,8 +66,8 @@ MonoBehaviour:
     y: 0
     width: 363
     height: 580
-  m_MinSize: {x: 202, y: 221}
-  m_MaxSize: {x: 4002, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 15}
   m_Panes:
   - {fileID: 15}
@@ -146,10 +146,10 @@ MonoBehaviour:
     y: 0
     width: 1920
     height: 580
-  m_MinSize: {x: 683, y: 221}
-  m_MaxSize: {x: 12008, y: 4021}
+  m_MinSize: {x: 681, y: 221}
+  m_MaxSize: {x: 12006, y: 4021}
   vertical: 0
-  controlID: 72
+  controlID: 10
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -170,10 +170,10 @@ MonoBehaviour:
     y: 30
     width: 1920
     height: 957
-  m_MinSize: {x: 683, y: 492}
-  m_MaxSize: {x: 12008, y: 14042}
+  m_MinSize: {x: 681, y: 492}
+  m_MaxSize: {x: 12006, y: 14042}
   vertical: 1
-  controlID: 71
+  controlID: 9
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -277,19 +277,19 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/Prefabs
+    - Assets/Temporary/Materials
   m_ViewMode: 1
   m_StartGridSize: 96
   m_LastFolders:
-  - Assets/Prefabs
+  - Assets/Temporary/Materials
   m_LastFoldersGridSize: 96
   m_LastProjectPath: E:\Documents\Uni\Year 3\Final Project\dissertation\Projects\Final\Unity\UnityCity
   m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 7e270000
-    m_LastClickedID: 10110
-    m_ExpandedIDs: 000000007a270000ce27000000ca9a3bffffff7f
+    m_SelectedIDs: 04280000
+    m_LastClickedID: 10244
+    m_ExpandedIDs: 0000000080270000da27000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -317,7 +317,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000007a270000
+    m_ExpandedIDs: 0000000080270000da270000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -504,14 +504,14 @@ MonoBehaviour:
     height: 559
   m_PersistentViewDataDictionary: {fileID: 0}
   m_SceneLighting: 1
-  lastFramingTime: 41.2412021238636
+  lastFramingTime: 4357.8291519464065
   m_2DMode: 0
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 321.66556, y: 266.54224, z: 246.15958}
+    m_Target: {x: 383.376, y: 9.2693405, z: 212.45149}
     speed: 2
-    m_Value: {x: 321.66556, y: 266.54224, z: 246.15958}
+    m_Value: {x: 383.376, y: 9.2693405, z: 212.45149}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -535,13 +535,13 @@ MonoBehaviour:
       speed: 2
       m_Value: 0
   m_Rotation:
-    m_Target: {x: 0.15042336, y: -0.7263856, z: 0.64915764, w: 0.16831887}
+    m_Target: {x: -0.063499734, y: 0.7183794, z: -0.06615073, w: -0.6895817}
     speed: 2
-    m_Value: {x: 0.15042336, y: -0.7263856, z: 0.64915764, w: 0.16831887}
+    m_Value: {x: -0.063499734, y: 0.7183794, z: -0.06615073, w: -0.6895817}
   m_Size:
-    m_Target: 82.39701
+    m_Target: 22.850618
     speed: 2
-    m_Value: 82.39701
+    m_Value: 22.850618
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -584,21 +584,21 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 9efbffff00000000
+    m_ExpandedIDs: f6dc95ff762998ff1e3198ffda2f99ff3cdab3ff5865b5ff6466b5ffb42cb6ffbc2db6ff602eb6ff782eb6ff74d7b7ffa0e7d0ffc8e9d0ffeccfd1ff4406d8ff4806d8ff0e33e0ff4234e0ffb232e1ffd23ce1ff6274e1ff2a74f6ff1ea5faff52bafaff7abaffff96baffff9efbffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
+      m_Name: Plane
+      m_OriginalName: Plane
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 0
+      m_UserData: -5532566
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 11
+      m_OriginalEventType: 0
       m_IsRenamingFilename: 0
       m_ClientGUIView: {fileID: 3}
     m_SearchString: 

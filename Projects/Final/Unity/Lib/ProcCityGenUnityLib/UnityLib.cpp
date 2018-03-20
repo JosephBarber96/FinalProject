@@ -7,6 +7,9 @@
 #include "MinorRoad.h"
 #include "BuildingLot.h"
 #include "WaterData.h"
+#include "FloorPlan.h"
+#include "Line.h"
+#include "shapeLine.h"
 
 /* City */
 
@@ -71,6 +74,22 @@ CITYLIB void MinorRoadBuildingPos(City* city, int roadIndex, int buildingIndex, 
 
 	x = lot.minX + (lot.GetWidth() / 2);
 	y = lot.minY + (lot.GetHeight() / 2);
+}
+
+CITYLIB int BuildingVertCount(City* city, int roadIndex, int buildingIndex)
+{
+	return city->GetRoadNetwork()->GetMinorRoad(roadIndex)->lots[buildingIndex]->fp->perimeterLines.size();
+}
+
+CITYLIB void GetBuildingLine(City* city, int roadIndex, int buildingIndex, int lineIndex, float &sx, float &sy, float &ex, float &ey)
+{
+	FloorPlan* fp = city->GetRoadNetwork()->GetMinorRoad(roadIndex)->lots[buildingIndex]->fp;
+
+	sx = fp->perimeterLines[lineIndex]->start->x;
+	sy = fp->perimeterLines[lineIndex]->start->y;
+
+	ex = fp->perimeterLines[lineIndex]->end->x;
+	ey = fp->perimeterLines[lineIndex]->end->y;
 }
 
 /* Terrain */

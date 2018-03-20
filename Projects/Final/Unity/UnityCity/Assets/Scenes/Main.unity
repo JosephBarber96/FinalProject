@@ -296,6 +296,13 @@ MonoBehaviour:
     type: 2}
   prefab_terrainWater: {fileID: 1907371448527618, guid: 59e1772239fded34caa7a535c82b4d6a,
     type: 2}
+  prefab_wall: {fileID: 1786656961036404, guid: 58947060c0b85344986302346c844ba1,
+    type: 2}
+  buildingMaterials:
+  - {fileID: 2100000, guid: d71ed3b8279187e4c86178885daed690, type: 2}
+  - {fileID: 2100000, guid: fe659ffe484575c4194faefc29390c97, type: 2}
+  - {fileID: 2100000, guid: cb44c8f5cfdccad46ade2d2f2f678d06, type: 2}
+  buildingHeight: 5
 --- !u!4 &2067316855
 Transform:
   m_ObjectHideFlags: 0

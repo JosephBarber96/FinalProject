@@ -19,6 +19,8 @@ extern "C"
 	/* Buildings */
 	CITYLIB int MinorRoadBuildingCount(City* city, int index);
 	CITYLIB void MinorRoadBuildingPos(City* city, int roadIndex, int buildingIndex, float &x, float &y);
+	CITYLIB int BuildingVertCount(City* city, int roadIndex, int buildingIndex);
+	CITYLIB void GetBuildingLine(City* city, int roadIndex, int buildingIndex, int lineIndex, float &sx, float &sy, float &ex, float &ey);
 
 	/* Terrain */
 	CITYLIB bool IsWater(City* city, int x, int y);

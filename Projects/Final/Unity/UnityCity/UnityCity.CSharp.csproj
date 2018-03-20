@@ -287,6 +287,9 @@
   <ItemGroup>
     <Compile Include="Assets\Code\CityGen.cs" />
     <Compile Include="Assets\Code\Road.cs" />
+    <Compile Include="Assets\Code\StretchableObject.cs" />
+    <Compile Include="Assets\Code\Utility.cs" />
+    <Compile Include="Assets\Code\Wall.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

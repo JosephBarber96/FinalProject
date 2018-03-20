@@ -140,7 +140,7 @@ void FloorPlan::GeneratePerimeter()
 
 
 	/*******************************************
-	Split the lines up accordingly
+			Split the lines up accordingly
 	********************************************/
 
 	// For each shape...
