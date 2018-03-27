@@ -17,7 +17,10 @@ public:
 	void CreatePoints();
 	std::vector<std::vector<RoadNode*>> CreatePointsAndPassBackRoadNodes(int offsetForRoadNodes, WaterData* wd);
 
+	float GetHeightAtPoint(int x, int y);
+
 	int Lowest() { return lowest; }
+	// Returns the maximum height of our terrain
 	int Highest() { return highest; }
 	int getDivisions() { return divisions; }
 	float getSize() const { return size; }
@@ -41,6 +44,7 @@ private:
 
 	// The maximum height for our terrain
 	float height;
+
 	std::vector<Vec3> terrainVertices;
 
 	// The 2d array of points

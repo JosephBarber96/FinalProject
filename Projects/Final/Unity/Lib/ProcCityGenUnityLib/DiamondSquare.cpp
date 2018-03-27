@@ -219,6 +219,11 @@ std::vector<std::vector<RoadNode*>> DiamondSquare::CreatePointsAndPassBackRoadNo
 	return roadNodes;
 }
 
+float DiamondSquare::GetHeightAtPoint(int x, int y)
+{
+	return (points[x][y]->z);
+}
+
 void DiamondSquare::DiaSqu(int row, int col, int size, float heightOffset)
 {
 	int halfSize = (int)size*0.5f;

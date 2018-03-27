@@ -13,6 +13,9 @@ WaterData::~WaterData() {}
 
 void WaterData::LoadFromTerrain(DiamondSquare* terrain, float percentage)
 {
+	// Remember the percentage
+	waterPercent = percentage;
+
 	// First, make all of the values positive
 	float lowest = terrain->Lowest();
 	float highest = terrain->Highest();
@@ -33,9 +36,9 @@ void WaterData::LoadFromTerrain(DiamondSquare* terrain, float percentage)
 	float difference = newHighest - newLowest;
 
 	// The bottom 20% shal be considered water
-	float cutoffPoint = difference * (percentage / 100);
+	waterLevel = difference * (percentage / 100);
 	std::cout << "Highest terrain point: " << newHighest << std::endl;
-	std::cout << "Cut off point: " << cutoffPoint << std::endl;
+	std::cout << "Cut off point: " << waterLevel << std::endl;
 
 	// Get the size
 	int wid, hei;
@@ -49,7 +52,7 @@ void WaterData::LoadFromTerrain(DiamondSquare* terrain, float percentage)
 		for (int x = 0; x < wid; x++)
 		{
 			// If the Z point is lower than or equal to the cut off point, set it as water. Otherwise, don't
-			points[y][x]->z <= cutoffPoint ? SetPixeAsWater(x, y, true) : SetPixeAsWater(x, y, false);
+			points[y][x]->z <= waterLevel ? SetPixeAsWater(x, y, true) : SetPixeAsWater(x, y, false);
 		}
 	}
 }

@@ -24,7 +24,7 @@ void PopulationMap::Generate(int size)
 	fn.SetFractalOctaves(6); // Default 3
 	fn.SetInterp(FastNoise::Interp::Quintic); // Default quintic
 
-											  // Fill noise
+	// Fill noise
 	FillNoise(fn, size);
 
 	// Positive the values

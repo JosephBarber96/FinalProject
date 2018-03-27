@@ -5,12 +5,26 @@ using System.Runtime.InteropServices; //DLL Import
 
 public class CityGen : MonoBehaviour
 {
+    private int citySize;
+
+    [Header("Terrain height")]
+    [SerializeField]
+    private float terrainHeight;
+
+    [Header("Water level (percent)")]
+    [SerializeField]
+    private float waterLevelInPercent;
+
+    [Header("Building height")]
+    [SerializeField]
+    private float buildingHeight;
+
     /* An IntPtr for holding the memory address of the C++ City object */
     System.IntPtr cityPtr;
 
     /* City generator */
     [DllImport("ProcCityGenUnityLib.dll")]
-    static extern System.IntPtr GenerateCity();
+    static extern System.IntPtr GenerateCity(int citySize, float maxTerrainHeight, float percentWater);
 
     /* Major road value getters */
     [DllImport("ProcCityGenUnityLib.dll")]
@@ -46,6 +60,24 @@ public class CityGen : MonoBehaviour
 
     /* Terrain */
     [DllImport("ProcCityGenUnityLib.dll")]
+    static extern int TerrainSize(System.IntPtr city);
+
+    [DllImport("ProcCityGenUnityLib.dll")]
+    static extern float GetTerrainMaximumHeight(System.IntPtr city);
+
+    [DllImport("ProcCityGenUnityLib.dll")]
+    static extern float GetTerrainMinimumHeight(System.IntPtr city);
+
+    [DllImport("ProcCityGenUnityLib.dll")]
+    static extern float GetTerrainHeightAt(System.IntPtr city, int x, int y);
+
+    [DllImport("ProcCityGenUnityLib.dll")]
+    static extern float GetWaterHeightPercent(System.IntPtr city);
+
+    [DllImport("ProcCityGenUnityLib.dll")]
+    static extern float GetWaterLevel(System.IntPtr city);
+
+    [DllImport("ProcCityGenUnityLib.dll")]
     static extern bool IsWater(System.IntPtr city, int x, int y);
 
     /* Prefabs */
@@ -56,18 +88,8 @@ public class CityGen : MonoBehaviour
     public GameObject prefab_terrainGrass;
     public GameObject prefab_terrainWater;
     public GameObject prefab_wall;
+    public GameObject prefab_terrain;
     public Material[] buildingMaterials;
-
-    [Header("Variables")]
-    public float buildingHeight;
-
-    private float grassY = -0.2f;
-    private float waterY = -0.1f;
-    private float minorRoadY = 0f;
-    private float majorRoadY = 0.1f;
-
-    /* Data */
-    int citySize = 512;
 
     void Start()
     {
@@ -75,8 +97,8 @@ public class CityGen : MonoBehaviour
         GenCity();
 
         // Spawn roads of the city
-        SpawnMajorRoads();
-        SpawnMinorRoadsAndBuildings();
+        // SpawnMajorRoads();
+        // SpawnMinorRoadsAndBuildings();
 
         // Spawn the terrain
         SpawnTerrain();
@@ -88,9 +110,13 @@ public class CityGen : MonoBehaviour
     /// </summary>
     void GenCity()
     {
-        // Generate the city, hold a pointer to it
         Debug.Log("Generating city...");
-        cityPtr = GenerateCity();
+
+        citySize = 512;
+
+        // Generate the city, hold a pointer to it
+        // Pass through city size, terrain height, water level
+        cityPtr = GenerateCity(citySize, terrainHeight, waterLevelInPercent);
     }
 
     /// <summary>
@@ -118,7 +144,7 @@ public class CityGen : MonoBehaviour
                 MajorRoadSegmentPos(cityPtr, i, j, ref startX, ref startY, ref endX, ref endY);
 
                 // Instantiate and place the road
-                Road road = Instantiate(prefab_majorRoad, new Vector3(0, majorRoadY, 0), Quaternion.identity).GetComponent<Road>();
+                Road road = Instantiate(prefab_majorRoad, new Vector3(0, 1, 0), Quaternion.identity).GetComponent<Road>();
                 road.gameObject.name = string.Format("Major_Road_Segment_{0}", j);
                 road.SetStart(startX, startY);
                 road.SetEnd(endX, endY);
@@ -151,7 +177,7 @@ public class CityGen : MonoBehaviour
             MinorRoadPos(cityPtr, i, ref roadSX, ref roadSY, ref roadEX, ref roadEY);
 
             // Instantiate the road
-            Road road = Instantiate(prefab_minorRoad, new Vector3(0, minorRoadY, 0), Quaternion.identity).GetComponent<Road>();
+            Road road = Instantiate(prefab_minorRoad, new Vector3(0, 1, 0), Quaternion.identity).GetComponent<Road>();
             road.gameObject.name = string.Format("Road");
 
             // Set its position
@@ -188,7 +214,7 @@ public class CityGen : MonoBehaviour
                     GetBuildingLine(cityPtr, i, j, k, ref sX, ref sY, ref eX, ref eY);
 
                     // Instantiate
-                    Wall wall = Instantiate(prefab_wall, new Vector3(0, minorRoadY, 0), Quaternion.identity).GetComponent<Wall>();
+                    Wall wall = Instantiate(prefab_wall, new Vector3(0, 1, 0), Quaternion.identity).GetComponent<Wall>();
                     wall.SetStart(sX, sY);
                     wall.SetEnd(eX, eY);
                     wall.Adjust();
@@ -215,25 +241,77 @@ public class CityGen : MonoBehaviour
     /// </summary>
     void SpawnTerrain()
     {
-        GameObject terrain = new GameObject("Terrain");
-        
-        // Spawn the grass terrain
-        float scaleAmount = (citySize / 2) / 10;
-        GameObject grass = Instantiate(prefab_terrainGrass, new Vector3(citySize / 2, grassY, citySize / 2), Quaternion.identity);
-        grass.transform.localScale = new Vector3(citySize / 10, 1, citySize / 10);
-        grass.transform.SetParent(terrain.transform);
+        // A gameobject in the hierarchy to hold all of the terrain
+        GameObject terrainHolder = new GameObject("Terrain");
 
-        // Spawn the water terrain
+        // Spawn the grass terrain
+        Terrain terrain = Instantiate(prefab_terrain).GetComponent<Terrain>();
+
+        // How big is the cities terrain
+        int terrainSize = TerrainSize(cityPtr);
+
+        // Get the max/min values
+        float highest = GetTerrainMaximumHeight(cityPtr);
+        float lowest = GetTerrainMinimumHeight(cityPtr);
+
+        Debug.Log(string.Format("Highest height: {0}", highest));
+        Debug.Log(string.Format("Lowest height: {0}", lowest));
+
+        // Set the terrain this big
+        float maxTerrain = highest;
+        terrain.terrainData.size = new Vector3(terrainSize, maxTerrain, terrainSize);
+
+        // Get the height data
+        float[,] heightData = terrain.terrainData.GetHeights(0, 0, terrainSize, terrainSize);
+
+        //--------------------------------------------
+        for (int y = 0; y < terrainSize; y++) { for (int x = 0; x < terrainSize; x++) { heightData[x, y] = 0; } }
+        //--------------------------------------------
+
+        // Populate the height data
+        for (int y = 0; y < terrainSize; y++)
+        {
+            for (int x = 0; x < terrainSize; x++)
+            {
+                // Get the height
+                float height = GetTerrainHeightAt(cityPtr, x, y);
+
+                if (height <= 0) { heightData[x, y] = 0; }
+                else
+                {
+                    // Find it's percent in decimal form
+                    float decimalPercentOfHeight = height / highest;
+
+                    // Debug.Log(decimalPercentOfHeight);
+
+                    // Assign height
+                    heightData[x, y] = decimalPercentOfHeight;
+                }
+            }
+        }
+
+        // Set the height data
+        terrain.terrainData.SetHeights(0, 0, heightData);
+
+        // Spawn the water terrain -----------------------------------------------------------------
+
+        // What percent
+        float percent = GetWaterHeightPercent(cityPtr);
+
+        // The bottom x percent shal be considered water
+        float waterLevel = highest * (percent / 100);
+
+        Debug.Log(string.Format("Water level: {0}", waterLevel));
+
         for (int x = 0; x < citySize; x++)
         {
             for (int y = 0; y < citySize; y++)
             {
                 if (IsWater(cityPtr, x, y))
                 {
-                    GameObject water = Instantiate(prefab_terrainWater, new Vector3(x, waterY, y), Quaternion.identity);
-                    water.transform.SetParent(terrain.transform);
+                    GameObject waterr = Instantiate(prefab_terrainWater, new Vector3(x, waterLevel, y), Quaternion.identity);
+                    waterr.transform.SetParent(terrainHolder.transform);
                 }
-                    
             }
         }
     }

@@ -28,16 +28,19 @@ City::City() {}
 
 City::~City() {}
 
-void City::Generate()
+void City::Generate(int _citySize, float terrainHeight, float percentWater)
 {
+	// Remember the city size
+	citySize = _citySize;
+
 	/* Population map */
 	GeneratePopulationMap();
 
 	/* Terrain */
-	GenerateTerrain();
+	GenerateTerrain(terrainHeight);
 
 	/* Water boundary map */
-	GenerateWaterBoundary();
+	GenerateWaterBoundary(percentWater);
 
 	/* Quad tree */
 	GenerateQuadTree();
@@ -76,23 +79,22 @@ void City::GeneratePopulationMap()
 	populationMap->Generate(citySize);
 }
 
-void City::GenerateTerrain()
+void City::GenerateTerrain(float terrainHeight)
 {
 	std::cout << "Generating terrain." << std::endl;
 	int divisions = citySize;
 	int size = 5;
-	int height = 64;
-	terrain = new DiamondSquare(divisions, size, height);
+	terrain = new DiamondSquare(divisions, size, terrainHeight);
 	terrain->Generate();
 	terrain->CreatePoints();
 	terrain->CalcuateBoundaryPoints();
 }
 
-void City::GenerateWaterBoundary()
+void City::GenerateWaterBoundary(float percentWater)
 {
 	std::cout << "Generating water." << std::endl;
 	waterData = new WaterData(citySize);
-	waterData->LoadFromTerrain(terrain, 10);
+	waterData->LoadFromTerrain(terrain, percentWater);
 }
 
 void City::GenerateQuadTree()

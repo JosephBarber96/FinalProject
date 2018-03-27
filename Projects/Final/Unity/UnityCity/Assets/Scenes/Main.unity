@@ -286,6 +286,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18b8bd2897be6b64ca190e58548fcfc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  terrainHeight: 30
+  waterLevelInPercent: 10
+  buildingHeight: 7.5
   prefab_minorRoad: {fileID: 1326438858396040, guid: da93330756474ec4381072957a517908,
     type: 2}
   prefab_majorRoad: {fileID: 1315216873474402, guid: 28beb55f610ee6c41b1ee4590e913a49,
@@ -298,11 +301,12 @@ MonoBehaviour:
     type: 2}
   prefab_wall: {fileID: 1786656961036404, guid: 58947060c0b85344986302346c844ba1,
     type: 2}
+  prefab_terrain: {fileID: 1086740468993342, guid: d8e4654d15fb06749b31aeb38e21df03,
+    type: 2}
   buildingMaterials:
   - {fileID: 2100000, guid: d71ed3b8279187e4c86178885daed690, type: 2}
   - {fileID: 2100000, guid: fe659ffe484575c4194faefc29390c97, type: 2}
   - {fileID: 2100000, guid: cb44c8f5cfdccad46ade2d2f2f678d06, type: 2}
-  buildingHeight: 5
 --- !u!4 &2067316855
 Transform:
   m_ObjectHideFlags: 0

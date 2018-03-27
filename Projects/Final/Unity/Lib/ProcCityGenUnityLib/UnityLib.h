@@ -5,7 +5,7 @@ class City;
 extern "C"
 {
 	/* City */
-	CITYLIB City* GenerateCity();
+	CITYLIB City* GenerateCity(int citySize, float maxTerrainHeight, float percentWater);
 
 	/* Major roads */
 	CITYLIB int GetMajorRoadCount(City* city);
@@ -23,5 +23,11 @@ extern "C"
 	CITYLIB void GetBuildingLine(City* city, int roadIndex, int buildingIndex, int lineIndex, float &sx, float &sy, float &ex, float &ey);
 
 	/* Terrain */
+	CITYLIB int TerrainSize(City* city);
+	CITYLIB float GetTerrainMaximumHeight(City* city);
+	CITYLIB float GetTerrainMinimumHeight(City* city);
+	CITYLIB float GetTerrainHeightAt(City* city, int x, int y);
+	CITYLIB float GetWaterHeightPercent(City* city);
+	CITYLIB float GetWaterLevel(City* city);
 	CITYLIB bool IsWater(City* city, int x, int y);
 }

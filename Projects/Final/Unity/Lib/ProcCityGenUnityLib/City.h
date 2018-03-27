@@ -22,16 +22,17 @@ public:
 	City();
 	~City();
 
-	void Generate();
+	void Generate(int _citySize, float terrainHeight, float percentWater);
 
 	int CitySize() const { return citySize; }
 	RoadNetwork* GetRoadNetwork() const { return roadNetwork; }
+	DiamondSquare* GetTerrain() const { return terrain; }
 	WaterData* GetWaterData() const { return waterData; }
 
 private:
 	// Vars
-	const int citySize = 512;
-	int offsetForRoadNodes = 5;
+	int citySize;
+	const int offsetForRoadNodes = 5;
 
 	// City components
 	PopulationMap* populationMap;
@@ -44,8 +45,8 @@ private:
 
 private:
 	void GeneratePopulationMap();
-	void GenerateTerrain();
-	void GenerateWaterBoundary();
+	void GenerateTerrain(float terrainHeight);
+	void GenerateWaterBoundary(float percentWater);
 	void GenerateQuadTree();
 	void GenerateVoronoi();
 	void GenerateMinorRoads();
