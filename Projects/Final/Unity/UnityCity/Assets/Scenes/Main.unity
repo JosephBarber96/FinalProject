@@ -286,7 +286,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18b8bd2897be6b64ca190e58548fcfc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  terrainHeight: 30
+  terrainHeight: 50
   waterLevelInPercent: 10
   buildingHeight: 7.5
   prefab_minorRoad: {fileID: 1326438858396040, guid: da93330756474ec4381072957a517908,

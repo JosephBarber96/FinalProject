@@ -35,7 +35,7 @@ public class CityGen : MonoBehaviour
 
     [DllImport("ProcCityGenUnityLib.dll")]
     static extern void MajorRoadSegmentPos(System.IntPtr city, int roadIndex, int segmentIndex, 
-        ref float sx, ref float sy, ref float ex, ref float ey);
+        ref float sx, ref float sz, ref float ex, ref float ez);
 
     /* Minor road value getters */
     [DllImport("ProcCityGenUnityLib.dll")]
@@ -91,17 +91,21 @@ public class CityGen : MonoBehaviour
     public GameObject prefab_terrain;
     public Material[] buildingMaterials;
 
+    /* Private objects we keep reference to */
+    float highestTerrainValue;
+    Terrain terrain;
+
     void Start()
     {
         // Generate the C++ City object
         GenCity();
 
-        // Spawn roads of the city
-        // SpawnMajorRoads();
-        // SpawnMinorRoadsAndBuildings();
-
         // Spawn the terrain
         SpawnTerrain();
+
+        // Spawn roads of the city
+        SpawnMajorRoads();
+        SpawnMinorRoadsAndBuildings();
     }
 
     /// <summary>
@@ -140,14 +144,72 @@ public class CityGen : MonoBehaviour
             for (int j = 0; j < segmentCount; j++)
             {
                 // Find the start and end position of this segment
-                float startX = 0, startY = 0, endX = 0, endY = 0;
-                MajorRoadSegmentPos(cityPtr, i, j, ref startX, ref startY, ref endX, ref endY);
+                float startX = 0, startZ = 0, endX = 0, endZ = 0;
+                MajorRoadSegmentPos(cityPtr, i, j, ref startX, ref startZ, ref endX, ref endZ);
 
-                // Instantiate and place the road
+                // If this segment is out of bounds, continue without spawning it
+                if (ValueOutOfCityBounds(startX) ||
+                    ValueOutOfCityBounds(startZ) ||
+                    ValueOutOfCityBounds(endX) ||
+                    ValueOutOfCityBounds(endZ)) { continue; }
+
+                // Grab the height from the terrain
+                float startY = 0, endY = 0;
+                startY = terrain.terrainData.GetHeight((int)startX, (int)startZ);
+                endY = terrain.terrainData.GetHeight((int)endX, (int)endZ);
+
+                startY += 0.25f;
+                endY += 0.25f;
+
+                //if (startX > 0 && startX < citySize && startZ > 0 && startZ < citySize)
+                //{
+                //    //--------------------------------------------------------------------------------------------------
+                //    //--------------------------------------------------------------------------------------------------
+                //    // Adjust the terrain to sit flush with the road...
+                //    // Find the road vector
+                //    Vector2 roadStart = new Vector2(startX, startZ);
+                //    Vector2 roadEnd = new Vector2(endX, endZ);
+                //    Vector2 roadVector = roadStart - roadEnd;
+
+                //    // Find normalized and magnitude values
+                //    Vector2 roadVectorNormalized = roadVector.normalized;
+                //    float roadMag = roadVector.magnitude;
+
+                //    // Find height values
+                //    float startHeight = startY;
+                //    float endHeight = endY;
+                //    float heightDifference = startHeight - endHeight;
+                //    float heightPerStep = heightDifference / (int)roadMag;
+
+                //    // For the length of the road number of iterations...
+                //    for (int k = 0; k < (int)roadMag; k++)
+                //    {
+                //        // Get the terrain height map
+                //        float[,] heights = terrain.terrainData.GetHeights(0, 0, citySize, citySize);
+
+                //        // Get the index of the current position of the road we're on
+                //        float indexX = roadStart.x + (roadVectorNormalized.x * k);
+                //        float indexZ = roadStart.y + (roadVectorNormalized.y * k);
+
+                //        // Find height - start Height plus heightPetStep multiplied by the current iteration
+                //        float heightValue = startHeight + (heightPerStep * k);
+
+                //        // Turn this into a 0-1 value
+                //        float decimalPercentOfHeight = heightValue / (endHeight - startHeight);
+
+                //        heights[(int)indexX, (int)indexZ] = decimalPercentOfHeight;
+                //    }
+                //    //--------------------------------------------------------------------------------------------------
+                //    //--------------------------------------------------------------------------------------------------
+                //}
+
+                // Instantiate the road
                 Road road = Instantiate(prefab_majorRoad, new Vector3(0, 1, 0), Quaternion.identity).GetComponent<Road>();
                 road.gameObject.name = string.Format("Major_Road_Segment_{0}", j);
-                road.SetStart(startX, startY);
-                road.SetEnd(endX, endY);
+
+                // Position the road
+                road.SetStart(startX, startY, startZ);
+                road.SetEnd(endX, endY, endZ);
                 road.Adjust();
 
                 // Parent in hierarchy
@@ -168,21 +230,35 @@ public class CityGen : MonoBehaviour
         int roadCount = GetMinorRoadCount(cityPtr);
         for (int i = 0; i < roadCount; i++)
         {
+
             // Create a GameObject to hold the Road and the Buildings of this road
             GameObject minorRoad = new GameObject(string.Format("Minor_Road_{0}", i));
             minorRoad.transform.SetParent(minorRoads.transform);
 
             // Get the start and end points of this road
-            float roadSX = 0, roadSY = 0, roadEX = 0, roadEY = 0;
-            MinorRoadPos(cityPtr, i, ref roadSX, ref roadSY, ref roadEX, ref roadEY);
+            float roadSX = 0, roadSZ = 0, roadEX = 0, roadEZ = 0;
+            MinorRoadPos(cityPtr, i, ref roadSX, ref roadSZ, ref roadEX, ref roadEZ);
+
+            // If this road is out of bounds, continue without spawning it
+            if (ValueOutOfCityBounds(roadSX) ||
+                ValueOutOfCityBounds(roadSZ) ||
+                ValueOutOfCityBounds(roadEX) ||
+                ValueOutOfCityBounds(roadEZ)) { continue; }
+
+            // Grab the height from the terrain
+            float roadSY = 0, roadEY = 0;
+            roadSY = terrain.terrainData.GetHeight((int)roadSX, (int)roadSZ);
+            roadEY = terrain.terrainData.GetHeight((int)roadEX, (int)roadEZ);
+            roadSY += 0.25f;
+            roadEY += 0.25f;
 
             // Instantiate the road
             Road road = Instantiate(prefab_minorRoad, new Vector3(0, 1, 0), Quaternion.identity).GetComponent<Road>();
             road.gameObject.name = string.Format("Road");
 
             // Set its position
-            road.SetStart(roadSX, roadSY);
-            road.SetEnd(roadEX, roadEY);
+            road.SetStart(roadSX, roadSY, roadSZ);
+            road.SetEnd(roadEX, roadEY, roadEZ);
             road.Adjust();
 
             // Make it a child in the hierarchy
@@ -193,9 +269,10 @@ public class CityGen : MonoBehaviour
             int buildingCount = MinorRoadBuildingCount(cityPtr, i);
             for (int j = 0; j < buildingCount; j++)
             {
-                // Get the building (x, y) position
-                float buildingX = 0, buildingY = 0;
-                MinorRoadBuildingPos(cityPtr, i, j, ref buildingX, ref buildingY);
+                // Get the building x, z and y position
+                float buildingX = 0, buildingZ = 0;
+                MinorRoadBuildingPos(cityPtr, i, j, ref buildingX, ref buildingZ);
+                float buildingY = terrain.terrainData.GetHeight((int)buildingX, (int)buildingZ);
 
                 // Get number of lines of the building
                 int lineCount = BuildingVertCount(cityPtr, i, j);
@@ -206,22 +283,42 @@ public class CityGen : MonoBehaviour
                 // What material will this building use
                 int buildingMaterialIndexer = (int)Random.Range(0, buildingMaterials.Length);
 
+                // Remember the lowest and highest x and y values of the building
+                float lowestX = int.MaxValue;
+                float lowestZ = int.MaxValue;
+                float highestX = int.MinValue;
+                float highestZ = int.MinValue;
+
                 // For each edge of the building
                 for (int k = 0; k < lineCount; k++)
                 {
                     // Get the line
-                    float sX = 0, sY = 0, eX = 0, eY = 0;
-                    GetBuildingLine(cityPtr, i, j, k, ref sX, ref sY, ref eX, ref eY);
+                    float buildingLineSX = 0, buildingLineSZ = 0, buildingLineEX = 0, buildingLineEZ = 0;
+                    GetBuildingLine(cityPtr, i, j, k, ref buildingLineSX, ref buildingLineSZ, ref buildingLineEX, ref buildingLineEZ);
+
+                    // See if this line holds any lowest/highest valeus
+                    // startX
+                    if (buildingLineSX < lowestX) lowestX = buildingLineSX;
+                    else if (buildingLineSX > highestX) highestX = buildingLineSX;
+                    // startZ
+                    if (buildingLineSZ < lowestZ) lowestZ = buildingLineSZ;
+                    else if (buildingLineSZ > highestZ) highestZ = buildingLineSZ;
+                    // endX
+                    if (buildingLineEX < lowestX) lowestX = buildingLineEX;
+                    else if (buildingLineEX > highestX) highestX = buildingLineEX;
+                    // endZ
+                    if (buildingLineEZ < lowestZ) lowestZ = buildingLineEZ;
+                    else if (buildingLineEZ > highestZ) highestZ = buildingLineEZ;
 
                     // Instantiate
-                    Wall wall = Instantiate(prefab_wall, new Vector3(0, 1, 0), Quaternion.identity).GetComponent<Wall>();
-                    wall.SetStart(sX, sY);
-                    wall.SetEnd(eX, eY);
+                    Wall wall = Instantiate(prefab_wall, new Vector3(0, buildingY, 0), Quaternion.identity).GetComponent<Wall>();
+                    wall.SetStart(buildingLineSX, buildingLineSZ);
+                    wall.SetEnd(buildingLineEX, buildingLineEZ);
                     wall.Adjust();
 
                     // Position and extrude the wall (Y axis for both)
                     wall.transform.localScale = new Vector3(wall.transform.localScale.x, buildingHeight, wall.transform.localScale.z);
-                    wall.transform.position = new Vector3(wall.transform.position.x, buildingHeight / 2, wall.transform.position.z);
+                    wall.transform.position = new Vector3(wall.transform.position.x, (buildingHeight / 2) + buildingY, wall.transform.position.z);
 
                     // Assign a material
                     wall.GetComponent<MeshRenderer>().material = buildingMaterials[buildingMaterialIndexer];
@@ -232,6 +329,30 @@ public class CityGen : MonoBehaviour
 
                 // Set its transform after rotation
                 building.transform.SetParent(minorRoad.transform);
+
+                // Adjust the terrain to be flush
+
+                // Find width and height of buildings
+                float buildingWidth = highestX - lowestX;
+                float buildingLength = highestZ - lowestZ;
+
+                // Find the terrain boundaries to adjust
+                int terrainStartX = (int)buildingX - (int)buildingWidth; //(int)buildingX - (int)(buildingWidth / 2);
+                int terrainEndX = (int)buildingX + (int)buildingWidth; //(int)buildingX + (int)(buildingWidth / 2);
+
+                int terrainStartZ = (int)buildingZ - (int)buildingLength; //(int)buildingZ - (int)(buildingLength / 2);
+                int terrainEndZ = (int)buildingZ + (int)buildingLength; //(int)buildingZ + (int)(buildingLength / 2);
+
+                // Adjust the terrainData
+                float[,] heights = terrain.terrainData.GetHeights(0, 0, citySize, citySize);
+                for (int x = terrainStartX; x < terrainEndX; x++)
+                {
+                    for (int z = terrainStartZ; z < terrainEndZ; z++)
+                    {
+                        heights[z, x] = TerrainDecimalValue(buildingY);
+                    }
+                }
+                terrain.terrainData.SetHeights(0, 0, heights);
             }
         }
     }
@@ -245,28 +366,23 @@ public class CityGen : MonoBehaviour
         GameObject terrainHolder = new GameObject("Terrain");
 
         // Spawn the grass terrain
-        Terrain terrain = Instantiate(prefab_terrain).GetComponent<Terrain>();
+        terrain = Instantiate(prefab_terrain).GetComponent<Terrain>();
 
         // How big is the cities terrain
         int terrainSize = TerrainSize(cityPtr);
 
         // Get the max/min values
-        float highest = GetTerrainMaximumHeight(cityPtr);
+        highestTerrainValue = GetTerrainMaximumHeight(cityPtr);
         float lowest = GetTerrainMinimumHeight(cityPtr);
 
-        Debug.Log(string.Format("Highest height: {0}", highest));
+        Debug.Log(string.Format("Highest height: {0}", highestTerrainValue));
         Debug.Log(string.Format("Lowest height: {0}", lowest));
 
         // Set the terrain this big
-        float maxTerrain = highest;
-        terrain.terrainData.size = new Vector3(terrainSize, maxTerrain, terrainSize);
+        terrain.terrainData.size = new Vector3(terrainSize, highestTerrainValue, terrainSize);
 
         // Get the height data
         float[,] heightData = terrain.terrainData.GetHeights(0, 0, terrainSize, terrainSize);
-
-        //--------------------------------------------
-        for (int y = 0; y < terrainSize; y++) { for (int x = 0; x < terrainSize; x++) { heightData[x, y] = 0; } }
-        //--------------------------------------------
 
         // Populate the height data
         for (int y = 0; y < terrainSize; y++)
@@ -279,13 +395,7 @@ public class CityGen : MonoBehaviour
                 if (height <= 0) { heightData[x, y] = 0; }
                 else
                 {
-                    // Find it's percent in decimal form
-                    float decimalPercentOfHeight = height / highest;
-
-                    // Debug.Log(decimalPercentOfHeight);
-
-                    // Assign height
-                    heightData[x, y] = decimalPercentOfHeight;
+                    heightData[x, y] = TerrainDecimalValue(height);
                 }
             }
         }
@@ -299,7 +409,7 @@ public class CityGen : MonoBehaviour
         float percent = GetWaterHeightPercent(cityPtr);
 
         // The bottom x percent shal be considered water
-        float waterLevel = highest * (percent / 100);
+        float waterLevel = highestTerrainValue * (percent / 100);
 
         Debug.Log(string.Format("Water level: {0}", waterLevel));
 
@@ -314,5 +424,38 @@ public class CityGen : MonoBehaviour
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Returns the 0-1 value of a given height for use in setting
+    /// terrain height
+    /// </summary>
+    /// <param name="height"></param>
+    /// <returns></returns>
+    private float TerrainDecimalValue(float height)
+    {
+        // Find the heights percent in decimal form
+        float decimalPercentOfHeight = height / highestTerrainValue;
+        return decimalPercentOfHeight;
+    }
+
+    /// <summary>
+    /// Checks whether a given x or y value is outside of the city terrain bounds
+    /// </summary>
+    /// <param name="val"></param>
+    /// <returns></returns>
+    private bool ValueOutOfCityBounds(float val)
+    {
+        return (val < 0 || val > citySize);
+    }
+
+    /// <summary>
+    /// Checks whether a given x or y value is outside of the city terrain bounds
+    /// </summary>
+    /// <param name="val"></param>
+    /// <returns></returns>
+    private bool ValueOutOfCityBounds(int val)
+    {
+        return (val < 0 || val > citySize);
     }
 }
