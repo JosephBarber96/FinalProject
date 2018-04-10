@@ -26,7 +26,7 @@ This can be installed from: https://dl.bintray.com/boostorg/release/1.65.1/binar
 Download and install boost_1_65_1-msvc-10.0-32.exe to C:\   
 The include directory used in the Visual Studio .sln is C:\local\boost_1_65_1  
 
-**Instructions:**
+### Instructions:
 
 * Go to SourceCode\Final\Standalone
 * Open ProceduralCityGenerator.sln in Visual Studio 2015
@@ -36,7 +36,7 @@ The include directory used in the Visual Studio .sln is C:\local\boost_1_65_1
 If an error occurs, abort and re-run.  
 Follow the instructions printed to the console window to control the application.
 
-**Fixing linker errors:**
+### Fixing linker errors:
 
 Whilst the repository contains the required SFML files, if you get a linker error, follow these steps:  
 Add these to the sln properties:
@@ -70,7 +70,7 @@ To install Unity, go to: https://store.unity.com/
 
 Install the Free (Personal) version of Unity3D
 
-**Instructions:**
+## Instructions:
 
 **Running the application:**
 
