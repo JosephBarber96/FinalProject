@@ -1,77 +1,57 @@
-﻿--Bibliography--
-[Sorted Alphabetically]
+﻿Brown, B. (2011). Prim's Algorithm: Minimal Spanning Tree. [Online] 15th May 2011. Available online: https://www.youtube.com/watch?v=YyLaRffCdk4 [Date of access: 02 October 2017].
 
-[1]
-Brown, B. (2011). Prim's Algorithm: Minimal Spanning Tree. [Online] 15th May 2011. Available online: https://www.youtube.com/watch?v=YyLaRffCdk4 [Date of access: 02 October 2017].
-
-[2]
 Chen G. Esch G. Wonka P. Mueller P. Zhang E. (2008). "Interactive Procedural Street Modeling" In Proceedings of SIGGRAPH 2008. ACM Trans. Graph. Article 103: 1-10.
 
-[3]
+CodeProject. (2007). How to Marshal a C++ Class. [Blogpost] March 15, 2007. Available online: https://www.codeproject.com/Articles/18032/How-to-Marshal-a-C-Class [Date of access: 27 February 2018]
+
 Emilien, A., Bernhardt, A., Peytavie, A., Cani, M. and Galin, E. (2012). Procedural generation of villages on arbitrary terrains. *The Visual Computer*, 28(6-8), pp.809-818.
 
-[4]
 Eppstein, D. (1996). Design and Analysis of Algorithms – Minimum Spanning Trees. [Online] 6th Feburary 1996. Available online: https://www.ics.uci.edu/~eppstein/161/960206.html [Date of access: 29 October 2017]
 
-[5]
 Evans, M. (2015). Procedual Generation For Dummies: Road Generation. [Online] 11 December 2015. Available online: http://martindevans.me/game-development/2015/12/11/Procedural-Generation-For-Dummies-Roads/ [Date of access: 19 May 2017]
 
-[6]
 Goldman, R., Schaefer, S. and Ju, T. (2004). Turtle geometry in computer graphics and computer-aided design. *Computer Aided Design*, 36(14), pp.1471-1482.
 
-[7]
 Greuter, S. Parker, J. Stewart, N. Leach, G. (2003). "Real-time procedural generation of 'pseudo infinite' cities". In *Proceedings of the 1st international conference on Computer graphics and interactive techniques in Astralasia and South East Asia* (GRAPHITE '03) Acm, New York, Ny, USA, 87 - ff.
 
-[8]
+Hardly Difficult. (2016) C++ in Unity3D Tutorial (C# Marshaling). [Blogpost] January 08, 2016. Available online: https://www.youtube.com/watch?v=w3jGgTHJoCY [Date of access: 27 February 2018]
+
 Havey, D. (2008). Tutorial #7: Voronoi diagrams [Online] May 4, 2008. Available online: http://donhavey.com/blog/tutorials/tutorial-7-voronoi-diagrams/ [Date of access: 30 May 2017]
 
-[9]
 Ilangovan, K, P. (2009) Procedural City Generaror, MSc thesus, Bournemouth University. Available at: https://nccastaff.bournemouth.ac.uk/jmacey/MastersProjects/MSc09/Ilangovan/Thesis_i7834000.pdf (Accessed: 30 May 2017).
 
-[10]
 Kelly, G. McCabe, H. (2006). "A Survey of Procedural Techniques for City Generation". In *ITB Journal, No. 14*.
 
-[11]
 Kelly, G and McCabe, H. (2006). "Interactive generation of cities for real-time applications" In Proceedings of SIGGRAPH '06 ACM SIGGRAPH 2006 Research Posters - SIGGRAPH '06
 
-[12]
 Martek, C. (2012). "Procedural generation of road networks for large virtual environments." Rochester Institute of Technology.
 
-[13]
 Martz, P. (1997). *Generating Random Fractal Terrain*. [Online] 1997. Available Online: http://www.gameprogrammer.com/fractal.html [Date of access: 09 May 2016]
 
-[14]
 Muller, P and Parish, Y, I, H.  (2001). "Procedural modeling of cities". In Proceedings of the 28th annual conference on Computer graphics and interactive techniques (SIGGRAPH '01). Acm, New York, NY, USA. 301 - 308.
 
-[15]
 Muller, P. Wonka, P. Haegler, S. Ulmer, A. Goo, L, V. (2006). "Procedural modeling of buildings" In Proceedings of SIGGRAPH 06' ACM SIGGRAPH 2006. Acm, New York, NY, USA. 614 - 623.
 
-[16]
 Omar, A. (2017). Unity Tutorials: Diamond-Square Procedural Terrain. [Online] 26th January 2017. Available online: https://www.youtube.com/watch?v=1HV8GbFnCik [Date of access: 14 December 2017].
 
-[17]
 Prusinkiewicx, P. and Janan, J. (1992). "Lindenmayer systems, fractals, and plants." New York, N.Y.: Springer-Verlag.
 
-[18]
 Rose, T and Bakaoukas, A. (2016). "Algorithms and Approaches for Procedural Terrain Generation - A Brief Review of Current Techniques". 2016 8th International Conference on Games and Virtual Worlds for Serious Applications (VS-GAMES). 1-2.
 
-[19]
 Red Blob Games. (2014) Introduction to A*. [Online] June 2016. Available online: http://www.redblobgames.com/pathfinding/a-star/introduction.html [Date of access: 29 September 2017].
 
-[20]
 Runions, A. Lane, B and Prusinkiewicz, P. (2007) "Modeling trees with a space colonization algorithm" In Proceedings of the Third Eugographics conference on Natural Phenomena. Prague, Czech Republic. pp 63 - 70.
 
-[21]
 Samet, H. (1995). Spatial Data Structures. Addison-Wesley.
 
-[22]
 Smelik, R., Tutenel, T., de Kraker, K. and Bidarra, R. (2011). A declarative approach to procedural modeling of virtual worlds. *Computers & Graphics*, 35(2), pp.352-363.
 
-[23]
 Smelik, R., Tutenel, T., Bidarra, R. and Benes, B. (2014). A survey on Procedural Modelling for Virtual Worlds. *Computer Graphics Forum*, 33(6), pp.31-50.
 
-[24]
 Sun, J. Yu, X. Baciu, G. Green, M. (2002). "Template-based generation of road networks for virtual city modeling". In Proceedings of the ACM symposium on Virtual reality software and technology (VRST '02). Acm, New Work, NY, USA, 33 - 40.
 
-[25]
 Tmwhere. (Date Unknown) Procedural City Generation. [Online] Date unnown. Available online: http://www.tmwhere.com/city_generation.html [Date of access: 27 October 2017].
+
+Unity3D (2018) Terrain. Available at: https://docs.unity3d.com/ScriptReference/Terrain.html [Date of access: 25 March 2018]
+
+Zucconi, A. (2015) How to Write Native Plugins for Unity. [Blogpost] October 11, 2015. Available online: https://www.alanzucconi.com/2015/10/11/how-to-write-native-plugins-for-unity/ [Date of access: 27 February 2018]
