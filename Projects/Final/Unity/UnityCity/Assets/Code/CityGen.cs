@@ -9,14 +9,17 @@ public class CityGen : MonoBehaviour
 
     [Header("Terrain height")]
     [SerializeField]
+    [Range(2, 25)]
     private float terrainHeight;
 
     [Header("Water level (percent)")]
     [SerializeField]
+    [Range(0, 50)]
     private float waterLevelInPercent;
 
     [Header("Building height")]
     [SerializeField]
+    [Range(5, 15)]
     private float buildingHeight;
 
     /* An IntPtr for holding the memory address of the C++ City object */
@@ -81,7 +84,7 @@ public class CityGen : MonoBehaviour
     static extern bool IsWater(System.IntPtr city, int x, int y);
 
     /* Prefabs */
-    [Header("Prefabs")]
+    [Header("Prefabs (Do not touc")]
     public GameObject prefab_minorRoad;
     public GameObject prefab_majorRoad;
     public GameObject prefab_building;
