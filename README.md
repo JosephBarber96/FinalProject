@@ -37,7 +37,7 @@ Whilst the repository contains the required SFML files, if you get a linker erro
 
 Add these to the sln properties:
 
-*Aditional include directories:*
+*Additional include directories:*
 
 * $(SolutionDir)\\..\\..\Libraries\SFML-2.4.2\include
 * C:\local\boost_1_65_1
