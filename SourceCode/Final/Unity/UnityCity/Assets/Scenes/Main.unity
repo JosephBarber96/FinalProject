@@ -273,96 +273,6 @@ MonoBehaviour:
   zoomSpeed: 2
   dragSpeed: 6
   moveSpeed: 10
---- !u!1 &1119700476
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 1119700480}
-  - component: {fileID: 1119700479}
-  - component: {fileID: 1119700477}
-  - component: {fileID: 1119700478}
-  m_Layer: 5
-  m_Name: Text_Loading
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1119700477
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1119700476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
-    m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
-    m_Alignment: 4
-    m_AlignByGeometry: 0
-    m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
-    m_LineSpacing: 1
-  m_Text: "Please wait, city is being generated.\nThis can take upwards of 30 seconds.\n\nIf
-    you are waiting over a minute, please exit the \napplication and reload."
---- !u!114 &1119700478
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1119700476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -900027084, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
-  m_EffectDistance: {x: 1, y: -1}
-  m_UseGraphicAlpha: 1
---- !u!222 &1119700479
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1119700476}
---- !u!224 &1119700480
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1119700476}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1844178100}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 400, y: 200}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1235536735
 GameObject:
   m_ObjectHideFlags: 0
@@ -397,8 +307,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -14.9}
-  m_SizeDelta: {x: 138, y: 187.97}
+  m_AnchoredPosition: {x: 0, y: -13.219545}
+  m_SizeDelta: {x: 138, y: 192.73}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1235536737
 MonoBehaviour:
@@ -502,7 +412,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 95.4016}
+  m_AnchoredPosition: {x: 0, y: 100.2}
   m_SizeDelta: {x: 130, y: 19}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1598099237
@@ -602,12 +512,12 @@ RectTransform:
   - {fileID: 1598099236}
   - {fileID: 1235536736}
   m_Father: {fileID: 1844178100}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -327.52, y: -113.27}
-  m_SizeDelta: {x: -655.04, y: -226.63}
+  m_AnchoredPosition: {x: -327.52002, y: -110.55}
+  m_SizeDelta: {x: -655.04, y: -221.18}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1610406963
 MonoBehaviour:
@@ -672,7 +582,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dab3a329fac8c1441b672d525a6a0185, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadingText: {fileID: 1119700477}
+  loadingText: {fileID: 0}
 --- !u!114 &1844178097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -740,7 +650,6 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
-  - {fileID: 1119700480}
   - {fileID: 1610406962}
   m_Father: {fileID: 0}
   m_RootOrder: 3

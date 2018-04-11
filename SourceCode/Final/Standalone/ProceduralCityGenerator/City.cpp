@@ -78,14 +78,14 @@ void City::Draw()
 
 	bool drawPopMap = false,
 		drawHeightMap = false,
-		drawWaterBoundaryMap = false,
+		drawWaterBoundaryMap = true,
 		drawQuadTree = false,
 		drawMstNodes = false,
 		drawRoads = true,
 		drawMST = false,
 		drawBuildingLots = false,
-		drawBuildings = false,
-		drawMinorRoads = false,
+		drawBuildings = true,
+		drawMinorRoads = true,
 		drawVoronoiPointsForMinorRoads = false;
 
 	std::cout << std::endl << "Instructions: " << std::endl;
@@ -96,10 +96,9 @@ void City::Draw()
 	std::cout << "\t5: Toggle mst nodes" << std::endl;
 	std::cout << "\t6: Toggle roads" << std::endl;
 	std::cout << "\t7: Toggle MST" << std::endl;
-	std::cout << "\t8: Toggle building lots" << std::endl;
-	std::cout << "\t9: Toggle buildings" << std::endl;
-	std::cout << "\t0: Toggle minor roads" << std::endl;
-	std::cout << "\tz: Toggle minor road voronoi points" << std::endl;
+	std::cout << "\t8: Toggle minor roads" << std::endl;
+	std::cout << "\t9: Toggle building lots" << std::endl;
+	std::cout << "\t0: Toggle buildings" << std::endl;
 	std::cout << std::endl;
 	std::cout << "\t WASD - Move camera" << std::endl;
 	std::cout << "\t Q/E - (Un)zoom camera" << std::endl;
@@ -121,10 +120,9 @@ void City::Draw()
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num5)) { drawMstNodes = !drawMstNodes; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num6)) { drawRoads = !drawRoads; }
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num7)) { drawMST = !drawMST; }
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num8)) { drawBuildingLots = !drawBuildingLots; }
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num9)) { drawBuildings = !drawBuildings; }
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num0)) { drawMinorRoads = !drawMinorRoads; }
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Z)) { drawVoronoiPointsForMinorRoads = !drawVoronoiPointsForMinorRoads; }
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num8)) { drawMinorRoads = !drawMinorRoads; }
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num9)) { drawBuildingLots = !drawBuildingLots; }
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num0)) { drawBuildings = !drawBuildings; }
 
 				// Camera movement
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
@@ -327,19 +325,6 @@ void City::Draw()
 			}
 		}
 
-		/* Minor road expansion points */
-		//if (drawVoronoiPointsForMinorRoads)
-		//{
-		//	for (auto point : voronoiPoints)
-		//	{
-		//		sf::CircleShape shape;
-		//		shape.setPosition(point.x(), point.y());
-		//		shape.setFillColor(sf::Color::Cyan);
-		//		shape.setRadius(1);
-		//		window.draw(shape);
-		//	}
-		//}
-
 		/* MST */
 		if (drawMST)
 		{
@@ -519,7 +504,7 @@ void City::GenerateBuildingLots()
 {
 	std::cout << "Generating building lots." << std::endl;
 	roadNetwork->GenerateBuildingLots();
-	roadNetwork->ValidateBuildingLots();
+	roadNetwork->ValidateBuildingLots(waterData);
 }
 
 void City::GenerateBuildings()

@@ -26,7 +26,7 @@ public:
 	void GenerateMajorRoads(MinimumSpanningTree* mst, int offsetForRoadNodes);
 	void ValidateRoads(WaterData* wd);
 	void GenerateBuildingLots();
-	void ValidateBuildingLots();
+	void ValidateBuildingLots(WaterData* waterData);
 	void GenerateBuildings();
 
 	/* Value getters */

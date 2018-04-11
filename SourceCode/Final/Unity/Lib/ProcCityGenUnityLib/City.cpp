@@ -202,7 +202,7 @@ void City::GenerateBuildingLots()
 {
 	std::cout << "Generating building lots." << std::endl;
 	roadNetwork->GenerateBuildingLots();
-	roadNetwork->ValidateBuildingLots();
+	roadNetwork->ValidateBuildingLots(waterData);
 }
 
 void City::GenerateBuildings()

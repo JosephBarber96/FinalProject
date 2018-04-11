@@ -10,6 +10,5 @@ public class CanvasController : MonoBehaviour
 
     public void HideLoadingText()
     {
-        loadingText.text = "";
     }
 }

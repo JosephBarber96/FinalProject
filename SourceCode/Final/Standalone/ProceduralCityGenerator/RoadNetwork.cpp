@@ -322,11 +322,29 @@ void RoadNetwork::GenerateBuildingLots()
 	std::cout << std::endl;
 }
 
-void RoadNetwork::ValidateBuildingLots()
+void RoadNetwork::ValidateBuildingLots(WaterData* waterData)
 {
 	std::cout << "Checking for building lot collisions..." << std::endl;
 
 	/* MINOR ROADS */
+
+	/* Remove any buildingLots ontop of water */
+	for (MinorRoad* minorRoad : minorRoads)
+	{
+		for (BuildingLot* lot : minorRoad->lots)
+		{
+			if (waterData->IsWater(lot->minX, lot->minY)
+				||
+				waterData->IsWater(lot->minX, lot->maxY)
+				||
+				waterData->IsWater(lot->maxX, lot->minY)
+				||
+				waterData->IsWater(lot->maxX, lot->maxY))
+			{
+				lot->markForDeletion = true;
+			}
+		}
+	}
 
 	/* First, we prioritive collisions against minor roads and major roads */
 	std::cout << "Between minor roads..." << std::endl;
