@@ -360,9 +360,9 @@ public class CityGen : MonoBehaviour
                     {
                         // Clamp the values in bounds
                         if (x < 0) x = 0;
-                        else if (x > citySize) x = citySize;
+                        else if (x >= citySize) x = citySize-1;
                         if (z < 0) z = 0;
-                        else if (z > citySize) z = citySize;
+                        else if (z >= citySize) z = citySize-1;
                         
                         // Assign
                         heights[z, x] = TerrainDecimalValue(buildingY);
