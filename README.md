@@ -4,6 +4,10 @@
 
 https://josephbarberfinalproject.wordpress.com/
 
+## Read more:
+
+http://jbarber.me/finalProject.html
+
 ## Introduction and explanation:
 
 **An investigation into techniques for procedurally generating realistic cities.**
